@@ -69,7 +69,8 @@ function AuthModal({ mode: initialMode, onClose }: { mode: "login" | "signup", o
           </div>
         )}
 
-        {!checkEmail && <div style={{ marginBottom:24, textAlign:"center" }}>
+        {!checkEmail && <>
+        <div style={{ marginBottom:24, textAlign:"center" }}>
           <h2 style={{ fontSize:22, fontWeight:800, color:"#fff", letterSpacing:"-0.03em", marginBottom:6 }}>
             {mode === "login" ? "Welcome back" : "Create your account"}
           </h2>
@@ -114,7 +115,7 @@ function AuthModal({ mode: initialMode, onClose }: { mode: "login" | "signup", o
             {mode === "login" ? "Sign up" : "Sign in"}
           </button>
         </p>
-        </div>}
+        </>}
       </div>
       <style>{`@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} } input::placeholder{color:rgba(255,255,255,0.2)} input:focus{outline:none;border-color:#2DD4BF!important}`}</style>
     </div>
