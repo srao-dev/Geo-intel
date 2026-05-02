@@ -1,6 +1,6 @@
 "use client"
 
-import { BarChart3, Globe, Building2, ChevronRight, Zap, Quote, LogOut } from "lucide-react"
+import { BarChart3, Globe, Building2, ChevronRight, Quote, LogOut, Plus } from "lucide-react"
 import { useState } from "react"
 import { useAuth } from "@/lib/auth-context"
 
@@ -14,9 +14,10 @@ interface SidebarProps {
   companies?: { id: string; name: string }[]
   selectedCompanyId?: string
   onSelectCompany?: (id: string) => void
+  onCreateNew?: () => void
 }
 
-export function Sidebar({ companies = [], selectedCompanyId, onSelectCompany }: SidebarProps) {
+export function Sidebar({ companies = [], selectedCompanyId, onSelectCompany, onCreateNew }: SidebarProps) {
   const [selectedNav, setSelectedNav] = useState("visibility")
   const { user, logout } = useAuth()
 
@@ -53,15 +54,18 @@ export function Sidebar({ companies = [], selectedCompanyId, onSelectCompany }: 
 
       {/* Companies */}
       <div className="flex-1 overflow-y-auto px-3 py-4">
-        <div className="mb-2 px-2">
-          <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            Companies Tracked
-          </span>
+        <div className="mb-2 flex items-center justify-between px-2">
+          <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Companies Tracked</span>
+          {onCreateNew && (
+            <button onClick={onCreateNew} className="rounded p-0.5 text-muted-foreground hover:bg-muted hover:text-primary transition-colors" title="Add company">
+              <Plus className="h-3.5 w-3.5" />
+            </button>
+          )}
         </div>
         <div className="mb-6 flex flex-col gap-1">
           {companies.length === 0 ? (
             <p className="px-3 py-2 text-xs text-muted-foreground">No companies yet</p>
-          ) : (
+          ) : companies.length > 0 && (
             companies.map((company) => (
               <button
                 key={company.id}

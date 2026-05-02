@@ -11,18 +11,7 @@ import { MentionsCoverage } from "@/components/mentions-coverage"
 import { ShareOfVoice } from "@/components/share-of-voice"
 import { SetupWizard } from "@/components/setup-wizard"
 import { useAuth } from "@/lib/auth-context"
-
-const API_BASE = "http://localhost:3000/api"
-
-interface Stats {
-  visibility: number
-  rank: number | null
-  mentionCount: number
-  totalResponses: number
-  shareOfVoice: { name: string; visibility: number; isOurBrand: boolean }[]
-  availableModels: string[]
-  lastRunAt: string | null
-}
+import { getCompanies, getDashboardStats, getRankings } from "@/lib/queries"
 
 function formatLastRun(iso: string | null) {
   if (!iso) return "Never"
@@ -34,60 +23,95 @@ function formatLastRun(iso: string | null) {
   return `${Math.floor(hrs / 24)}d ago`
 }
 
+interface Stats {
+  visibility: number
+  rank: number | null
+  mentionCount: number
+  totalResponses: number
+  shareOfVoice: { name: string; visibility: number; isOurBrand: boolean }[]
+  availableModels: string[]
+  lastRunAt: string | null
+}
+
 export default function DashboardPage() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
-  const [selectedModel, setSelectedModel] = useState("all")
   const [selectedRange, setSelectedRange] = useState("Last 30 days")
   const [days, setDays] = useState(30)
-  const [rankings, setRankings] = useState<any[]>([])
-  const [stats, setStats] = useState<Stats | null>(null)
   const [showSetup, setShowSetup] = useState(false)
+  const [companies, setCompanies] = useState<{ id: string; name: string }[]>([])
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null)
+  const [stats, setStats] = useState<Stats | null>(null)
+  const [rankings, setRankings] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-  // Redirect to auth if not logged in
+  // Redirect if not logged in
   useEffect(() => {
     if (!authLoading && !user) router.push("/auth")
   }, [authLoading, user, router])
 
+  // Load companies
+  useEffect(() => {
+    if (!user) return
+    getCompanies(user.id).then(data => {
+      setCompanies(data)
+      if (data.length > 0) setSelectedCompanyId(data[0].id)
+      else setLoading(false)
+    }).catch(() => setLoading(false))
+  }, [user])
+
+  // Load dashboard data when company or range changes
   const fetchData = useCallback(async () => {
-    const params = new URLSearchParams({ days: String(days), model: selectedModel })
-    const [statsRes, rankingsRes] = await Promise.all([
-      fetch(`${API_BASE}/stats?${params}`).then((r) => r.json()).catch(() => null),
-      fetch(`${API_BASE}/rankings`).then((r) => r.json()).catch(() => ({ rankings: [] })),
-    ])
-    if (statsRes) setStats(statsRes)
-    setRankings(rankingsRes.rankings || [])
-  }, [days, selectedModel])
+    if (!selectedCompanyId) return
+    setLoading(true)
+    try {
+      const [statsData, rankingsData] = await Promise.all([
+        getDashboardStats(selectedCompanyId, days),
+        getRankings(selectedCompanyId),
+      ])
+      setStats(statsData)
+      setRankings(rankingsData)
+    } catch (err) {
+      console.error("Failed to fetch dashboard data:", err)
+    } finally {
+      setLoading(false)
+    }
+  }, [selectedCompanyId, days])
 
   useEffect(() => { fetchData() }, [fetchData])
 
   const handleRunNow = async () => {
-    await fetch(`${API_BASE}/track/start`, { method: "POST" })
+    if (!selectedCompanyId) return
+    await fetch('/api/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ companyId: selectedCompanyId }),
+    })
     setTimeout(fetchData, 3000)
   }
 
   const handleRangeChange = (range: string, d: number) => { setSelectedRange(range); setDays(d) }
 
-  const ourBrand = rankings.find((r) => r.isOurBrand)
+  const ourBrand = rankings.find(r => r.isOurBrand)
 
   const kpiData = [
     {
       label: "Visibility",
       value: stats ? `${stats.visibility}%` : "—",
-      delta: stats?.totalResponses ? `${stats.mentionCount} of ${stats.totalResponses}` : "No data",
+      delta: stats?.totalResponses ? `${stats.mentionCount} of ${stats.totalResponses} responses` : "No data yet",
       trend: (stats?.visibility ?? 0) >= 50 ? "up" as const : "down" as const,
     },
     {
       label: "Your Rank",
       value: stats?.rank ? `#${stats.rank}` : "—",
-      delta: stats?.rank ? `of ${stats.shareOfVoice.length} tracked` : "No data",
+      delta: stats?.rank ? `of ${stats.shareOfVoice.length} tracked` : "No data yet",
       trend: (stats?.rank ?? 99) <= 2 ? "up" as const : "neutral" as const,
     },
     {
       label: "Avg Position",
       value: ourBrand?.avgPosition ? `#${ourBrand.avgPosition}` : "—",
       delta: "In AI numbered lists",
-      trend: ourBrand?.avgPosition <= 2 ? "up" as const : "neutral" as const,
+      trend: "neutral" as const,
     },
     {
       label: "Sentiment",
@@ -99,7 +123,7 @@ export default function DashboardPage() {
 
   if (authLoading || !user) return null
 
-  const hasData = rankings.length > 0 || (stats?.totalResponses ?? 0) > 0
+  const hasData = companies.length > 0 && selectedCompanyId && (rankings.length > 0 || (stats?.totalResponses ?? 0) > 0)
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
@@ -115,7 +139,14 @@ export default function DashboardPage() {
               <X className="h-4 w-4" />
             </button>
             <SetupWizard
-              onComplete={() => { setShowSetup(false); fetchData() }}
+              onComplete={() => {
+                setShowSetup(false)
+                // Reload companies then refresh data
+                if (user) getCompanies(user.id).then(data => {
+                  setCompanies(data)
+                  if (data.length > 0) setSelectedCompanyId(data[0].id)
+                })
+              }}
               onSaveExit={() => setShowSetup(false)}
             />
           </div>
@@ -123,25 +154,27 @@ export default function DashboardPage() {
       )}
 
       <Sidebar
-        companies={rankings.filter(r => r.isOurBrand).map(r => ({ id: r.name, name: r.name }))}
-        selectedCompanyId={rankings.find(r => r.isOurBrand)?.name}
+        companies={companies}
+        selectedCompanyId={selectedCompanyId || undefined}
+        onSelectCompany={setSelectedCompanyId}
+        onCreateNew={() => setShowSetup(true)}
       />
 
       <main className="flex flex-1 flex-col overflow-hidden">
         <DashboardHeader
           models={stats?.availableModels || []}
-          selectedModel={selectedModel}
+          selectedModel="all"
           selectedRange={selectedRange}
           lastTracked={formatLastRun(stats?.lastRunAt || null)}
-          onModelChange={setSelectedModel}
+          onModelChange={() => {}}
           onRangeChange={handleRangeChange}
           onRunNow={handleRunNow}
         />
 
         <div className="flex flex-1 flex-col gap-3 overflow-hidden p-4">
 
-          {/* Empty state — no companies tracked yet */}
-          {!hasData && (
+          {/* Empty state */}
+          {!selectedCompanyId && !loading && (
             <div className="flex flex-1 flex-col items-center justify-center gap-4">
               <div className="rounded-full bg-primary/10 p-5">
                 <Plus className="h-8 w-8 text-primary" />
@@ -160,35 +193,39 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Dashboard content — only show when data exists */}
-          {hasData && <>
-          {/* KPI Row */}
-          <div className="grid flex-shrink-0 grid-cols-2 gap-3 sm:grid-cols-4">
-            {kpiData.map((kpi) => (
-              <KPICard key={kpi.label} label={kpi.label} value={kpi.value} delta={kpi.delta} trend={kpi.trend} />
-            ))}
-          </div>
+          {/* Loading */}
+          {loading && selectedCompanyId && (
+            <div className="flex flex-1 items-center justify-center">
+              <div className="text-sm text-muted-foreground">Loading dashboard...</div>
+            </div>
+          )}
 
-          {/* Main content — fills remaining height */}
-          <div className="flex flex-1 gap-3 overflow-hidden">
-            {/* Left column: Mentions + Share of Voice */}
-            <div className="flex w-72 flex-shrink-0 flex-col gap-3">
-              <MentionsCoverage
-                mentionCount={stats?.mentionCount || 0}
-                totalResponses={stats?.totalResponses || 0}
-                models={ourBrand?.models || []}
-              />
-              <div className="flex-1 overflow-hidden">
-                <ShareOfVoice data={stats?.shareOfVoice || []} />
+          {/* Dashboard content */}
+          {!loading && selectedCompanyId && (
+            <>
+              <div className="grid flex-shrink-0 grid-cols-2 gap-3 sm:grid-cols-4">
+                {kpiData.map(kpi => (
+                  <KPICard key={kpi.label} label={kpi.label} value={kpi.value} delta={kpi.delta} trend={kpi.trend} />
+                ))}
               </div>
-            </div>
 
-            {/* Right: Ranking table fills all remaining space */}
-            <div className="flex flex-1 flex-col overflow-hidden">
-              <RankingTable data={rankings} />
-            </div>
-          </div>
-          </>}
+              <div className="flex flex-1 gap-3 overflow-hidden">
+                <div className="flex w-72 flex-shrink-0 flex-col gap-3">
+                  <MentionsCoverage
+                    mentionCount={stats?.mentionCount || 0}
+                    totalResponses={stats?.totalResponses || 0}
+                    models={ourBrand?.models || []}
+                  />
+                  <div className="flex-1 overflow-hidden">
+                    <ShareOfVoice data={stats?.shareOfVoice || []} />
+                  </div>
+                </div>
+                <div className="flex flex-1 flex-col overflow-hidden">
+                  <RankingTable data={rankings} />
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </main>
     </div>

@@ -6,8 +6,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Plus, Trash2, Loader2, ArrowRight, Building2, Users, MessageSquare, Cpu, ClipboardList } from "lucide-react"
-
-const API_BASE = "http://localhost:3000/api"
+import { supabase } from "@/lib/supabase"
+import { saveCompany } from "@/lib/queries"
 
 interface SetupWizardProps {
   onComplete: () => void
@@ -52,34 +52,14 @@ export function SetupWizard({ onComplete, onSaveExit }: SetupWizardProps) {
   })
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [configRes, companyRes] = await Promise.all([
-          fetch(`${API_BASE}/config`).then(r => r.json()).catch(() => ({})),
-          fetch(`${API_BASE}/company`).then(r => r.json()).catch(() => ({})),
-        ])
-        if (configRes.availableModels) {
-          setLlmProviders(Object.entries(configRes.availableModels as Record<string, string[]>).map(([name, models]) => ({ name, models })))
-        }
-        if (companyRes.company) {
-          const c = companyRes.company
-          const selectedModels: { provider: string; model: string }[] = []
-          if (c.llms) Object.entries(c.llms as Record<string, string[]>).forEach(([provider, models]) => models.forEach(model => selectedModels.push({ provider, model })))
-          setData({
-            name: c.name || "", url: c.url || "", description: c.description || "",
-            industry: c.industry || "", icpDescription: c.icpDescription || "",
-            competitors: c.competitors?.length ? c.competitors.map((name: string) => ({ name, url: "" })) : [{ name: "", url: "" }],
-            prompts: c.prompts?.length ? c.prompts.map((p: { text: string }) => p.text) : [""],
-            selectedModels,
-          })
-        }
-      } catch (err) {
-        console.error("Failed to load config:", err)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-    loadData()
+    // Static model list — no longer needs the Express backend
+    setLlmProviders([
+      { name: "ChatGPT", models: ["GPT-5.3", "GPT-5.5"] },
+      { name: "Claude", models: ["Claude Sonnet 4.6", "Claude Opus 4.6", "Claude Haiku 4.5"] },
+      { name: "Gemini", models: ["Gemini 3 Flash"] },
+      { name: "Perplexity", models: ["Sonar"] },
+    ])
+    setIsLoading(false)
   }, [])
 
   const update = <K extends keyof CompanyData>(key: K, value: CompanyData[K]) => setData(prev => ({ ...prev, [key]: value }))
@@ -110,11 +90,25 @@ export function SetupWizard({ onComplete, onSaveExit }: SetupWizardProps) {
     if (!canProceed()) return
     setIsSubmitting(true)
     try {
-      const saveRes = await fetch(`${API_BASE}/company`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(buildPayload()) })
-      if (!saveRes.ok) throw new Error("Failed to save company data")
-      const trackRes = await fetch(`${API_BASE}/track/start`, { method: "POST" })
-      const trackData = await trackRes.json()
-      if (!trackData.success) throw new Error(trackData.error || "Failed to start tracking")
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error("Not logged in")
+
+      const companyId = await saveCompany(user.id, {
+        name: data.name, url: data.url, description: data.description,
+        industry: data.industry, icpDescription: data.icpDescription,
+        competitors: data.competitors.filter(c => c.name.trim()).map(c => c.name),
+        prompts: data.prompts.filter(p => p.trim()),
+        selectedModels: data.selectedModels,
+      })
+
+      // Start tracking job via Next.js API route
+      const trackRes = await fetch('/api/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ companyId }),
+      })
+      if (!trackRes.ok) throw new Error("Failed to start tracking")
+
       onComplete()
     } catch (err) {
       console.error("Submit failed:", err)
@@ -124,7 +118,15 @@ export function SetupWizard({ onComplete, onSaveExit }: SetupWizardProps) {
 
   const handleSaveExit = async () => {
     try {
-      await fetch(`${API_BASE}/company`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(buildPayload()) })
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return onSaveExit()
+      await saveCompany(user.id, {
+        name: data.name, url: data.url, description: data.description,
+        industry: data.industry, icpDescription: data.icpDescription,
+        competitors: data.competitors.filter(c => c.name.trim()).map(c => c.name),
+        prompts: data.prompts.filter(p => p.trim()),
+        selectedModels: data.selectedModels,
+      })
     } catch {}
     onSaveExit()
   }
