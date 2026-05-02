@@ -2,12 +2,14 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
+import { Plus } from "lucide-react"
 import { Sidebar } from "@/components/sidebar"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { KPICard } from "@/components/kpi-card"
 import { RankingTable } from "@/components/ranking-table"
 import { MentionsCoverage } from "@/components/mentions-coverage"
 import { ShareOfVoice } from "@/components/share-of-voice"
+import { useAuth } from "@/lib/auth-context"
 
 const API_BASE = "http://localhost:3000/api"
 
@@ -33,11 +35,18 @@ function formatLastRun(iso: string | null) {
 
 export default function DashboardPage() {
   const router = useRouter()
+  const { user, loading: authLoading } = useAuth()
   const [selectedModel, setSelectedModel] = useState("all")
   const [selectedRange, setSelectedRange] = useState("Last 30 days")
   const [days, setDays] = useState(30)
   const [rankings, setRankings] = useState<any[]>([])
   const [stats, setStats] = useState<Stats | null>(null)
+  const [showSetup, setShowSetup] = useState(false)
+
+  // Redirect to auth if not logged in
+  useEffect(() => {
+    if (!authLoading && !user) router.push("/auth")
+  }, [authLoading, user, router])
 
   const fetchData = useCallback(async () => {
     const params = new URLSearchParams({ days: String(days), model: selectedModel })
@@ -87,6 +96,10 @@ export default function DashboardPage() {
     },
   ]
 
+  if (authLoading || !user) return null
+
+  const hasData = rankings.length > 0 || (stats?.totalResponses ?? 0) > 0
+
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       <Sidebar />
@@ -103,6 +116,29 @@ export default function DashboardPage() {
         />
 
         <div className="flex flex-1 flex-col gap-3 overflow-hidden p-4">
+
+          {/* Empty state — no companies tracked yet */}
+          {!hasData && (
+            <div className="flex flex-1 flex-col items-center justify-center gap-4">
+              <div className="rounded-full bg-primary/10 p-5">
+                <Plus className="h-8 w-8 text-primary" />
+              </div>
+              <div className="text-center">
+                <h2 className="text-lg font-semibold text-card-foreground">No companies tracked yet</h2>
+                <p className="mt-1 text-sm text-muted-foreground">Add your first company to start tracking AI visibility</p>
+              </div>
+              <button
+                onClick={() => setShowSetup(true)}
+                className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+              >
+                <Plus className="h-4 w-4" />
+                Create New
+              </button>
+            </div>
+          )}
+
+          {/* Dashboard content — only show when data exists */}
+          {hasData && <>
           {/* KPI Row */}
           <div className="grid flex-shrink-0 grid-cols-2 gap-3 sm:grid-cols-4">
             {kpiData.map((kpi) => (
@@ -129,6 +165,7 @@ export default function DashboardPage() {
               <RankingTable data={rankings} />
             </div>
           </div>
+          </>}
         </div>
       </main>
     </div>

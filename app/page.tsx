@@ -15,7 +15,7 @@ export default function LandingPage() {
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
           <Link href="/dashboard" style={{ padding:"6px 14px", borderRadius:7, fontSize:13, color:"var(--text-2)" }}>Sign in</Link>
-          <Link href="/setup" style={{ display:"flex", alignItems:"center", gap:5, padding:"7px 16px", borderRadius:7, background:"var(--accent)", color:"#0a0a0f", fontWeight:600, fontSize:13 }}>Get started <ArrowRight size={13} /></Link>
+          <Link href="/auth" style={{ display:"flex", alignItems:"center", gap:5, padding:"7px 16px", borderRadius:7, background:"var(--accent)", color:"#0a0a0f", fontWeight:600, fontSize:13 }}>Get started <ArrowRight size={13} /></Link>
         </div>
       </nav>
       <section style={{ padding:"80px 32px 64px", maxWidth:960, margin:"0 auto", textAlign:"center" }}>
@@ -26,7 +26,7 @@ export default function LandingPage() {
         <h1 style={{ fontSize:"clamp(36px,6vw,62px)", fontWeight:800, letterSpacing:"-0.04em", lineHeight:1.1, marginBottom:20 }}>See where you stand.<br />Understand why.<br /><span style={{ color:"var(--accent)" }}>Fix it today.</span></h1>
         <p style={{ fontSize:17, color:"var(--text-2)", maxWidth:540, margin:"0 auto 36px", lineHeight:1.7 }}>GeoIntel tracks how your brand appears across ChatGPT, Perplexity, Gemini and Claude — then tells you exactly what to fix and gives you the code to do it.</p>
         <div style={{ display:"flex", gap:10, justifyContent:"center", flexWrap:"wrap" }}>
-          <Link href="/setup" style={{ display:"flex", alignItems:"center", gap:6, padding:"12px 28px", borderRadius:9, background:"var(--accent)", color:"#0a0a0f", fontWeight:700, fontSize:15 }}>Start free audit <ArrowRight size={15} /></Link>
+          <Link href="/auth" style={{ display:"flex", alignItems:"center", gap:6, padding:"12px 28px", borderRadius:9, background:"var(--accent)", color:"#0a0a0f", fontWeight:700, fontSize:15 }}>Start free audit <ArrowRight size={15} /></Link>
           <Link href="/dashboard" style={{ display:"flex", alignItems:"center", gap:6, padding:"12px 24px", borderRadius:9, background:"var(--bg-2)", color:"var(--text-2)", fontWeight:500, fontSize:15, border:"1px solid var(--border)" }}>View demo</Link>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:8, justifyContent:"center", marginTop:36 }}>
@@ -65,7 +65,7 @@ export default function LandingPage() {
             <div style={{ fontSize:38, fontWeight:800, letterSpacing:"-0.04em", marginBottom:4 }}>$0</div>
             <div style={{ fontSize:12, color:"var(--text-3)", marginBottom:20 }}>forever</div>
             {["3 audits per month","Basic visibility report","Fix generator (3 uses)","1 competitor tracked"].map(f=><div key={f} style={{ display:"flex", gap:8, alignItems:"center", marginBottom:7 }}><Check size={12} color="var(--green)" /><span style={{ fontSize:13, color:"var(--text-2)" }}>{f}</span></div>)}
-            <Link href="/setup" style={{ display:"block", textAlign:"center", marginTop:20, padding:"9px", borderRadius:8, background:"var(--bg-3)", border:"1px solid var(--border)", color:"var(--text-2)", fontWeight:600, fontSize:13 }}>Get started free</Link>
+            <Link href="/auth" style={{ display:"block", textAlign:"center", marginTop:20, padding:"9px", borderRadius:8, background:"var(--bg-3)", border:"1px solid var(--border)", color:"var(--text-2)", fontWeight:600, fontSize:13 }}>Get started free</Link>
           </div>
           <div style={{ background:"var(--accent-dim)", border:"1px solid var(--accent)", borderRadius:14, padding:26, position:"relative" }}>
             <div style={{ position:"absolute", top:-10, right:14, padding:"2px 10px", borderRadius:20, background:"var(--accent)", color:"#0a0a0f", fontSize:10, fontWeight:700, letterSpacing:"0.06em", textTransform:"uppercase" }}>Beta pricing</div>
@@ -73,7 +73,7 @@ export default function LandingPage() {
             <div style={{ fontSize:38, fontWeight:800, letterSpacing:"-0.04em", marginBottom:4 }}>$15</div>
             <div style={{ fontSize:12, color:"var(--text-3)", marginBottom:20 }}>per month · price goes up at launch</div>
             {["Unlimited audits","All 4 AI engines","Full fix generator","5 competitors tracked","AI prompt research","Daily re-scans"].map(f=><div key={f} style={{ display:"flex", gap:8, alignItems:"center", marginBottom:7 }}><Check size={12} color="var(--accent)" /><span style={{ fontSize:13, color:"var(--text)" }}>{f}</span></div>)}
-            <Link href="/setup" style={{ display:"block", textAlign:"center", marginTop:20, padding:"9px", borderRadius:8, background:"var(--accent)", color:"#0a0a0f", fontWeight:700, fontSize:13 }}>Lock in $15 →</Link>
+            <Link href="/auth" style={{ display:"block", textAlign:"center", marginTop:20, padding:"9px", borderRadius:8, background:"var(--accent)", color:"#0a0a0f", fontWeight:700, fontSize:13 }}>Lock in $15 →</Link>
           </div>
         </div>
         <p style={{ textAlign:"center", marginTop:14, fontSize:12, color:"var(--text-3)" }}>vs Otterly at $189–$989/month · No credit card required to start</p>
@@ -81,7 +81,7 @@ export default function LandingPage() {
       <section style={{ padding:"60px 32px", textAlign:"center", borderTop:"1px solid var(--border)" }}>
         <h2 style={{ fontSize:30, fontWeight:800, letterSpacing:"-0.03em", marginBottom:12 }}>Find out where you stand — free</h2>
         <p style={{ fontSize:14, color:"var(--text-2)", marginBottom:28 }}>Setup takes 2 minutes. First results in 60 seconds.</p>
-        <Link href="/setup" style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"13px 32px", borderRadius:10, background:"var(--accent)", color:"#0a0a0f", fontWeight:700, fontSize:15 }}>Run your free audit <ArrowRight size={15} /></Link>
+        <Link href="/auth" style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"13px 32px", borderRadius:10, background:"var(--accent)", color:"#0a0a0f", fontWeight:700, fontSize:15 }}>Run your free audit <ArrowRight size={15} /></Link>
       </section>
       <footer style={{ borderTop:"1px solid var(--border)", padding:"18px 32px", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
         <div style={{ display:"flex", alignItems:"center", gap:8 }}><Radio size={12} color="var(--accent)" /><span style={{ fontSize:12, color:"var(--text-3)" }}>GeoIntel</span></div>
