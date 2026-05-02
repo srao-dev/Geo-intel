@@ -2,13 +2,14 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { Plus } from "lucide-react"
+import { Plus, X } from "lucide-react"
 import { Sidebar } from "@/components/sidebar"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { KPICard } from "@/components/kpi-card"
 import { RankingTable } from "@/components/ranking-table"
 import { MentionsCoverage } from "@/components/mentions-coverage"
 import { ShareOfVoice } from "@/components/share-of-voice"
+import { SetupWizard } from "@/components/setup-wizard"
 import { useAuth } from "@/lib/auth-context"
 
 const API_BASE = "http://localhost:3000/api"
@@ -102,7 +103,29 @@ export default function DashboardPage() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      <Sidebar />
+
+      {/* Setup wizard modal */}
+      {showSetup && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 backdrop-blur-sm p-6">
+          <div className="relative w-full max-w-3xl rounded-xl bg-background shadow-2xl my-6">
+            <button
+              onClick={() => setShowSetup(false)}
+              className="absolute right-4 top-4 rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-card-foreground transition-colors z-10"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <SetupWizard
+              onComplete={() => { setShowSetup(false); fetchData() }}
+              onSaveExit={() => setShowSetup(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      <Sidebar
+        companies={rankings.filter(r => r.isOurBrand).map(r => ({ id: r.name, name: r.name }))}
+        selectedCompanyId={rankings.find(r => r.isOurBrand)?.name}
+      />
 
       <main className="flex flex-1 flex-col overflow-hidden">
         <DashboardHeader
