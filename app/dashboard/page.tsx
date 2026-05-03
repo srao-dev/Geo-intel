@@ -41,6 +41,7 @@ export default function DashboardPage() {
   const [selectedRange, setSelectedRange] = useState("Last 30 days")
   const [days, setDays] = useState(30)
   const [showSetup, setShowSetup] = useState(false)
+  const [editingCompanyId, setEditingCompanyId] = useState<string | null>(null)
   const [companies, setCompanies] = useState<{ id: string; name: string }[]>([])
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null)
   const [stats, setStats] = useState<Stats | null>(null)
@@ -147,15 +148,16 @@ export default function DashboardPage() {
               <X className="h-4 w-4" />
             </button>
             <SetupWizard
+              editingCompanyId={editingCompanyId}
               onComplete={() => {
                 setShowSetup(false)
-                // Reload companies then refresh data
+                setEditingCompanyId(null)
                 if (user) getCompanies(user.id).then(data => {
                   setCompanies(data)
                   if (data.length > 0) setSelectedCompanyId(data[0].id)
                 })
               }}
-              onSaveExit={() => setShowSetup(false)}
+              onSaveExit={() => { setShowSetup(false); setEditingCompanyId(null) }}
             />
           </div>
         </div>
@@ -165,7 +167,8 @@ export default function DashboardPage() {
         companies={companies}
         selectedCompanyId={selectedCompanyId || undefined}
         onSelectCompany={setSelectedCompanyId}
-        onCreateNew={() => setShowSetup(true)}
+        onCreateNew={() => { setEditingCompanyId(null); setShowSetup(true) }}
+        onEditCompany={(id) => { setEditingCompanyId(id); setShowSetup(true) }}
         onDeleteCompany={(id) => {
           const remaining = companies.filter(c => c.id !== id)
           setCompanies(remaining)

@@ -1,6 +1,6 @@
 "use client"
 
-import { BarChart3, Globe, Building2, ChevronRight, Quote, LogOut, Plus, Trash2 } from "lucide-react"
+import { BarChart3, Globe, Building2, ChevronRight, Quote, LogOut, Plus, Trash2, Pencil } from "lucide-react"
 import { useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
@@ -18,9 +18,10 @@ interface SidebarProps {
   onSelectCompany?: (id: string) => void
   onCreateNew?: () => void
   onDeleteCompany?: (id: string) => void
+  onEditCompany?: (id: string) => void
 }
 
-export function Sidebar({ companies = [], selectedCompanyId, onSelectCompany, onCreateNew, onDeleteCompany }: SidebarProps) {
+export function Sidebar({ companies = [], selectedCompanyId, onSelectCompany, onCreateNew, onDeleteCompany, onEditCompany }: SidebarProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const { user, logout } = useAuth()
   const router = useRouter()
@@ -99,8 +100,15 @@ export function Sidebar({ companies = [], selectedCompanyId, onSelectCompany, on
                 <span className="flex-1 truncate">{company.name}</span>
                 <div className="ml-auto flex flex-shrink-0 items-center gap-1">
                   {selectedCompanyId === company.id && (
-                    <ChevronRight className="h-4 w-4 text-primary" />
+                    <ChevronRight className="h-4 w-4 text-primary group-hover:hidden" />
                   )}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onEditCompany?.(company.id) }}
+                    className="hidden rounded p-0.5 text-muted-foreground hover:bg-primary/10 hover:text-primary group-hover:block transition-colors"
+                    title="Edit company"
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </button>
                   <button
                     onClick={(e) => handleDelete(e, company.id, company.name)}
                     disabled={deletingId === company.id}

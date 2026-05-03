@@ -7,11 +7,12 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Plus, Trash2, Loader2, ArrowRight, Building2, Users, MessageSquare, Cpu, ClipboardList } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import { saveCompany } from "@/lib/queries"
+import { saveCompany, getCompanyWithDetails } from "@/lib/queries"
 
 interface SetupWizardProps {
   onComplete: () => void
   onSaveExit: () => void
+  editingCompanyId?: string | null
 }
 
 interface CompanyData {
@@ -39,7 +40,7 @@ const STEPS = [
   { id: 6, label: "Review", icon: ClipboardList },
 ]
 
-export function SetupWizard({ onComplete, onSaveExit }: SetupWizardProps) {
+export function SetupWizard({ onComplete, onSaveExit, editingCompanyId }: SetupWizardProps) {
   const [step, setStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -52,15 +53,38 @@ export function SetupWizard({ onComplete, onSaveExit }: SetupWizardProps) {
   })
 
   useEffect(() => {
-    // Static model list — no longer needs the Express backend
     setLlmProviders([
       { name: "ChatGPT", models: ["GPT-5.3", "GPT-5.5"] },
       { name: "Claude", models: ["Claude Sonnet 4.6", "Claude Opus 4.6", "Claude Haiku 4.5"] },
       { name: "Gemini", models: ["Gemini 3 Flash"] },
       { name: "Perplexity", models: ["Sonar"] },
     ])
-    setIsLoading(false)
-  }, [])
+
+    // Pre-load company data if editing
+    if (editingCompanyId) {
+      getCompanyWithDetails(editingCompanyId).then(company => {
+        const selectedModels: { provider: string; model: string }[] = company.trackedModels.map(
+          (m: { provider: string; model_slug: string }) => ({ provider: m.provider, model: m.model_slug })
+        )
+        setData({
+          name: company.name || "",
+          url: company.url || "",
+          description: company.description || "",
+          industry: company.industry || "",
+          icpDescription: company.icp_description || "",
+          competitors: company.competitors.length
+            ? company.competitors.map((name: string) => ({ name, url: "" }))
+            : [{ name: "", url: "" }],
+          prompts: company.prompts.length
+            ? company.prompts.map((p: { text: string }) => p.text)
+            : [""],
+          selectedModels,
+        })
+      }).catch(console.error).finally(() => setIsLoading(false))
+    } else {
+      setIsLoading(false)
+    }
+  }, [editingCompanyId])
 
   const update = <K extends keyof CompanyData>(key: K, value: CompanyData[K]) => setData(prev => ({ ...prev, [key]: value }))
 
@@ -150,7 +174,7 @@ export function SetupWizard({ onComplete, onSaveExit }: SetupWizardProps) {
     <div className="flex h-full flex-col">
       {/* Header */}
       <div className="flex-shrink-0 border-b border-border px-6 py-5">
-        <h2 className="text-lg font-semibold text-card-foreground">Track a New Company</h2>
+        <h2 className="text-lg font-semibold text-card-foreground">{editingCompanyId ? "Edit Company" : "Track a New Company"}</h2>
         <p className="mt-0.5 text-sm text-muted-foreground">Step {step} of {STEPS.length} — {STEPS[step - 1].label}</p>
         {/* Step indicators */}
         <div className="mt-4 flex items-center gap-1">
