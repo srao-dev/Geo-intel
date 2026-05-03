@@ -172,67 +172,109 @@ export default function LandingPage() {
         </div>
 
         {/* Hero Visual */}
-        <div style={{ margin: "40px auto 0", maxWidth: 720, width: "100%" }}>
-          <svg width="100%" viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg" style={{ filter: "drop-shadow(0 4px 24px rgba(0,0,0,0.07))" }}>
+        <div style={{ margin: "40px auto 0", maxWidth: 900, width: "100%" }}>
+          <svg width="100%" viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg" style={{ filter: "drop-shadow(0 4px 24px rgba(0,0,0,0.07))" }}>
             <defs>
               <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                 <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </marker>
             </defs>
+
+            {/* Background dots */}
             <g opacity="0.08">
-              <circle cx="80" cy="100" r="1.5" fill="#888"/><circle cx="160" cy="100" r="1.5" fill="#888"/>
-              <circle cx="80" cy="180" r="1.5" fill="#888"/><circle cx="160" cy="180" r="1.5" fill="#888"/>
-              <circle cx="80" cy="260" r="1.5" fill="#888"/><circle cx="160" cy="260" r="1.5" fill="#888"/>
-              <circle cx="80" cy="340" r="1.5" fill="#888"/><circle cx="160" cy="340" r="1.5" fill="#888"/>
-              <circle cx="480" cy="140" r="1.5" fill="#888"/><circle cx="560" cy="140" r="1.5" fill="#888"/>
-              <circle cx="480" cy="220" r="1.5" fill="#888"/><circle cx="560" cy="220" r="1.5" fill="#888"/>
-              <circle cx="480" cy="300" r="1.5" fill="#888"/><circle cx="560" cy="300" r="1.5" fill="#888"/>
+              <circle cx="80" cy="100" r="1.5" fill="#888"/><circle cx="160" cy="100" r="1.5" fill="#888"/><circle cx="240" cy="100" r="1.5" fill="#888"/>
+              <circle cx="80" cy="180" r="1.5" fill="#888"/><circle cx="160" cy="180" r="1.5" fill="#888"/><circle cx="240" cy="180" r="1.5" fill="#888"/>
+              <circle cx="80" cy="260" r="1.5" fill="#888"/><circle cx="160" cy="260" r="1.5" fill="#888"/><circle cx="240" cy="260" r="1.5" fill="#888"/>
+              <circle cx="80" cy="340" r="1.5" fill="#888"/><circle cx="160" cy="340" r="1.5" fill="#888"/><circle cx="240" cy="340" r="1.5" fill="#888"/>
+              <circle cx="660" cy="100" r="1.5" fill="#888"/><circle cx="740" cy="100" r="1.5" fill="#888"/><circle cx="820" cy="100" r="1.5" fill="#888"/>
+              <circle cx="660" cy="180" r="1.5" fill="#888"/><circle cx="820" cy="180" r="1.5" fill="#888"/>
+              <circle cx="660" cy="340" r="1.5" fill="#888"/><circle cx="820" cy="340" r="1.5" fill="#888"/>
             </g>
-            <path d="M 182 118 C 250 118 265 230 308 248" fill="none" stroke="#10b981" strokeWidth="1.5" strokeDasharray="5,4" markerEnd="url(#arrow)" opacity="0.6"/>
-            <path d="M 182 198 C 255 198 272 240 308 252" fill="none" stroke="#8b5cf6" strokeWidth="1.5" strokeDasharray="5,4" markerEnd="url(#arrow)" opacity="0.6"/>
-            <path d="M 182 278 C 255 278 272 268 308 262" fill="none" stroke="#3b82f6" strokeWidth="1.5" strokeDasharray="5,4" markerEnd="url(#arrow)" opacity="0.6"/>
-            <path d="M 182 358 C 250 358 265 285 308 268" fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="5,4" markerEnd="url(#arrow)" opacity="0.6"/>
-            <path d="M 390 258 C 430 258 445 258 472 258" fill="none" stroke="#2dd4bf" strokeWidth="2" markerEnd="url(#arrow)"/>
-            <rect x="62" y="94" width="120" height="48" rx="10" fill="#ecfdf5" stroke="#10b981" strokeWidth="1"/>
-            <text x="122" y="122" textAnchor="middle" fontSize="13" fontWeight="600" fill="#065f46" fontFamily="system-ui,sans-serif">ChatGPT</text>
-            <rect x="62" y="174" width="120" height="48" rx="10" fill="#f5f3ff" stroke="#8b5cf6" strokeWidth="1"/>
-            <text x="122" y="202" textAnchor="middle" fontSize="13" fontWeight="600" fill="#4c1d95" fontFamily="system-ui,sans-serif">Perplexity</text>
-            <rect x="62" y="254" width="120" height="48" rx="10" fill="#eff6ff" stroke="#3b82f6" strokeWidth="1"/>
-            <text x="122" y="282" textAnchor="middle" fontSize="13" fontWeight="600" fill="#1e3a8a" fontFamily="system-ui,sans-serif">Gemini</text>
-            <rect x="62" y="334" width="120" height="48" rx="10" fill="#fffbeb" stroke="#f59e0b" strokeWidth="1"/>
-            <text x="122" y="362" textAnchor="middle" fontSize="13" fontWeight="600" fill="#78350f" fontFamily="system-ui,sans-serif">Claude</text>
-            <rect x="308" y="224" width="82" height="68" rx="12" fill="white" stroke="#2dd4bf" strokeWidth="2"/>
-            <text x="349" y="252" textAnchor="middle" fontSize="12" fontWeight="600" fill="#0f766e" fontFamily="system-ui,sans-serif">Your</text>
-            <text x="349" y="268" textAnchor="middle" fontSize="12" fontWeight="600" fill="#0f766e" fontFamily="system-ui,sans-serif">Brand</text>
-            <circle cx="349" cy="282" r="3" fill="#2dd4bf"/>
-            <rect x="472" y="100" width="170" height="300" rx="14" fill="white" stroke="#e5e7eb" strokeWidth="1"/>
-            <rect x="472" y="100" width="170" height="38" rx="14" fill="#f9fafb" stroke="#e5e7eb" strokeWidth="1"/>
-            <rect x="472" y="116" width="170" height="22" fill="#f9fafb"/>
-            <circle cx="490" cy="119" r="4" fill="#2dd4bf"/>
-            <text x="500" y="123" fontSize="11" fontWeight="600" fill="#111827" fontFamily="system-ui,sans-serif">GeoIntel</text>
-            <circle cx="628" cy="118" r="3" fill="#10b981"/>
-            <text x="624" y="123" textAnchor="end" fontSize="10" fill="#10b981" fontFamily="system-ui,sans-serif">Live</text>
-            <text x="488" y="158" fontSize="10" fill="#9ca3af" fontFamily="system-ui,sans-serif" letterSpacing="0.05em">AI VISIBILITY</text>
-            <text x="488" y="184" fontSize="30" fontWeight="700" fill="#f59e0b" fontFamily="system-ui,sans-serif">24%</text>
-            <line x1="488" y1="198" x2="628" y2="198" stroke="#f3f4f6" strokeWidth="1"/>
-            <text x="488" y="216" fontSize="10" fill="#9ca3af" fontFamily="system-ui,sans-serif" letterSpacing="0.05em">SHARE OF VOICE</text>
-            <text x="488" y="234" fontSize="11" fill="#6b7280" fontFamily="system-ui,sans-serif">Competitor A</text>
-            <rect x="556" y="224" width="68" height="7" rx="3" fill="#f3f4f6"/>
-            <rect x="556" y="224" width="52" height="7" rx="3" fill="#3b82f6" opacity="0.7"/>
-            <text x="488" y="252" fontSize="11" fontWeight="600" fill="#0f766e" fontFamily="system-ui,sans-serif">You ★</text>
-            <rect x="556" y="242" width="68" height="7" rx="3" fill="#f3f4f6"/>
-            <rect x="556" y="242" width="18" height="7" rx="3" fill="#2dd4bf"/>
-            <text x="488" y="270" fontSize="11" fill="#6b7280" fontFamily="system-ui,sans-serif">Competitor B</text>
-            <rect x="556" y="260" width="68" height="7" rx="3" fill="#f3f4f6"/>
-            <rect x="556" y="260" width="34" height="7" rx="3" fill="#8b5cf6" opacity="0.7"/>
-            <line x1="488" y1="282" x2="628" y2="282" stroke="#f3f4f6" strokeWidth="1"/>
-            <text x="488" y="300" fontSize="10" fill="#9ca3af" fontFamily="system-ui,sans-serif" letterSpacing="0.05em">TOP FIX</text>
-            <rect x="488" y="308" width="140" height="50" rx="6" fill="#fef2f2" stroke="#fecaca" strokeWidth="1"/>
-            <rect x="488" y="308" width="3" height="50" rx="1" fill="#ef4444"/>
-            <rect x="496" y="315" width="38" height="13" rx="3" fill="#fee2e2"/>
-            <text x="515" y="325" textAnchor="middle" fontSize="9" fontWeight="600" fill="#b91c1c" fontFamily="system-ui,sans-serif">Critical</text>
-            <text x="496" y="341" fontSize="10" fontWeight="600" fill="#111827" fontFamily="system-ui,sans-serif">Add FAQPage schema</text>
-            <text x="496" y="354" fontSize="9" fill="#6b7280" fontFamily="system-ui,sans-serif">Copy-paste fix ready</text>
+
+            {/* Connection lines — AI engines to brand */}
+            <path d="M 202 118 C 290 118 310 210 368 228" fill="none" stroke="#10b981" strokeWidth="1.5" strokeDasharray="5,4" markerEnd="url(#arrow)" opacity="0.6"/>
+            <path d="M 202 198 C 295 198 318 220 368 232" fill="none" stroke="#8b5cf6" strokeWidth="1.5" strokeDasharray="5,4" markerEnd="url(#arrow)" opacity="0.6"/>
+            <path d="M 202 278 C 295 278 318 250 368 242" fill="none" stroke="#3b82f6" strokeWidth="1.5" strokeDasharray="5,4" markerEnd="url(#arrow)" opacity="0.6"/>
+            <path d="M 202 358 C 290 358 310 265 368 248" fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="5,4" markerEnd="url(#arrow)" opacity="0.6"/>
+
+            {/* Brand to GeoIntel */}
+            <path d="M 468 238 C 510 238 525 238 548 238" fill="none" stroke="#2dd4bf" strokeWidth="2.5" markerEnd="url(#arrow)"/>
+
+            {/* AI Engine chips */}
+            <rect x="62" y="94" width="140" height="48" rx="10" fill="#ecfdf5" stroke="#10b981" strokeWidth="1"/>
+            <text x="132" y="122" textAnchor="middle" fontSize="14" fontWeight="600" fill="#065f46" fontFamily="system-ui,sans-serif">ChatGPT</text>
+
+            <rect x="62" y="174" width="140" height="48" rx="10" fill="#f5f3ff" stroke="#8b5cf6" strokeWidth="1"/>
+            <text x="132" y="202" textAnchor="middle" fontSize="14" fontWeight="600" fill="#4c1d95" fontFamily="system-ui,sans-serif">Perplexity</text>
+
+            <rect x="62" y="254" width="140" height="48" rx="10" fill="#eff6ff" stroke="#3b82f6" strokeWidth="1"/>
+            <text x="132" y="282" textAnchor="middle" fontSize="14" fontWeight="600" fill="#1e3a8a" fontFamily="system-ui,sans-serif">Gemini</text>
+
+            <rect x="62" y="334" width="140" height="48" rx="10" fill="#fffbeb" stroke="#f59e0b" strokeWidth="1"/>
+            <text x="132" y="362" textAnchor="middle" fontSize="14" fontWeight="600" fill="#78350f" fontFamily="system-ui,sans-serif">Claude</text>
+
+            {/* Your Brand node */}
+            <rect x="368" y="204" width="100" height="68" rx="14" fill="white" stroke="#2dd4bf" strokeWidth="2.5"/>
+            <text x="418" y="232" textAnchor="middle" fontSize="13" fontWeight="600" fill="#0f766e" fontFamily="system-ui,sans-serif">Your</text>
+            <text x="418" y="250" textAnchor="middle" fontSize="13" fontWeight="600" fill="#0f766e" fontFamily="system-ui,sans-serif">Brand</text>
+            <circle cx="418" cy="264" r="3.5" fill="#2dd4bf"/>
+
+            {/* GeoIntel panel — wide */}
+            <rect x="548" y="60" width="312" height="350" rx="16" fill="white" stroke="#e5e7eb" strokeWidth="1"/>
+
+            {/* Panel header */}
+            <rect x="548" y="60" width="312" height="44" rx="16" fill="#f9fafb" stroke="#e5e7eb" strokeWidth="1"/>
+            <rect x="548" y="80" width="312" height="24" fill="#f9fafb"/>
+            <circle cx="570" cy="82" r="5" fill="#2dd4bf"/>
+            <text x="582" y="87" fontSize="13" fontWeight="600" fill="#111827" fontFamily="system-ui,sans-serif">GeoIntel</text>
+            <circle cx="846" cy="81" r="4" fill="#10b981"/>
+            <text x="840" y="86" textAnchor="end" fontSize="11" fill="#10b981" fontFamily="system-ui,sans-serif">Live</text>
+
+            {/* KPI row */}
+            <rect x="564" y="118" width="86" height="58" rx="10" fill="#fefce8" stroke="#fef08a" strokeWidth="1"/>
+            <text x="607" y="138" textAnchor="middle" fontSize="10" fill="#a16207" fontFamily="system-ui,sans-serif" letterSpacing="0.04em">VISIBILITY</text>
+            <text x="607" y="162" textAnchor="middle" fontSize="24" fontWeight="700" fill="#d97706" fontFamily="system-ui,sans-serif">24%</text>
+
+            <rect x="660" y="118" width="86" height="58" rx="10" fill="#f0fdf4" stroke="#bbf7d0" strokeWidth="1"/>
+            <text x="703" y="138" textAnchor="middle" fontSize="10" fill="#166534" fontFamily="system-ui,sans-serif" letterSpacing="0.04em">RANK</text>
+            <text x="703" y="162" textAnchor="middle" fontSize="24" fontWeight="700" fill="#16a34a" fontFamily="system-ui,sans-serif">#3</text>
+
+            <rect x="756" y="118" width="86" height="58" rx="10" fill="#fef2f2" stroke="#fecaca" strokeWidth="1"/>
+            <text x="799" y="138" textAnchor="middle" fontSize="10" fill="#991b1b" fontFamily="system-ui,sans-serif" letterSpacing="0.04em">GEO SCORE</text>
+            <text x="799" y="162" textAnchor="middle" fontSize="24" fontWeight="700" fill="#dc2626" fontFamily="system-ui,sans-serif">42</text>
+
+            {/* Divider */}
+            <line x1="564" y1="190" x2="844" y2="190" stroke="#f3f4f6" strokeWidth="1"/>
+
+            {/* Share of voice */}
+            <text x="564" y="210" fontSize="10" fill="#9ca3af" fontFamily="system-ui,sans-serif" letterSpacing="0.06em">SHARE OF VOICE</text>
+
+            <text x="564" y="230" fontSize="12" fill="#6b7280" fontFamily="system-ui,sans-serif">Competitor A</text>
+            <rect x="664" y="220" width="160" height="8" rx="4" fill="#f3f4f6"/>
+            <rect x="664" y="220" width="118" height="8" rx="4" fill="#3b82f6" opacity="0.6"/>
+            <text x="830" y="229" textAnchor="end" fontSize="11" fill="#6b7280" fontFamily="system-ui,sans-serif">68%</text>
+
+            <text x="564" y="252" fontSize="12" fontWeight="600" fill="#0f766e" fontFamily="system-ui,sans-serif">You ★</text>
+            <rect x="664" y="242" width="160" height="8" rx="4" fill="#f3f4f6"/>
+            <rect x="664" y="242" width="38" height="8" rx="4" fill="#2dd4bf"/>
+            <text x="830" y="251" textAnchor="end" fontSize="11" fontWeight="600" fill="#0f766e" fontFamily="system-ui,sans-serif">24%</text>
+
+            <text x="564" y="274" fontSize="12" fill="#6b7280" fontFamily="system-ui,sans-serif">Competitor B</text>
+            <rect x="664" y="264" width="160" height="8" rx="4" fill="#f3f4f6"/>
+            <rect x="664" y="264" width="68" height="8" rx="4" fill="#8b5cf6" opacity="0.6"/>
+            <text x="830" y="273" textAnchor="end" fontSize="11" fill="#6b7280" fontFamily="system-ui,sans-serif">41%</text>
+
+            {/* Divider */}
+            <line x1="564" y1="288" x2="844" y2="288" stroke="#f3f4f6" strokeWidth="1"/>
+
+            {/* Recommendation */}
+            <text x="564" y="308" fontSize="10" fill="#9ca3af" fontFamily="system-ui,sans-serif" letterSpacing="0.06em">TOP FIX</text>
+            <rect x="564" y="316" width="276" height="62" rx="8" fill="#fef2f2" stroke="#fecaca" strokeWidth="1"/>
+            <rect x="564" y="316" width="4" height="62" rx="2" fill="#ef4444"/>
+            <rect x="576" y="324" width="46" height="15" rx="4" fill="#fee2e2"/>
+            <text x="599" y="335" textAnchor="middle" fontSize="10" fontWeight="600" fill="#b91c1c" fontFamily="system-ui,sans-serif">Critical</text>
+            <text x="576" y="354" fontSize="12" fontWeight="600" fill="#111827" fontFamily="system-ui,sans-serif">Add FAQPage schema to product pages</text>
+            <text x="576" y="371" fontSize="11" fill="#6b7280" fontFamily="system-ui,sans-serif">Copy-paste JSON-LD fix ready to implement</text>
           </svg>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center", marginTop: 28 }}>
