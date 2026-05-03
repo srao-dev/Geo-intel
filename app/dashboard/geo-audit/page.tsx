@@ -127,8 +127,177 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
   )
 }
 
-function ContentTypeCard({ ct }: { ct: any }) {
+function PageDrillDown({ contentType, domain, vertical, onClose }: { contentType: string; domain: string; vertical: string; onClose: () => void }) {
+  const [url, setUrl] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [analysis, setAnalysis] = useState<any>(null)
+  const [error, setError] = useState("")
+
+  const run = async () => {
+    if (!url.trim()) return
+    setLoading(true); setError(""); setAnalysis(null)
+    try {
+      const res = await fetch("/api/content-page-analysis", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: url.trim(), contentType, domain, vertical }),
+      })
+      const data = await res.json()
+      if (data.analysis) setAnalysis(data.analysis)
+      else setError(data.error || "Analysis failed")
+    } catch { setError("Could not connect to analysis service") }
+    setLoading(false)
+  }
+
+  const gradeColor = analysis ? GRADE_COLORS[analysis.geo_grade] : ""
+  const gradeBg = analysis ? GRADE_BG[analysis.geo_grade] : ""
+
+  return (
+    <div className="mt-3 rounded-xl border border-primary/30 bg-primary/5 p-4 flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-xs font-semibold text-primary uppercase tracking-wider">Deep Page Analysis</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Paste a specific {contentType} URL to get a detailed rewrite brief</p>
+        </div>
+        <button onClick={onClose} className="text-xs text-muted-foreground hover:text-card-foreground">✕ Close</button>
+      </div>
+
+      <div className="flex gap-2">
+        <input
+          type="text" value={url} onChange={e => setUrl(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && run()}
+          placeholder={`e.g. ${domain}/blog/your-post-title`}
+          className="flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm text-card-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20"
+        />
+        <button onClick={run} disabled={loading || !url.trim()} className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors">
+          {loading ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Analysing...</> : <>Analyse →</>}
+        </button>
+      </div>
+
+      {error && <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{error}</p>}
+
+      {loading && (
+        <div className="flex items-center gap-3 py-4 justify-center">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Reading page content and generating brief...</p>
+        </div>
+      )}
+
+      {analysis && !loading && (
+        <div className="flex flex-col gap-4">
+          {/* Score */}
+          <div className={cn("rounded-xl border-2 p-4", gradeBg)}>
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <p className="text-xs text-muted-foreground font-medium truncate max-w-xs">{analysis.page_title}</p>
+                <p className="text-xs text-muted-foreground">{analysis.content_type}</p>
+              </div>
+              <div className="flex items-end gap-2">
+                <span className="text-4xl font-black tabular-nums text-card-foreground leading-none">{analysis.geo_score}</span>
+                <span className={cn("text-2xl font-black mb-0.5", gradeColor)}>{analysis.geo_grade}</span>
+              </div>
+            </div>
+            <p className="text-xs text-card-foreground leading-relaxed">{analysis.summary}</p>
+          </div>
+
+          {/* What works */}
+          {analysis.what_works?.length > 0 && (
+            <div className="rounded-lg bg-emerald-50 border border-emerald-200 p-3">
+              <p className="text-xs font-semibold text-emerald-800 mb-2">✅ What works</p>
+              {analysis.what_works.map((w: string, i: number) => (
+                <p key={i} className="text-xs text-emerald-700 leading-relaxed">• {w}</p>
+              ))}
+            </div>
+          )}
+
+          {/* Critical gaps */}
+          {analysis.critical_gaps?.length > 0 && (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Critical Gaps & Fixes</p>
+              <div className="flex flex-col gap-2">
+                {analysis.critical_gaps.map((gap: any, i: number) => (
+                  <div key={i} className="rounded-lg border border-red-200 bg-red-50 p-3">
+                    <p className="text-xs font-semibold text-red-800 mb-1">Gap: {gap.gap}</p>
+                    <p className="text-xs text-red-700 mb-1"><span className="font-semibold">Fix:</span> {gap.fix}</p>
+                    {gap.example && (
+                      <div className="mt-2 bg-white/70 rounded p-2 border border-red-100">
+                        <p className="text-xs text-muted-foreground font-medium mb-0.5">Example:</p>
+                        <p className="text-xs text-card-foreground italic">"{gap.example}"</p>
+                      </div>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-1">→ {gap.impact}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Schema to add */}
+          {analysis.missing_schema?.length > 0 && (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Schema to Add</p>
+              <div className="flex flex-col gap-2">
+                {analysis.missing_schema.map((s: any, i: number) => (
+                  <div key={i} className="rounded-lg border border-blue-200 bg-blue-50 p-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-xs font-semibold text-blue-800">{s.type}</p>
+                    </div>
+                    <p className="text-xs text-blue-700 mb-2">{s.why}</p>
+                    {s.snippet && <pre className="text-xs font-mono bg-white/70 p-2 rounded border border-blue-100 overflow-x-auto whitespace-pre-wrap">{s.snippet}</pre>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Rewrite suggestions */}
+          {analysis.rewrite_suggestions?.length > 0 && (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">Rewrite Suggestions</p>
+              <div className="flex flex-col gap-2">
+                {analysis.rewrite_suggestions.map((r: any, i: number) => (
+                  <div key={i} className="rounded-lg border border-amber-200 bg-amber-50 p-3">
+                    <p className="text-xs font-semibold text-amber-800 mb-2">{r.element}</p>
+                    {r.current && (
+                      <div className="mb-2">
+                        <p className="text-xs text-muted-foreground font-medium mb-0.5">Current:</p>
+                        <p className="text-xs text-card-foreground bg-white/60 rounded p-1.5 border border-amber-100 italic">"{r.current}"</p>
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-xs text-muted-foreground font-medium mb-0.5">Suggested:</p>
+                      <p className="text-xs text-amber-900 bg-white/60 rounded p-1.5 border border-amber-100 font-medium">"{r.suggested}"</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1.5">→ {r.why}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Quick wins */}
+          {analysis.quick_wins?.length > 0 && (
+            <div className="rounded-lg border border-teal-200 bg-teal-50 p-3">
+              <p className="text-xs font-semibold text-teal-800 mb-2">⚡ Quick wins for this page</p>
+              {analysis.quick_wins.map((w: any, i: number) => (
+                <div key={i} className="flex items-start gap-2 mb-1.5">
+                  <span className="text-teal-500 font-bold text-xs flex-shrink-0">{i+1}.</span>
+                  <div>
+                    <p className="text-xs font-medium text-teal-800">{w.action}</p>
+                    <p className="text-xs text-teal-600">{w.impact} · ⏱ {w.effort}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ContentTypeCard({ ct, domain, vertical }: { ct: any; domain: string; vertical: string }) {
   const [open, setOpen] = useState(false)
+  const [showDrillDown, setShowDrillDown] = useState(false)
   const st = STATUS_STYLES[ct.status] || STATUS_STYLES.weak
   const scoreColor = ct.score >= 70 ? "text-emerald-600" : ct.score >= 50 ? "text-amber-600" : "text-red-500"
 
@@ -186,6 +355,23 @@ function ContentTypeCard({ ct }: { ct: any }) {
               })}
             </div>
           </div>
+
+          <button
+            onClick={() => setShowDrillDown(s => !s)}
+            className="flex items-center gap-2 text-xs text-primary font-semibold hover:underline mt-1"
+          >
+            <Search className="h-3.5 w-3.5" />
+            {showDrillDown ? "Hide page analyser" : "Analyse a specific page →"}
+          </button>
+
+          {showDrillDown && (
+            <PageDrillDown
+              contentType={ct.type}
+              domain={domain}
+              vertical={vertical}
+              onClose={() => setShowDrillDown(false)}
+            />
+          )}
         </div>
       )}
     </div>
@@ -302,7 +488,7 @@ function ContentAnalysisTab({ domain, vertical }: { domain: string; vertical: st
             </div>
             <div className="flex flex-col gap-3">
               {analysis.content_types?.map((ct: any, i: number) => (
-                <ContentTypeCard key={i} ct={ct} />
+                <ContentTypeCard key={i} ct={ct} domain={domain} vertical={vertical} />
               ))}
             </div>
           </div>
