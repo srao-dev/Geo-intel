@@ -17,9 +17,9 @@ function getModelStyle(model: string) {
 
 function getModelShort(model: string) {
   if (model.toLowerCase().includes("gpt")) return "GPT"
-  if (model.toLowerCase().includes("claude")) return "C"
-  if (model.toLowerCase().includes("gemini")) return "G"
-  if (model.toLowerCase().includes("sonar") || model.toLowerCase().includes("perplexity")) return "P"
+  if (model.toLowerCase().includes("claude")) return "Claude"
+  if (model.toLowerCase().includes("gemini")) return "Gemini"
+  if (model.toLowerCase().includes("sonar") || model.toLowerCase().includes("perplexity")) return "Perplexity"
   return model.substring(0, 2).toUpperCase()
 }
 
@@ -27,29 +27,30 @@ export function MentionsCoverage({ mentionCount, totalResponses, models, loading
   const pct = totalResponses > 0 ? Math.round((mentionCount / totalResponses) * 100) : 0
   const circumference = 2 * Math.PI * 26
   const filled = (pct / 100) * circumference
+  const ringColor = pct >= 70 ? "stroke-emerald-500" : pct >= 40 ? "stroke-amber-400" : "stroke-blue-500"
 
   return (
-    <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4 shadow-sm">
+    <div className="flex flex-col gap-3 rounded-xl border border-border border-t-4 border-t-blue-400 bg-card p-4 shadow-sm">
       <div>
-        <p className="text-xs font-semibold text-card-foreground">Mentions Coverage</p>
-        <p className="text-xs text-muted-foreground">AI answers mentioning your brand</p>
+        <p className="text-sm font-semibold text-card-foreground">Mentions Coverage</p>
+        <p className="text-xs text-muted-foreground">% of AI answers mentioning your brand</p>
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         <div className="relative flex-shrink-0">
-          <svg width="60" height="60" viewBox="0 0 60 60">
-            <circle cx="30" cy="30" r="26" fill="none" stroke="hsl(var(--muted))" strokeWidth="7" />
-            <circle cx="30" cy="30" r="26" fill="none" stroke="hsl(var(--primary))" strokeWidth="7"
+          <svg width="64" height="64" viewBox="0 0 60 60">
+            <circle cx="30" cy="30" r="26" fill="none" className="stroke-muted" strokeWidth="7" />
+            <circle cx="30" cy="30" r="26" fill="none" className={ringColor} strokeWidth="7"
               strokeDasharray={`${filled} ${circumference - filled}`}
               strokeLinecap="round" transform="rotate(-90 30 30)" />
           </svg>
           <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-card-foreground">{pct}%</span>
         </div>
-        <div>
-          <p className="text-xs text-card-foreground"><span className="font-semibold">{mentionCount}</span> of <span className="font-semibold">{totalResponses}</span> answers</p>
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-card-foreground">{mentionCount} <span className="text-xs font-normal text-muted-foreground">of {totalResponses} answers</span></p>
           {models.length > 0 && (
-            <div className="mt-1.5 flex flex-wrap gap-1">
+            <div className="mt-2 flex flex-wrap gap-1">
               {models.map(m => (
-                <span key={m} title={m} className={cn("rounded-full px-1.5 py-0.5 text-xs font-medium", getModelStyle(m))}>{getModelShort(m)}</span>
+                <span key={m} className={cn("rounded-full px-2 py-0.5 text-xs font-medium", getModelStyle(m))}>{getModelShort(m)}</span>
               ))}
             </div>
           )}
