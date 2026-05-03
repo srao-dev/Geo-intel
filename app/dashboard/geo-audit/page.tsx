@@ -384,6 +384,10 @@ function ContentAnalysisTab({ domain, vertical }: { domain: string; vertical: st
   const [analysis, setAnalysis] = useState<any>(null)
   const [foundPages, setFoundPages] = useState<string[]>([])
   const [error, setError] = useState("")
+  const [showAdvanced, setShowAdvanced] = useState(false)
+  const [customUrls, setCustomUrls] = useState({
+    blog: "", compare: "", casestudies: "", solutions: "", faq: ""
+  })
 
   const run = async () => {
     if (!url.trim()) return
@@ -391,7 +395,11 @@ function ContentAnalysisTab({ domain, vertical }: { domain: string; vertical: st
     try {
       const res = await fetch("/api/content-analysis", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ domain: url.trim(), vertical }),
+        body: JSON.stringify({
+          domain: url.trim(),
+          vertical,
+          customUrls: showAdvanced ? customUrls : undefined,
+        }),
       })
       const data = await res.json()
       if (data.analysis) { setAnalysis(data.analysis); setFoundPages(data.foundPages || []) }
@@ -418,6 +426,38 @@ function ContentAnalysisTab({ domain, vertical }: { domain: string; vertical: st
           </button>
         </div>
         <p className="text-xs text-muted-foreground">We crawl your blog, comparison pages, case studies, product pages and FAQs — then give specific recommendations per content type.</p>
+
+        {/* Advanced: manual URL overrides */}
+        <div>
+          <button
+            onClick={() => setShowAdvanced(s => !s)}
+            className="flex items-center gap-1.5 text-xs text-primary font-medium hover:underline"
+          >
+            {showAdvanced ? "▲" : "▼"} {showAdvanced ? "Hide" : "My content is at custom URLs — specify them"}
+          </button>
+          {showAdvanced && (
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              {[
+                { key: "blog", label: "Blog / Articles / Resources URL", placeholder: "e.g. edgeverve.com/resources" },
+                { key: "compare", label: "Comparison pages URL", placeholder: "e.g. edgeverve.com/compare" },
+                { key: "casestudies", label: "Case studies URL", placeholder: "e.g. edgeverve.com/case-studies" },
+                { key: "solutions", label: "Solutions / Products URL", placeholder: "e.g. edgeverve.com/solutions" },
+                { key: "faq", label: "FAQ / Help URL", placeholder: "e.g. edgeverve.com/faq" },
+              ].map(({ key, label, placeholder }) => (
+                <div key={key} className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-muted-foreground">{label}</label>
+                  <input
+                    type="text"
+                    value={customUrls[key as keyof typeof customUrls]}
+                    onChange={e => setCustomUrls(prev => ({ ...prev, [key]: e.target.value }))}
+                    placeholder={placeholder}
+                    className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-card-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {error && (

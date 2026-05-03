@@ -112,11 +112,32 @@ async function discoverAndFetchContent(domain: string): Promise<{ pages: Record<
 
 export async function POST(req: NextRequest) {
   try {
-    const { domain, vertical = "saas" } = await req.json()
+    const { domain, vertical = "saas", customUrls } = await req.json()
     if (!domain) return NextResponse.json({ error: "Domain required" }, { status: 400 })
 
     const cleanDomain = domain.replace(/^https?:\/\//, "").split("/")[0]
-    const { pages, foundPaths, discoveredLinks } = await discoverAndFetchContent(cleanDomain)
+    const base = `https://${cleanDomain}`
+
+    // If custom URLs provided, fetch them directly
+    let { pages, foundPaths, discoveredLinks } = await discoverAndFetchContent(cleanDomain)
+
+    if (customUrls) {
+      const customKeys: Record<string, string> = {
+        blog: "blog", compare: "compare", casestudies: "casestudies",
+        solutions: "solutions", faq: "faq"
+      }
+      await Promise.all(
+        Object.entries(customUrls).map(async ([key, url]) => {
+          if (!url) return
+          const fullUrl = (url as string).startsWith("http") ? url as string : `https://${url}`
+          const fetched = await fetchPage(fullUrl)
+          if (fetched.length > 200) {
+            pages[customKeys[key]] = fetched
+            foundPaths[customKeys[key]] = [fullUrl as string]
+          }
+        })
+      )
+    }
     const foundPages = Object.keys(pages).filter(k => k !== "homepage")
     
     const navigationHint = Object.keys(foundPaths).length > 0
