@@ -30,23 +30,23 @@ export function MentionsCoverage({ mentionCount, totalResponses, models, loading
   const ringColor = pct >= 70 ? "stroke-emerald-500" : pct >= 40 ? "stroke-amber-400" : "stroke-blue-500"
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-border border-t-4 border-t-blue-400 bg-card p-4 shadow-sm">
+    <div className="flex flex-col gap-3 rounded-xl border border-indigo-200 border-t-4 border-t-indigo-400 bg-indigo-50 p-4 shadow-sm">
       <div>
-        <p className="text-sm font-semibold text-card-foreground">Mentions Coverage</p>
-        <p className="text-xs text-muted-foreground">% of AI answers mentioning your brand</p>
+        <p className="text-sm font-semibold text-indigo-900">Mentions Coverage</p>
+        <p className="text-xs text-indigo-600">% of AI answers mentioning your brand</p>
       </div>
       <div className="flex items-center gap-4">
         <div className="relative flex-shrink-0">
           <svg width="64" height="64" viewBox="0 0 60 60">
-            <circle cx="30" cy="30" r="26" fill="none" className="stroke-muted" strokeWidth="7" />
+            <circle cx="30" cy="30" r="26" fill="none" stroke="#c7d2fe" strokeWidth="7" />
             <circle cx="30" cy="30" r="26" fill="none" className={ringColor} strokeWidth="7"
               strokeDasharray={`${filled} ${circumference - filled}`}
               strokeLinecap="round" transform="rotate(-90 30 30)" />
           </svg>
-          <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-card-foreground">{pct}%</span>
+          <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-indigo-900">{pct}%</span>
         </div>
         <div className="flex-1">
-          <p className="text-sm font-semibold text-card-foreground">{mentionCount} <span className="text-xs font-normal text-muted-foreground">of {totalResponses} answers</span></p>
+          <p className="text-sm font-semibold text-indigo-900">{mentionCount} <span className="text-xs font-normal text-indigo-600">of {totalResponses} answers</span></p>
           {models.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1">
               {models.map(m => (
@@ -54,7 +54,7 @@ export function MentionsCoverage({ mentionCount, totalResponses, models, loading
               ))}
             </div>
           )}
-          {models.length === 0 && <p className="text-xs text-muted-foreground mt-1">No mentions yet</p>}
+          {models.length === 0 && <p className="text-xs text-indigo-500 mt-1">No mentions yet</p>}
         </div>
       </div>
     </div>

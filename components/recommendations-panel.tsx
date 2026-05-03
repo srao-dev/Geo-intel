@@ -22,7 +22,7 @@ function getRecommendations(props: RecommendationsPanelProps) {
   } else if (visibility === 0) {
     recs.push({ icon: AlertCircle, title: "Your brand isn't appearing in AI answers", detail: `Out of ${totalResponses} AI responses, your brand was mentioned 0 times. This is the most urgent issue to fix.`, action: "Run GEO audit to find out why", href: "/dashboard/geo-audit", priority: "critical" })
   } else if (visibility < 30) {
-    recs.push({ icon: AlertCircle, title: `Low visibility — only ${visibility}% of AI answers mention you`, detail: "You're appearing in fewer than 1 in 3 AI responses. Your content structure likely needs improvement.", action: "Run GEO audit", href: "/dashboard/geo-audit", priority: "critical" })
+    recs.push({ icon: AlertCircle, title: `Low visibility — only ${visibility}% of AI answers mention you`, detail: "You're appearing in fewer than 1 in 3 AI responses.", action: "Run GEO audit", href: "/dashboard/geo-audit", priority: "critical" })
   }
 
   if (topCompetitor && topCompetitor.visibility > (visibility + 20)) {
@@ -30,12 +30,12 @@ function getRecommendations(props: RecommendationsPanelProps) {
   }
 
   if (sentiment === "negative") {
-    recs.push({ icon: AlertCircle, title: "Negative sentiment detected", detail: "AI engines are describing your brand negatively. Your messaging needs attention.", action: "Fix brand positioning", href: "/dashboard/geo-audit", priority: "high" })
+    recs.push({ icon: AlertCircle, title: "Negative sentiment detected", detail: "AI engines are describing your brand negatively.", action: "Fix brand positioning", href: "/dashboard/geo-audit", priority: "high" })
   }
 
-  if (recs.length < 3) recs.push({ icon: Zap, title: "Add FAQPage schema to product pages", detail: "FAQPage schema increases AI citation probability by 3.2×. Highest-ROI GEO fix for most SaaS companies.", action: "Get the code", href: "/dashboard/geo-audit", priority: "quick" })
-  if (recs.length < 3) recs.push({ icon: Shield, title: "Allow AI crawler bots in robots.txt", detail: "Add GPTBot, PerplexityBot and ClaudeBot. Takes 15 minutes and directly improves AI crawlability.", action: "See how", href: "/dashboard/geo-audit", priority: "quick" })
-  if (recs.length < 3) recs.push({ icon: TrendingUp, title: "Add Organization schema with sameAs links", detail: "Link your Wikipedia, G2, LinkedIn profiles. Helps AI engines verify who you are.", action: "Get the code", href: "/dashboard/geo-audit", priority: "quick" })
+  if (recs.length < 3) recs.push({ icon: Zap, title: "Add FAQPage schema to product pages", detail: "FAQPage schema increases AI citation probability by 3.2×. Highest-ROI GEO fix.", action: "Get the code", href: "/dashboard/geo-audit", priority: "quick" })
+  if (recs.length < 3) recs.push({ icon: Shield, title: "Allow AI crawler bots in robots.txt", detail: "Add GPTBot, PerplexityBot and ClaudeBot. 15 minutes, direct crawlability improvement.", action: "See how", href: "/dashboard/geo-audit", priority: "quick" })
+  if (recs.length < 3) recs.push({ icon: TrendingUp, title: "Add Organization schema with sameAs links", detail: "Link Wikipedia, G2, LinkedIn profiles. Helps AI engines verify who you are.", action: "Get the code", href: "/dashboard/geo-audit", priority: "quick" })
 
   return recs.slice(0, 3)
 }
@@ -43,18 +43,18 @@ function getRecommendations(props: RecommendationsPanelProps) {
 const P = {
   critical: { border: "border-l-red-500", bg: "bg-red-50", badge: "bg-red-100 text-red-700", label: "Critical" },
   high:     { border: "border-l-orange-400", bg: "bg-orange-50", badge: "bg-orange-100 text-orange-700", label: "High" },
-  quick:    { border: "border-l-blue-400", bg: "bg-blue-50", badge: "bg-blue-100 text-blue-700", label: "Quick win" },
+  quick:    { border: "border-l-teal-400", bg: "bg-teal-50", badge: "bg-teal-100 text-teal-700", label: "Quick win" },
 }
 
 export function RecommendationsPanel(props: RecommendationsPanelProps) {
   const router = useRouter()
   const recs = getRecommendations(props)
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-border border-t-4 border-t-amber-400 bg-card p-4 shadow-sm">
+    <div className="flex flex-col gap-3 rounded-xl border border-amber-200 border-t-4 border-t-amber-400 bg-amber-50 p-4 shadow-sm">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-card-foreground">Recommended Actions</h3>
-          <p className="text-xs text-muted-foreground">Based on your current visibility data</p>
+          <h3 className="text-sm font-semibold text-amber-900">Recommended Actions</h3>
+          <p className="text-xs text-amber-700">Based on your current visibility data</p>
         </div>
         <button onClick={() => router.push("/dashboard/geo-audit")} className="flex items-center gap-1 text-xs text-primary font-semibold hover:underline">
           Full audit <ArrowRight className="h-3 w-3" />

@@ -7,22 +7,25 @@ interface KPICardProps {
 }
 
 export function KPICard({ label, value, delta, trend, loading }: KPICardProps) {
-  const trendColors = { up: "text-emerald-600 bg-emerald-50", down: "text-red-500 bg-red-50", neutral: "text-muted-foreground bg-muted" }
-  const trendIcon = { up: "↑", down: "↓", neutral: "→" }
-  const borderColors = { up: "border-t-emerald-400", down: "border-t-red-400", neutral: "border-t-blue-300" }
+  const styles = {
+    up:      { card: "bg-emerald-50 border-emerald-200 border-t-emerald-400", value: "text-emerald-700", badge: "bg-emerald-100 text-emerald-700", icon: "↑" },
+    down:    { card: "bg-red-50 border-red-200 border-t-red-400", value: "text-red-600", badge: "bg-red-100 text-red-600", icon: "↓" },
+    neutral: { card: "bg-blue-50 border-blue-200 border-t-blue-400", value: "text-blue-700", badge: "bg-blue-100 text-blue-700", icon: "→" },
+  }
+  const s = styles[trend]
   if (loading) return (
-    <div className="flex flex-col gap-1.5 rounded-xl border border-border border-t-4 border-t-muted bg-card px-4 py-3 shadow-sm">
-      <div className="h-3 w-16 rounded bg-muted animate-pulse" />
-      <div className="h-7 w-20 rounded bg-muted animate-pulse" />
-      <div className="h-3 w-24 rounded bg-muted animate-pulse" />
+    <div className="flex flex-col gap-1.5 rounded-xl border border-t-4 bg-muted/30 px-4 py-3 shadow-sm animate-pulse">
+      <div className="h-3 w-16 rounded bg-muted" />
+      <div className="h-7 w-20 rounded bg-muted" />
+      <div className="h-3 w-24 rounded bg-muted" />
     </div>
   )
   return (
-    <div className={`flex flex-col gap-1.5 rounded-xl border border-border border-t-4 ${borderColors[trend]} bg-card px-4 py-3 shadow-sm hover:shadow-md transition-shadow`}>
+    <div className={`flex flex-col gap-1.5 rounded-xl border border-t-4 ${s.card} px-4 py-3 shadow-sm hover:shadow-md transition-shadow`}>
       <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
-      <span className="text-2xl font-bold tabular-nums text-card-foreground leading-tight">{value}</span>
-      <span className={`inline-flex w-fit items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${trendColors[trend]}`}>
-        {trendIcon[trend]} {delta}
+      <span className={`text-2xl font-bold tabular-nums leading-tight ${s.value}`}>{value}</span>
+      <span className={`inline-flex w-fit items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${s.badge}`}>
+        {s.icon} {delta}
       </span>
     </div>
   )
