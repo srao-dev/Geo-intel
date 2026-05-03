@@ -250,7 +250,16 @@ export default function DashboardPage() {
                   </div>
                 </div>
                 <div className="flex flex-1 flex-col gap-3 overflow-y-auto">
-                  <RankingTable data={rankings} />
+                  <RecommendationsPanel
+                visibility={stats?.visibility || 0}
+                rank={stats?.rank || null}
+                totalTracked={stats?.shareOfVoice?.length || 0}
+                mentionCount={stats?.mentionCount || 0}
+                totalResponses={stats?.totalResponses || 0}
+                topCompetitor={stats?.shareOfVoice?.filter((s: any) => !s.isOurBrand)?.sort((a: any, b: any) => b.visibility - a.visibility)?.[0] || null}
+                sentiment={ourBrand?.sentiment}
+              />
+              <RankingTable data={rankings} />
                   <ResponseFeed responses={responses} />
                 </div>
               </div>
