@@ -113,6 +113,9 @@ function AuthModal({ mode, onClose }: { mode: "login" | "signup"; onClose: () =>
           </>
         )}
     </div>
+  )
+}
+
 export default function LandingPage() {
   const [modal, setModal] = useState<"login" | "signup" | null>(null)
 
