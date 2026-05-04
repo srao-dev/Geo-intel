@@ -183,7 +183,7 @@ export default function LandingPage() {
           </div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 28 }}>
-          <svg width="220" height="220" viewBox="0 0 56 56" style={{ animation: "float 3s ease-in-out infinite" }}>
+          <svg width="140" height="140" viewBox="0 0 56 56" style={{ animation: "float 3s ease-in-out infinite" }}>
             <rect x="12" y="22" width="32" height="28" rx="8" fill="#eef1fd" stroke="#3B5BDB" strokeWidth="1.5"/>
             <circle cx="21" cy="33" r="4" fill="white"/><circle cx="35" cy="33" r="4" fill="white"/>
             <circle cx="21" cy="33" r="2" fill="#3B5BDB"/><circle cx="35" cy="33" r="2" fill="#3B5BDB"/>
