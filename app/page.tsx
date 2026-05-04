@@ -153,7 +153,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero split layout */}
-      <section style={{ padding: "80px 8% 80px", maxWidth: 1400, margin: "0 auto", display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: 80, alignItems: "center" }}>
+      <section style={{ padding: "80px 6% 80px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60, alignItems: "center" }}>
         <div>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 20, background: "#eef1fd", border: "1px solid #c5d0f5", marginBottom: 28 }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#3B5BDB", display: "inline-block" }} />
