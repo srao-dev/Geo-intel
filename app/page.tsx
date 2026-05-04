@@ -308,9 +308,9 @@ export default function LandingPage() {
       </section>
 
       {/* How it works — horizontal steps */}
-      <section id="how-it-works" style={{ padding: "0 5% 56px", maxWidth: 1280, margin: "0 auto" }}>
+      <section id="how-it-works" style={{ padding: "60px 5% 56px", maxWidth: 1280, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: "#3B5BDB", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>How it works</div>
+          <div style={{ fontSize: 12, fontWeight: 800, color: "#3B5BDB", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 8 }}>How it works</div>
           <h2 style={{ fontSize: 36, fontWeight: 900, letterSpacing: "-0.04em", color: "#111827" }}>From invisible to cited — in one afternoon</h2>
         </div>
         <div style={{ display: "flex", gap: 0, position: "relative" }}>
@@ -329,7 +329,7 @@ export default function LandingPage() {
       {/* Features — alternating list layout */}
       <section style={{ padding: "0 5% 56px", maxWidth: 1280, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: "#3B5BDB", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 8 }}>Features</div>
+          <div style={{ fontSize: 12, fontWeight: 800, color: "#3B5BDB", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 8 }}>Features</div>
           <h2 style={{ fontSize: 36, fontWeight: 900, letterSpacing: "-0.04em", color: "#111827" }}>Everything you need to win AI search</h2>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
