@@ -121,7 +121,7 @@ export default function LandingPage() {
   const [modal, setModal] = useState<"login" | "signup" | null>(null)
 
   return (
-    <div style={{ minHeight: "100vh", color: "#1a1a1a", background: "linear-gradient(135deg, #f8f9ff 0%, #fafafa 40%, #f0f4ff 100%)" }}>
+    <div style={{ minHeight: "100vh", color: "#1a1a1a", background: "linear-gradient(135deg, #eef1fd 0%, #f5f7ff 50%, #e8edfc 100%)" }}>
       {modal && <AuthModal mode={modal} onClose={() => setModal(null)} />}
 
       {/* Nav */}
