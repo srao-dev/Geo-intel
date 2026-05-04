@@ -221,50 +221,25 @@ function TechnicalAuditTab({ vertical }: { vertical: string }) {
 }
 
 function ContentAnalysisTab({ vertical }: { vertical: string }) {
-  const { user } = useAuth()
   const [url, setUrl] = useState("")
   const [loading, setLoading] = useState(false)
   const [analysis, setAnalysis] = useState<any>(null)
-  const [currentUrl, setCurrentUrl] = useState("")
   const [error, setError] = useState("")
-  const [history, setHistory] = useState<any[]>([])
-  const [cached, setCached] = useState(false)
 
-  useEffect(() => {
-    if (!user) return
-    getAnalysisHistory(user.id, 8).then(setHistory)
-  }, [user])
-
-  const run = async (runUrl?: string) => {
-    const targetUrl = runUrl || url
-    if (!targetUrl.trim()) return
-    setLoading(true); setError(""); setAnalysis(null); setCached(false)
-    const fullUrl = targetUrl.startsWith("http") ? targetUrl : "https://" + targetUrl
+  const run = async () => {
+    if (!url.trim()) return
+    setLoading(true); setError(""); setAnalysis(null)
+    const fullUrl = url.startsWith("http") ? url : "https://" + url
     const domain = fullUrl.replace(/^https?:\/\//, "").split("/")[0]
-
-    // Check cache first
-    if (user) {
-      const hit = await getCachedAnalysis(user.id, fullUrl)
-      if (hit) {
-        setAnalysis(hit.analysis)
-        setCurrentUrl(fullUrl)
-        setCached(true)
-        setLoading(false)
-        return
-      }
-    }
-
     try {
-      const res = await fetch("/api/content-page-analysis", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: fullUrl, domain, vertical }) })
+      const res = await fetch("/api/content-page-analysis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: fullUrl, domain, vertical }),
+      })
       const data = await res.json()
-      if (data.analysis) {
-        setAnalysis(data.analysis)
-        setCurrentUrl(fullUrl)
-        if (user) {
-          await saveAnalysisResult(user.id, fullUrl, data.analysis)
-          getAnalysisHistory(user.id, 8).then(setHistory)
-        }
-      } else setError(data.error || "Analysis failed")
+      if (data.analysis) setAnalysis(data.analysis)
+      else setError(data.error || "Analysis failed")
     } catch { setError("Could not connect to analysis service") }
     setLoading(false)
   }
@@ -273,39 +248,42 @@ function ContentAnalysisTab({ vertical }: { vertical: string }) {
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Input — always visible at top */}
       <div className="rounded-xl border border-border bg-card p-5 shadow-sm">
         <div className="flex gap-3">
           <div className="flex-1 flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2.5 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all">
             <Search className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
-            <input type="text" value={url} onChange={e => setUrl(e.target.value)} onKeyDown={e => e.key === "Enter" && run()} placeholder="Paste a page URL — blog post, case study, whitepaper, FAQ..." className="flex-1 bg-transparent text-sm text-card-foreground placeholder:text-muted-foreground outline-none" />
+            <input
+              type="text" value={url} onChange={e => setUrl(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && run()}
+              placeholder="Paste a page URL — blog post, case study, whitepaper, FAQ..."
+              className="flex-1 bg-transparent text-sm text-card-foreground placeholder:text-muted-foreground outline-none"
+            />
             {url && <button onClick={() => { setUrl(""); setAnalysis(null); setError("") }}><X className="h-3.5 w-3.5 text-muted-foreground" /></button>}
           </div>
           <button onClick={run} disabled={loading || !url.trim()} className="flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors shadow-sm">
             {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Analysing...</> : <>Analyse <ArrowRight className="h-4 w-4" /></>}
           </button>
         </div>
-        <p className="text-xs text-muted-foreground mt-2">Works on any specific content page — not section homepages like /blog or /resources</p>
+        <p className="text-xs text-muted-foreground mt-2">Works on specific content pages — not section homepages like /blog or /resources</p>
       </div>
 
-      {error && <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-center gap-2"><AlertCircle className="h-4 w-4 flex-shrink-0" />{error}</div>}
+      {error && (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-center gap-2">
+          <AlertCircle className="h-4 w-4 flex-shrink-0" />{error}
+        </div>
+      )}
 
       {loading && (
         <div className="rounded-xl border border-border bg-card p-8 flex items-center gap-6">
           <div className="flex-shrink-0 w-10 h-10 rounded-full border-2 border-primary border-t-transparent animate-spin" />
           <div>
             <p className="text-sm font-semibold text-card-foreground">Fetching and analysing page...</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Reading content, checking schema, assessing AI citation readiness · ~20 seconds</p>
-            <div className="mt-3 flex gap-2 flex-wrap">
-              {["Fetching page content", "Detecting content type", "Checking schema", "Finding GEO gaps", "Generating fixes"].map((step, i) => (
-                <span key={step} className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">{step}</span>
-              ))}
-            </div>
+            <p className="text-xs text-muted-foreground mt-0.5">Reading content, checking schema, assessing AI citation readiness</p>
           </div>
         </div>
       )}
 
-      {analysis && !loading && ss && (
+      {analysis && ss && !loading && (
         <div className="flex flex-col gap-4">
           <div className={cn("rounded-2xl border-2 p-5 shadow-sm", ss.bg, ss.border)}>
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">{analysis.page_title || url}</p>
@@ -320,7 +298,9 @@ function ContentAnalysisTab({ vertical }: { vertical: string }) {
           {analysis.what_works?.length > 0 && (
             <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
               <p className="text-xs font-semibold text-emerald-800 uppercase tracking-wider mb-2">What works</p>
-              {analysis.what_works.map((w: string, i: number) => <p key={i} className="text-xs text-emerald-700">• {w}</p>)}
+              {analysis.what_works.map((w: string, i: number) => (
+                <p key={i} className="text-xs text-emerald-700">• {w}</p>
+              ))}
             </div>
           )}
 
@@ -331,7 +311,11 @@ function ContentAnalysisTab({ vertical }: { vertical: string }) {
                 <div key={i} className="rounded-xl border border-red-200 bg-red-50 border-l-4 border-l-red-500 p-4">
                   <p className="text-xs font-semibold text-red-800 mb-1">{gap.gap}</p>
                   <p className="text-xs text-red-700 mb-2"><span className="font-semibold">Fix:</span> {gap.fix}</p>
-                  {gap.example && <div className="bg-white/70 rounded-lg p-2.5 border border-red-100 mt-2"><p className="text-xs text-card-foreground italic">"{gap.example}"</p></div>}
+                  {gap.example && (
+                    <div className="bg-white/70 rounded-lg p-2.5 border border-red-100 mt-2">
+                      <p className="text-xs text-card-foreground italic">"{gap.example}"</p>
+                    </div>
+                  )}
                   <p className="text-xs text-muted-foreground mt-1.5">Impact: {gap.impact}</p>
                 </div>
               ))}
@@ -381,54 +365,81 @@ function ContentAnalysisTab({ vertical }: { vertical: string }) {
           )}
 
           <div className="text-center pt-2">
-            <button onClick={() => { setUrl(""); setAnalysis(null) }} className="text-xs text-primary font-semibold hover:underline">Analyse a different URL</button>
+            <button onClick={() => { setUrl(""); setAnalysis(null) }} className="text-xs text-primary font-semibold hover:underline">
+              Analyse a different URL
+            </button>
           </div>
         </div>
       )}
 
       {!analysis && !loading && !error && (
-        <div className="flex flex-col gap-4">
-          {history.length > 0 && (
-            <div className="rounded-xl border border-border bg-card p-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Previously analysed</p>
-              <div className="flex flex-col gap-2">
-                {history.map((h: any, i: number) => {
-                  const ss2 = getScoreStatus(h.analysis?.geo_score || 0)
-                  return (
-                    <button key={i} onClick={() => { setUrl(h.url); run(h.url) }}
-                      className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors text-left">
-                      <div className={cn("flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold", ss2.bg, ss2.color)}>
-                        {h.analysis?.geo_score || "?"}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-card-foreground truncate">{h.analysis?.page_title || h.url}</p>
-                        <p className="text-xs text-muted-foreground truncate">{h.url}</p>
-                      </div>
-                      <span className={cn("text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0", ss2.bg, ss2.color)}>{ss2.label}</span>
-                    </button>
-                  )
-                })}
+        <div className="flex flex-col gap-5">
+          <div className="rounded-xl border border-border bg-card px-8 py-6 flex items-center gap-8">
+            <div className="flex-shrink-0">
+              <svg width="80" height="80" viewBox="0 0 56 56" style={{ animation: "float 3s ease-in-out infinite" }}>
+                <rect x="12" y="22" width="32" height="28" rx="8" fill="#eef1fd" stroke="#3B5BDB" strokeWidth="1.5"/>
+                <circle cx="21" cy="33" r="4" fill="white"/>
+                <circle cx="35" cy="33" r="4" fill="white"/>
+                <circle cx="21" cy="33" r="2" fill="#3B5BDB"/>
+                <circle cx="35" cy="33" r="2" fill="#3B5BDB"/>
+                <path d="M22 41 Q28 46 34 41" fill="none" stroke="#3B5BDB" strokeWidth="1.5" strokeLinecap="round"/>
+                <line x1="28" y1="22" x2="28" y2="12" stroke="#3B5BDB" strokeWidth="1.5" strokeLinecap="round"/>
+                <ellipse cx="28" cy="10" rx="7" ry="4" fill="none" stroke="#3B5BDB" strokeWidth="1.5" style={{ transformOrigin: "28px 10px", animation: "spin 3s linear infinite" }}/>
+                <rect x="4" y="28" width="8" height="4" rx="2" fill="#eef1fd" stroke="#3B5BDB" strokeWidth="1"/>
+                <rect x="44" y="28" width="8" height="4" rx="2" fill="#eef1fd" stroke="#3B5BDB" strokeWidth="1"/>
+                <rect x="18" y="37" width="20" height="8" rx="3" fill="rgba(59,91,219,0.1)" stroke="#3B5BDB" strokeWidth="0.5"/>
+                <text x="28" y="43.5" textAnchor="middle" fontSize="5" fontWeight="700" fill="#3B5BDB" fontFamily="monospace">GEO</text>
+              </svg>
+              <style>{`@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}} @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
+            </div>
+            <div className="flex-1">
+              <div className="bg-primary/5 border border-primary/20 rounded-xl rounded-tl-none px-4 py-3 mb-3">
+                <p className="text-sm font-semibold text-card-foreground mb-0.5">Hi! I am Radar, your GEO analyst.</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">Paste any content page URL above and I will tell you exactly why AI engines are not citing it — and how to fix it. Works on blog posts, case studies, whitepapers, FAQs and comparison pages.</p>
+              </div>
+              <div className="flex items-center gap-6">
+                {[
+                  { label: "Score 0-100", sub: "GEO readiness" },
+                  { label: "Specific gaps", sub: "Not generic tips" },
+                  { label: "Copy-paste fixes", sub: "Schema and rewrites" },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    {i > 0 && <div className="w-px h-6 bg-border" />}
+                    <div>
+                      <p className="text-xs font-semibold text-card-foreground">{item.label}</p>
+                      <p className="text-xs text-muted-foreground">{item.sub}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          )}
-          <div className="grid grid-cols-2 gap-4">
-          {[
-            { title: "Detects content type", desc: "Blog post, case study, whitepaper, FAQ, comparison page — each has different GEO requirements.", icon: "📄", color: "bg-blue-50 border-blue-200" },
-            { title: "Finds specific gaps", desc: "Missing schema, weak entity definition, no AI-citable stats, poor heading structure.", icon: "🔍", color: "bg-amber-50 border-amber-200" },
-            { title: "Rewrite suggestions", desc: "Exact sentences to add or change — not generic advice. Specific to the page content.", icon: "✏️", color: "bg-violet-50 border-violet-200" },
-            { title: "Schema to add", desc: "Copy-paste JSON-LD ready to implement. FAQPage, Article, CaseStudy, HowTo and more.", icon: "🔧", color: "bg-emerald-50 border-emerald-200" },
-          ].map(item => (
-            <div key={item.title} className={cn("rounded-xl border p-4", item.color)}>
-              <div className="text-lg mb-2">{item.icon}</div>
-              <p className="text-xs font-semibold text-card-foreground mb-1">{item.title}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
+          </div>
+
+          <div className="rounded-xl border border-border bg-card overflow-hidden">
+            <div className="px-5 py-3 border-b border-border">
+              <p className="text-xs font-semibold text-card-foreground">What you get from each analysis</p>
             </div>
-          ))}
+            <div className="grid grid-cols-4 divide-x divide-border">
+              {[
+                { label: "Content type", desc: "Blog, case study, whitepaper, FAQ — each scored differently", color: "text-blue-600", bg: "bg-blue-50", n: "01" },
+                { label: "GEO gaps", desc: "Missing schema, weak entity definition, no AI-citable stats", color: "text-amber-600", bg: "bg-amber-50", n: "02" },
+                { label: "Rewrite briefs", desc: "Exact sentences to add or change — specific to the page", color: "text-violet-600", bg: "bg-violet-50", n: "03" },
+                { label: "Schema code", desc: "Copy-paste JSON-LD ready to implement same day", color: "text-emerald-600", bg: "bg-emerald-50", n: "04" },
+              ].map(item => (
+                <div key={item.label} className="px-5 py-4">
+                  <div className={cn("inline-flex items-center justify-center w-6 h-6 rounded-md text-xs font-bold mb-3", item.bg, item.color)}>{item.n}</div>
+                  <p className="text-xs font-semibold text-card-foreground mb-1">{item.label}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>
   )
 }
+
 
 export default function GeoAuditPage() {
   const { user } = useAuth()
