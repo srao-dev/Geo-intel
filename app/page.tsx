@@ -142,35 +142,68 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Hero */}
-      <section style={{ padding: "64px 32px 56px", maxWidth: 900, margin: "0 auto", textAlign: "center" }}>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 20, background: "#eef1fd", border: "1px solid #c5d0f5", marginBottom: 24 }}>
-          <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#3B5BDB", display: "inline-block" }} />
-          <span style={{ fontSize: 11, fontWeight: 600, color: "#3B5BDB", letterSpacing: "0.06em", textTransform: "uppercase" }}>AI search visibility platform</span>
+      {/* Hero — split layout */}
+      <section style={{ padding: "72px 5% 64px", maxWidth: 1280, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 64, alignItems: "center" }}>
+        <div>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 20, background: "#eef1fd", border: "1px solid #c5d0f5", marginBottom: 28 }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#3B5BDB", display: "inline-block" }} />
+            <span style={{ fontSize: 11, fontWeight: 600, color: "#3B5BDB", letterSpacing: "0.06em", textTransform: "uppercase" }}>AI search visibility platform</span>
+          </div>
+          <h1 style={{ fontSize: "clamp(40px,4vw,64px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: 20, color: "#111827" }}>
+            See where you stand.<br />
+            Understand why.<br />
+            <span style={{ color: "#3B5BDB" }}>Fix it today.</span>
+          </h1>
+          <p style={{ fontSize: 18, color: "#6b7280", marginBottom: 36, lineHeight: 1.7, maxWidth: 480 }}>
+            GeoIntel tracks how your brand appears across ChatGPT, Perplexity, Gemini and Claude — then tells you exactly what to fix and gives you the code to do it.
+          </p>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 32 }}>
+            <button onClick={() => setModal("signup")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "14px 32px", borderRadius: 10, background: "#3B5BDB", color: "white", fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer" }}>
+              Start free audit <ArrowRight size={16} />
+            </button>
+            <button onClick={() => setModal("login")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "14px 24px", borderRadius: 10, background: "white", color: "#374151", fontWeight: 500, fontSize: 16, border: "1px solid #e5e7eb", cursor: "pointer" }}>
+              Sign in
+            </button>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 12, color: "#9ca3af" }}>Tracking across</span>
+            {["ChatGPT", "Perplexity", "Gemini", "Claude"].map(l => (
+              <span key={l} style={{ padding: "3px 10px", borderRadius: 20, fontSize: 12, fontWeight: 500, background: "white", border: "1px solid #e5e7eb", color: "#374151" }}>{l}</span>
+            ))}
+          </div>
         </div>
-
-        {/* Radar in hero */}
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 28 }}>
-          <RadarMascot />
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 24 }}>
+          <svg width="200" height="200" viewBox="0 0 56 56" style={{ animation: "float 3s ease-in-out infinite" }}>
+            <rect x="12" y="22" width="32" height="28" rx="8" fill="#eef1fd" stroke="#3B5BDB" strokeWidth="1.5"/>
+            <circle cx="21" cy="33" r="4" fill="white"/><circle cx="35" cy="33" r="4" fill="white"/>
+            <circle cx="21" cy="33" r="2" fill="#3B5BDB"/><circle cx="35" cy="33" r="2" fill="#3B5BDB"/>
+            <path d="M22 41 Q28 46 34 41" fill="none" stroke="#3B5BDB" strokeWidth="1.5" strokeLinecap="round"/>
+            <line x1="28" y1="22" x2="28" y2="12" stroke="#3B5BDB" strokeWidth="1.5" strokeLinecap="round"/>
+            <ellipse cx="28" cy="10" rx="7" ry="4" fill="none" stroke="#3B5BDB" strokeWidth="1.5" style={{ transformOrigin: "28px 10px", animation: "spin 3s linear infinite" }}/>
+            <rect x="4" y="28" width="8" height="4" rx="2" fill="#eef1fd" stroke="#3B5BDB" strokeWidth="1"/>
+            <rect x="44" y="28" width="8" height="4" rx="2" fill="#eef1fd" stroke="#3B5BDB" strokeWidth="1"/>
+            <rect x="18" y="37" width="20" height="8" rx="3" fill="rgba(59,91,219,0.1)" stroke="#3B5BDB" strokeWidth="0.5"/>
+            <text x="28" y="43.5" textAnchor="middle" fontSize="5" fontWeight="700" fill="#3B5BDB" fontFamily="monospace">GEO</text>
+          </svg>
+          <style>{"@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}} @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}"}</style>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, width: "100%" }}>
+            {[
+              { label: "AI Visibility", value: "24%", sub: "typical before", color: "#ef4444" },
+              { label: "After fixes", value: "71%", sub: "avg improvement", color: "#3B5BDB" },
+              { label: "Time to fix", value: "2hrs", sub: "copy-paste ready", color: "#10b981" },
+              { label: "Cost", value: "$15", sub: "vs $189-$989/mo", color: "#f59e0b" },
+            ].map(s => (
+              <div key={s.label} style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 12, padding: "14px 16px", textAlign: "center" }}>
+                <div style={{ fontSize: 28, fontWeight: 800, color: s.color, letterSpacing: "-0.03em", lineHeight: 1 }}>{s.value}</div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: "#374151", marginTop: 4 }}>{s.label}</div>
+                <div style={{ fontSize: 10, color: "#9ca3af", marginTop: 2 }}>{s.sub}</div>
+              </div>
+            ))}
+          </div>
         </div>
+      </section>
 
-        <h1 style={{ fontSize: "clamp(32px,5vw,56px)", fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1.1, marginBottom: 18, color: "#111827" }}>
-          See where you stand.<br />
-          Understand why.<br />
-          <span style={{ color: "#3B5BDB" }}>Fix it today.</span>
-        </h1>
-        <p style={{ fontSize: 16, color: "#6b7280", maxWidth: 500, margin: "0 auto 32px", lineHeight: 1.7 }}>
-          GeoIntel tracks how your brand appears across ChatGPT, Perplexity, Gemini and Claude — then tells you exactly what to fix and gives you the code to do it.
-        </p>
-        <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
-          <button onClick={() => setModal("signup")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "12px 28px", borderRadius: 9, background: "#3B5BDB", color: "white", fontWeight: 700, fontSize: 15, border: "none", cursor: "pointer" }}>
-            Start free audit <ArrowRight size={15} />
-          </button>
-          <button onClick={() => setModal("login")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "12px 24px", borderRadius: 9, background: "white", color: "#374151", fontWeight: 500, fontSize: 15, border: "1px solid #e5e7eb", cursor: "pointer" }}>
-            Sign in
-          </button>
-        </div>
-
+      {/* Hero Visual */}
         {/* Hero Visual */}
         <div style={{ margin: "40px auto 0", maxWidth: 900, width: "100%" }}>
           <svg width="100%" viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg" style={{ filter: "drop-shadow(0 4px 24px rgba(0,0,0,0.07))" }}>
