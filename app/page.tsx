@@ -309,7 +309,22 @@ export default function LandingPage() {
             <text x="576" y="354" fontSize="12" fontWeight="600" fill="#111827" fontFamily="system-ui,sans-serif">Add FAQPage schema to product pages</text>
             <text x="576" y="371" fontSize="11" fill="#6b7280" fontFamily="system-ui,sans-serif">Copy-paste JSON-LD fix ready to implement</text>
           </svg>
-      </div>
+          <style>{"@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}} @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}"}</style>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, width: "100%" }}>
+            {[
+              { label: "AI Visibility", value: "24%", sub: "typical before", color: "#ef4444" },
+              { label: "After fixes", value: "71%", sub: "avg improvement", color: "#3B5BDB" },
+              { label: "Time to fix", value: "2hrs", sub: "copy-paste ready", color: "#10b981" },
+              { label: "Cost", value: "$15", sub: "vs $189-$989/mo", color: "#f59e0b" },
+            ].map(s => (
+              <div key={s.label} style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 12, padding: "14px 16px", textAlign: "center" }}>
+                <div style={{ fontSize: 28, fontWeight: 800, color: s.color, letterSpacing: "-0.03em", lineHeight: 1 }}>{s.value}</div>
+                <div style={{ fontSize: 11, fontWeight: 600, color: "#374151", marginTop: 4 }}>{s.label}</div>
+                <div style={{ fontSize: 10, color: "#9ca3af", marginTop: 2 }}>{s.sub}</div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* How it works — horizontal steps */}
