@@ -155,7 +155,7 @@ export default function LandingPage() {
             <span style={{ color: "#3B5BDB" }}>Fix it today.</span>
           </h1>
           <p style={{ fontSize: 18, color: "#6b7280", marginBottom: 36, lineHeight: 1.7, maxWidth: 480 }}>
-            GeoIntel tracks how your brand appears across ChatGPT, Perplexity, Gemini and Claude — then tells you exactly what to fix and gives you the code to do it.
+            Your buyers are asking ChatGPT, Perplexity and Gemini which tool to use. Are you showing up? GeoIntel tells you exactly where you stand, why competitors rank above you, and gives you copy-paste fixes to change that.
           </p>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 32 }}>
             <button onClick={() => setModal("signup")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "14px 32px", borderRadius: 10, background: "#3B5BDB", color: "white", fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer" }}>
