@@ -202,14 +202,54 @@ function TechnicalAuditTab({ vertical }: { vertical: string }) {
       )}
 
       {!report && !loading && !error && (
-        <div className="flex flex-col items-center text-center py-8 gap-4">
-          <p className="text-base font-semibold text-card-foreground">Full GEO audit in 30 seconds</p>
-          <div className="flex items-stretch rounded-xl border border-border bg-muted/30 overflow-hidden w-full max-w-2xl">
-            {[{ icon: "🎯", label: "GEO Score", desc: "0–100 with status label" }, { icon: "📐", label: "5 Dimensions", desc: "Crawl · Schema · Content · Authority" }, { icon: "🔧", label: "Copy-paste Fixes", desc: "Code ready same day" }].map((item, i) => (
-              <div key={item.label} className={cn("flex-1 px-5 py-4 flex flex-col items-center text-center gap-1", i > 0 ? "border-l border-border" : "")}>
-                <span className="text-xl mb-1">{item.icon}</span>
-                <p className="text-xs font-semibold text-card-foreground">{item.label}</p>
-                <p className="text-xs text-muted-foreground">{item.desc}</p>
+        <div className="flex flex-col gap-4">
+          <div className="rounded-xl border border-border bg-card px-8 py-6 flex items-center gap-8">
+            <div className="flex-shrink-0">
+              <svg width="72" height="72" viewBox="0 0 56 56" style={{ animation: "float 3s ease-in-out infinite" }}>
+                <rect x="12" y="22" width="32" height="28" rx="8" fill="#eef1fd" stroke="#3B5BDB" strokeWidth="1.5"/>
+                <circle cx="21" cy="33" r="4" fill="white"/><circle cx="35" cy="33" r="4" fill="white"/>
+                <circle cx="21" cy="33" r="2" fill="#3B5BDB"/><circle cx="35" cy="33" r="2" fill="#3B5BDB"/>
+                <path d="M22 41 Q28 46 34 41" fill="none" stroke="#3B5BDB" strokeWidth="1.5" strokeLinecap="round"/>
+                <line x1="28" y1="22" x2="28" y2="12" stroke="#3B5BDB" strokeWidth="1.5" strokeLinecap="round"/>
+                <ellipse cx="28" cy="10" rx="7" ry="4" fill="none" stroke="#3B5BDB" strokeWidth="1.5" style={{ transformOrigin: "28px 10px", animation: "spin 3s linear infinite" }}/>
+                <rect x="4" y="28" width="8" height="4" rx="2" fill="#eef1fd" stroke="#3B5BDB" strokeWidth="1"/>
+                <rect x="44" y="28" width="8" height="4" rx="2" fill="#eef1fd" stroke="#3B5BDB" strokeWidth="1"/>
+                <rect x="18" y="37" width="20" height="8" rx="3" fill="rgba(59,91,219,0.1)" stroke="#3B5BDB" strokeWidth="0.5"/>
+                <text x="28" y="43.5" textAnchor="middle" fontSize="5" fontWeight="700" fill="#3B5BDB" fontFamily="monospace">GEO</text>
+              </svg>
+              <style>{"@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}} @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}"}</style>
+            </div>
+            <div className="flex-1">
+              <div className="bg-primary/5 border border-primary/20 rounded-xl rounded-tl-none px-4 py-3 mb-3">
+                <p className="text-sm font-semibold text-card-foreground mb-0.5">Hi! I am Radar, your GEO analyst.</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">Enter any website domain and I will audit it across 5 GEO dimensions. You will get a score, specific findings, and copy-paste fixes ready to implement.</p>
+              </div>
+              <div className="flex items-center gap-6">
+                {[
+                  { label: "Score 0-100", sub: "With status label" },
+                  { label: "5 dimensions", sub: "Full breakdown" },
+                  { label: "Copy-paste fixes", sub: "Ready same day" },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    {i > 0 && <div className="w-px h-6 bg-border" />}
+                    <div>
+                      <p className="text-xs font-semibold text-card-foreground">{item.label}</p>
+                      <p className="text-xs text-muted-foreground">{item.sub}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { label: "Real data", desc: "We fetch your site, check robots.txt, extract schema and analyse content structure.", color: "text-blue-700", bg: "bg-blue-50", border: "border-blue-200" },
+              { label: "5 dimensions scored", desc: "Crawlability, content depth, schema markup, authority signals and competitive positioning.", color: "text-violet-700", bg: "bg-violet-50", border: "border-violet-200" },
+              { label: "Fixes ready to ship", desc: "Every finding has a copy-paste fix — schema JSON-LD, robots.txt snippets, content rewrites.", color: "text-emerald-700", bg: "bg-emerald-50", border: "border-emerald-200" },
+            ].map(item => (
+              <div key={item.label} className={`rounded-xl border p-4 ${item.bg} ${item.border}`}>
+                <p className={`text-sm font-semibold mb-1 ${item.color}`}>{item.label}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
