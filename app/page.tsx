@@ -192,8 +192,6 @@ export default function LandingPage() {
             <ellipse cx="28" cy="10" rx="7" ry="4" fill="none" stroke="#3B5BDB" strokeWidth="1.5" style={{ transformOrigin: "28px 10px", animation: "spin 3s linear infinite" }}/>
             <rect x="4" y="28" width="8" height="4" rx="2" fill="#eef1fd" stroke="#3B5BDB" strokeWidth="1"/>
             <rect x="44" y="28" width="8" height="4" rx="2" fill="#eef1fd" stroke="#3B5BDB" strokeWidth="1"/>
-            <rect x="18" y="37" width="20" height="8" rx="3" fill="rgba(59,91,219,0.1)" stroke="#3B5BDB" strokeWidth="0.5"/>
-            <text x="28" y="43.5" textAnchor="middle" fontSize="5" fontWeight="700" fill="#3B5BDB" fontFamily="monospace">GEO</text>
           </svg>
           <style>{"@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}} @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}"}</style>
           {/* Dark dashboard mockup */}
@@ -257,10 +255,13 @@ export default function LandingPage() {
           <div style={{ position: "relative", height: 340 }}>
             <svg width="100%" height="340" viewBox="0 0 800 340" style={{ overflow: "visible" }}>
               {/* Connection lines */}
-              <path d="M 140 80 C 140 180 400 200 400 260" fill="none" stroke="#2dd4bf" strokeWidth="1.5" strokeDasharray="5,4" opacity="0.4"/>
-              <path d="M 300 80 C 300 180 400 200 400 260" fill="none" stroke="#8b5cf6" strokeWidth="1.5" strokeDasharray="5,4" opacity="0.4"/>
-              <path d="M 500 80 C 500 180 400 200 400 260" fill="none" stroke="#3b82f6" strokeWidth="1.5" strokeDasharray="5,4" opacity="0.4"/>
-              <path d="M 660 80 C 660 180 400 200 400 260" fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="5,4" opacity="0.4"/>
+              <path d="M 140 80 C 140 180 400 200 400 260" fill="none" stroke="#2dd4bf" strokeWidth="1.5" strokeDasharray="8,5" opacity="0.6" style={{ animation: "dash 2s linear infinite" }}/>
+              <path d="M 300 80 C 300 180 400 200 400 260" fill="none" stroke="#8b5cf6" strokeWidth="1.5" strokeDasharray="8,5" opacity="0.6" style={{ animation: "dash 2.4s linear infinite" }}/>
+              <path d="M 500 80 C 500 180 400 200 400 260" fill="none" stroke="#3b82f6" strokeWidth="1.5" strokeDasharray="8,5" opacity="0.6" style={{ animation: "dash 2.8s linear infinite" }}/>
+              <path d="M 660 80 C 660 180 400 200 400 260" fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="8,5" opacity="0.6" style={{ animation: "dash 3.2s linear infinite" }}/>
+              <defs>
+                <style>{`@keyframes dash { to { stroke-dashoffset: -26; } }`}</style>
+              </defs>
 
               {/* ChatGPT */}
               <rect x="80" y="20" width="120" height="56" rx="14" fill="#1a1a2e" stroke="rgba(45,212,191,0.3)" strokeWidth="1"/>
