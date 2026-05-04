@@ -239,6 +239,64 @@ export default function LandingPage() {
         </div>
       </section>
 
+
+      {/* AI engines visual */}
+      <section style={{ background: "#0f1117", padding: "80px 5% 80px", margin: "0" }}>
+        <div style={{ maxWidth: 860, margin: "0 auto", textAlign: "center" }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: "#2dd4bf", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 16 }}>Your competitive moat</div>
+          <h2 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 800, color: "white", letterSpacing: "-0.03em", marginBottom: 12, lineHeight: 1.15 }}>Every AI engine is answering<br />your buyers right now</h2>
+          <p style={{ fontSize: 16, color: "#9896b0", marginBottom: 56, maxWidth: 500, margin: "0 auto 56px" }}>GeoIntel tracks all 4 — and tells you exactly what to fix to show up in each one.</p>
+
+          <div style={{ position: "relative", height: 340 }}>
+            <svg width="100%" height="340" viewBox="0 0 800 340" style={{ overflow: "visible" }}>
+              {/* Connection lines */}
+              <path d="M 140 80 C 140 180 400 200 400 260" fill="none" stroke="#2dd4bf" strokeWidth="1.5" strokeDasharray="5,4" opacity="0.4"/>
+              <path d="M 300 80 C 300 180 400 200 400 260" fill="none" stroke="#8b5cf6" strokeWidth="1.5" strokeDasharray="5,4" opacity="0.4"/>
+              <path d="M 500 80 C 500 180 400 200 400 260" fill="none" stroke="#3b82f6" strokeWidth="1.5" strokeDasharray="5,4" opacity="0.4"/>
+              <path d="M 660 80 C 660 180 400 200 400 260" fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="5,4" opacity="0.4"/>
+
+              {/* ChatGPT */}
+              <rect x="80" y="20" width="120" height="56" rx="14" fill="#1a1a2e" stroke="rgba(45,212,191,0.3)" strokeWidth="1"/>
+              <text x="140" y="52" textAnchor="middle" fontSize="14" fontWeight="600" fill="#10b981" fontFamily="system-ui">ChatGPT</text>
+
+              {/* Perplexity */}
+              <rect x="240" y="20" width="120" height="56" rx="14" fill="#1a1a2e" stroke="rgba(139,92,246,0.3)" strokeWidth="1"/>
+              <text x="300" y="52" textAnchor="middle" fontSize="14" fontWeight="600" fill="#8b5cf6" fontFamily="system-ui">Perplexity</text>
+
+              {/* Gemini */}
+              <rect x="440" y="20" width="120" height="56" rx="14" fill="#1a1a2e" stroke="rgba(59,130,246,0.3)" strokeWidth="1"/>
+              <text x="500" y="52" textAnchor="middle" fontSize="14" fontWeight="600" fill="#60a5fa" fontFamily="system-ui">Gemini</text>
+
+              {/* Claude */}
+              <rect x="600" y="20" width="120" height="56" rx="14" fill="#1a1a2e" stroke="rgba(245,158,11,0.3)" strokeWidth="1"/>
+              <text x="660" y="52" textAnchor="middle" fontSize="14" fontWeight="600" fill="#f59e0b" fontFamily="system-ui">Claude</text>
+
+              {/* Your Brand */}
+              <rect x="320" y="240" width="160" height="60" rx="14" fill="rgba(45,212,191,0.15)" stroke="#2dd4bf" strokeWidth="2"/>
+              <text x="400" y="268" textAnchor="middle" fontSize="13" fontWeight="600" fill="#2dd4bf" fontFamily="system-ui">Your Brand</text>
+              <text x="400" y="288" textAnchor="middle" fontSize="11" fill="#9896b0" fontFamily="system-ui">tracked across all 4</text>
+
+              {/* Glow dots on lines */}
+              <circle cx="400" cy="260" r="5" fill="#2dd4bf" opacity="0.8"/>
+            </svg>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginTop: 8 }}>
+            {[
+              { name: "ChatGPT", desc: "Largest user base. Most buyer queries start here.", color: "#10b981" },
+              { name: "Perplexity", desc: "Fast growing. Cites sources directly — high citation value.", color: "#8b5cf6" },
+              { name: "Gemini", desc: "Google backed. Increasingly used for research queries.", color: "#60a5fa" },
+              { name: "Claude", desc: "Enterprise preferred. Strong for complex B2B questions.", color: "#f59e0b" },
+            ].map(e => (
+              <div key={e.name} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 12, padding: "14px 16px", textAlign: "left" }}>
+                <p style={{ fontSize: 13, fontWeight: 600, color: e.color, margin: "0 0 6px" }}>{e.name}</p>
+                <p style={{ fontSize: 11, color: "#5e5c78", margin: 0, lineHeight: 1.5 }}>{e.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* How it works — horizontal steps */}
       <section id="how-it-works" style={{ padding: "0 5% 56px", maxWidth: 1280, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
