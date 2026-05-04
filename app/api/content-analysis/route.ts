@@ -203,3 +203,4 @@ Return ONLY valid JSON:
     return NextResponse.json({ error: err.message || "Analysis failed" }, { status: 500 })
   }
 }
+// patch applied
