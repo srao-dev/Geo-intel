@@ -137,7 +137,7 @@ export default function LandingPage() {
               <ellipse cx="28" cy="12" rx="5" ry="3" fill="none" stroke="#3B5BDB" strokeWidth="1.5"/>
             </svg>
           </div>
-          <span style={{ fontWeight: 700, fontSize: 15, letterSpacing: "-0.02em", color: "#1a1a1a" }}>GeoIntel</span>
+          <span style={{ fontWeight: 800, fontSize: 17, letterSpacing: "-0.03em", color: "#111827" }}>GeoIntel</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
           <a href="#how-it-works" style={{ fontSize: 13, color: "#374151", textDecoration: "none", fontWeight: 500 }}>How it works</a>
@@ -248,9 +248,9 @@ export default function LandingPage() {
       {/* AI engines visual */}
       <section style={{ background: "#0f1117", padding: "80px 5% 80px", margin: "0" }}>
         <div style={{ maxWidth: 860, margin: "0 auto", textAlign: "center" }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: "#2dd4bf", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 16 }}>Your competitive moat</div>
-          <h2 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 800, color: "white", letterSpacing: "-0.03em", marginBottom: 12, lineHeight: 1.15 }}>Every AI engine is answering<br />your buyers right now</h2>
-          <p style={{ fontSize: 16, color: "#9896b0", marginBottom: 56, maxWidth: 500, margin: "0 auto 56px" }}>GeoIntel tracks all 4 — and tells you exactly what to fix to show up in each one.</p>
+          <div style={{ fontSize: 11, fontWeight: 600, color: "#2dd4bf", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 16 }}>Where your buyers are searching</div>
+          <h2 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 800, color: "white", letterSpacing: "-0.03em", marginBottom: 12, lineHeight: 1.15 }}>Your buyers search AI before<br />they ever visit your website</h2>
+          <p style={{ fontSize: 16, color: "#9896b0", marginBottom: 56, maxWidth: 500, margin: "0 auto 56px" }}>AI search has become the new first touch in B2B. GeoIntel tracks all 4 engines and tells you exactly what to fix to show up.</p>
 
           <div style={{ position: "relative", height: 340 }}>
             <svg width="100%" height="340" viewBox="0 0 800 340" style={{ overflow: "visible" }}>
