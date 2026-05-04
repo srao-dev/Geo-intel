@@ -27,18 +27,32 @@ async function fetchPage(url: string): Promise<string> {
 
 export async function POST(req: NextRequest) {
   try {
-    const { url, contentType, domain, vertical = "saas" } = await req.json()
+    const { url, contentType, domain, vertical = "saas", pastedContent } = await req.json()
     if (!url) return NextResponse.json({ error: "URL required" }, { status: 400 })
 
     let pageContent = ""
-    try {
-      pageContent = await fetchPage(url)
-    } catch (e: any) {
-      return NextResponse.json({ error: e.message }, { status: 400 })
-    }
 
-    if (pageContent.length < 100) {
-      return NextResponse.json({ error: "Page returned too little content — it may block crawlers or require login" }, { status: 400 })
+    // If user pasted content directly, use that
+    if (pastedContent && pastedContent.trim().length > 200) {
+      pageContent = pastedContent.trim().substring(0, 8000)
+    } else {
+      try {
+        pageContent = await fetchPage(url)
+      } catch (e: any) {
+        return NextResponse.json({ 
+          error: e.message,
+          blocked: true,
+          message: "This site blocks automated access. Copy the page content from your browser and paste it below."
+        }, { status: 400 })
+      }
+
+      if (pageContent.length < 100) {
+        return NextResponse.json({ 
+          error: "Page returned too little content",
+          blocked: true,
+          message: "This site blocks automated access. Copy the page content from your browser and paste it below."
+        }, { status: 400 })
+      }
     }
 
     // Sanitize content to prevent JSON issues

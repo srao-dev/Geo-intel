@@ -264,20 +264,26 @@ function ContentAnalysisTab({ vertical }: { vertical: string }) {
   const [loading, setLoading] = useState(false)
   const [analysis, setAnalysis] = useState<any>(null)
   const [error, setError] = useState("")
+  const [blocked, setBlocked] = useState(false)
+  const [pastedContent, setPastedContent] = useState("")
 
-  const run = async () => {
+  const run = async (usePasted = false) => {
     if (!url.trim()) return
-    setLoading(true); setError(""); setAnalysis(null)
+    setLoading(true); setError(""); setAnalysis(null); setBlocked(false)
     const fullUrl = url.startsWith("http") ? url : "https://" + url
     const domain = fullUrl.replace(/^https?:\/\//, "").split("/")[0]
     try {
       const res = await fetch("/api/content-page-analysis", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: fullUrl, domain, vertical }),
+        body: JSON.stringify({ 
+          url: fullUrl, domain, vertical,
+          pastedContent: usePasted ? pastedContent : undefined
+        }),
       })
       const data = await res.json()
       if (data.analysis) setAnalysis(data.analysis)
+      else if (data.blocked) { setBlocked(true); setError("") }
       else setError(data.error || "Analysis failed")
     } catch { setError("Could not connect to analysis service") }
     setLoading(false)
@@ -309,6 +315,32 @@ function ContentAnalysisTab({ vertical }: { vertical: string }) {
       {error && (
         <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-center gap-2">
           <AlertCircle className="h-4 w-4 flex-shrink-0" />{error}
+        </div>
+      )}
+
+      {blocked && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
+          <div className="flex items-start gap-3 mb-4">
+            <AlertCircle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-amber-800">This site blocks automated access</p>
+              <p className="text-xs text-amber-700 mt-0.5">Open the page in your browser, select all text (Ctrl+A / Cmd+A), copy it, and paste it below. We will analyse it directly.</p>
+            </div>
+          </div>
+          <textarea
+            value={pastedContent}
+            onChange={e => setPastedContent(e.target.value)}
+            placeholder="Paste the page content here..."
+            rows={6}
+            className="w-full rounded-lg border border-amber-200 bg-white px-3 py-2.5 text-xs text-card-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-amber-300 resize-none font-mono"
+          />
+          <button
+            onClick={() => run(true)}
+            disabled={loading || pastedContent.trim().length < 100}
+            className="mt-3 flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 text-xs font-semibold text-white hover:bg-amber-700 disabled:opacity-50 transition-colors"
+          >
+            {loading ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Analysing...</> : <>Analyse pasted content <ArrowRight className="h-3.5 w-3.5" /></>}
+          </button>
         </div>
       )}
 
