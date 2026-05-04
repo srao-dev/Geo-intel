@@ -121,11 +121,11 @@ export default function LandingPage() {
   const [modal, setModal] = useState<"login" | "signup" | null>(null)
 
   return (
-    <div style={{ minHeight: "100vh", background: "#fafafa", color: "#1a1a1a" }}>
+    <div style={{ minHeight: "100vh", color: "#1a1a1a", background: "linear-gradient(135deg, #f8f9ff 0%, #fafafa 40%, #f0f4ff 100%)" }}>
       {modal && <AuthModal mode={modal} onClose={() => setModal(null)} />}
 
       {/* Nav */}
-      <nav style={{ position: "sticky", top: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 32px", height: 56, background: "rgba(255,255,255,0.92)", backdropFilter: "blur(12px)", borderBottom: "1px solid #e5e7eb" }}>
+      <nav style={{ position: "sticky", top: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 32px", height: 56, background: "rgba(255,255,255,0.95)", backdropFilter: "blur(12px)", borderBottom: "1px solid #e5e7eb" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ width: 28, height: 28, background: "#eef1fd", border: "1px solid #c5d0f5", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: "#3B5BDB" }}>G</span>
