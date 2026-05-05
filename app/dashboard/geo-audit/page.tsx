@@ -82,7 +82,7 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
           </div>
           {!fix && (
             <button onClick={getFix} disabled={loadingFix} className="flex w-fit items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60 transition-colors">
-              {loadingFix ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Generating...</> : <><Zap className="h-3.5 w-3.5" /> Get copy-paste fix</>}
+              {loadingFix ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Generating...</> : <><Zap className="h-3.5 w-3.5" /> Get fix</>}
             </button>
           )}
           {fix && (
@@ -149,12 +149,7 @@ function TechnicalAuditTab({ vertical }: { vertical: string }) {
             {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Analysing...</> : <>Run Audit <ArrowRight className="h-4 w-4" /></>}
           </button>
         </div>
-        <div className="flex gap-2 flex-wrap items-center">
-          <span className="text-xs text-muted-foreground">Try:</span>
-          {["hubspot.com", "notion.so", "monday.com", "zapier.com"].map(d => (
-            <button key={d} onClick={() => setUrl(d)} className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/20 transition-colors">{d}</button>
-          ))}
-        </div>
+
       </div>
 
       {error && <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-center gap-2"><AlertCircle className="h-4 w-4 flex-shrink-0" />{error}</div>}
