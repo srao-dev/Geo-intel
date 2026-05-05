@@ -38,29 +38,11 @@ function DeltaBadge({ delta }: { delta: number | null }) {
 }
 
 function hasSevenConsecutiveDays(runs: RunData[]) {
-  if (runs.length < 7) return false
-
-  // Get unique day strings e.g. "2026-05-01"
-  const uniqueDays = [...new Set(
+  // At least one run on 7 different days (skipping days is fine)
+  const uniqueDays = new Set(
     runs.map(r => new Date(r.date).toISOString().split('T')[0])
-  )].sort()
-
-  if (uniqueDays.length < 7) return false
-
-  // Check for 7 consecutive days anywhere in the list
-  let streak = 1
-  for (let i = 1; i < uniqueDays.length; i++) {
-    const prev = new Date(uniqueDays[i - 1]).getTime()
-    const curr = new Date(uniqueDays[i]).getTime()
-    const diffDays = (curr - prev) / (24 * 60 * 60 * 1000)
-    if (diffDays === 1) {
-      streak++
-      if (streak >= 7) return true
-    } else {
-      streak = 1
-    }
-  }
-  return false
+  )
+  return uniqueDays.size >= 7
 }
 
 // ─── Scorecard ────────────────────────────────────────────────────────────────
