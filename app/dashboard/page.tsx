@@ -71,6 +71,7 @@ export default function DashboardPage() {
   const [showSetup, setShowSetup] = useState(false)
   const [companies, setCompanies] = useState<{ id: string; name: string }[]>([])
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null)
+  const [selectedModel, setSelectedModel] = useState("all")
   const [stats, setStats] = useState<any>(null)
   const [rankings, setRankings] = useState<any[]>([])
   const [responses, setResponses] = useState<any[]>([])
@@ -92,7 +93,7 @@ export default function DashboardPage() {
     setLoading(true)
     try {
       const [s, r, resp, runs] = await Promise.all([
-        getDashboardStats(selectedCompanyId, 30, "all"),
+        getDashboardStats(selectedCompanyId, 30, selectedModel),
         getRankings(selectedCompanyId),
         getResponses(selectedCompanyId, 8),
         getVisibilityPerRun(selectedCompanyId),
@@ -100,7 +101,7 @@ export default function DashboardPage() {
       setStats(s); setRankings(r); setResponses(resp); setVisibilityRuns(runs)
     } catch {}
     setLoading(false)
-  }, [selectedCompanyId])
+  }, [selectedCompanyId, selectedModel])
 
   useEffect(() => { fetchData() }, [fetchData])
 
