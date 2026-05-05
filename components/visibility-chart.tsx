@@ -1,6 +1,6 @@
 "use client"
 
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts"
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, CartesianGrid } from "recharts"
 import { TrendingUp, TrendingDown, Minus } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -64,10 +64,7 @@ function Scorecard({ runs }: { runs: RunData[] }) {
       </div>
 
       {latest && (
-        <p className="text-xs text-muted-foreground">
-          Mentioned in {latest.total > 0 ? Math.round((latest.visibility / 100) * latest.total) : 0} of {latest.total} responses
-          · Last run {formatDate(latest.date)}
-        </p>
+        <p className="text-xs text-muted-foreground">Last run {formatDate(latest.date)}</p>
       )}
 
       {runsLeft > 0 && (
@@ -141,9 +138,9 @@ function TrendChart({ runs }: { runs: RunData[] }) {
 export function VisibilityWidget({ runs }: { runs: RunData[] }) {
   if (runs.length === 0) {
     return (
-      <div className="flex flex-col gap-2 rounded-xl border border-dashed border-border bg-card p-5 text-center">
-        <p className="text-sm font-medium text-card-foreground">No visibility data yet</p>
-        <p className="text-xs text-muted-foreground">Run a tracking job to see your visibility score</p>
+      <div className="flex flex-col gap-2 p-2">
+        <p className="text-3xl font-bold text-muted-foreground">—</p>
+        <p className="text-xs text-muted-foreground">Insufficient data — run a tracking job</p>
       </div>
     )
   }
