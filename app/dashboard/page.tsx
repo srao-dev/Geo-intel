@@ -195,7 +195,7 @@ export default function DashboardPage() {
 
                 {/* Status strip */}
                 <div className="col-span-10 rounded-xl border border-border bg-card">
-                  <div className="grid grid-cols-4 h-full divide-x divide-border">
+                  <div className="grid grid-cols-3 h-full divide-x divide-border">
                     <div className="p-5">
                       <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Your Rank</p>
                       <p className="text-4xl font-black text-card-foreground tabular-nums">{stats?.rank ? `#${stats.rank}` : "—"}</p>
@@ -205,11 +205,6 @@ export default function DashboardPage() {
                       <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Avg Position</p>
                       <p className="text-4xl font-black text-card-foreground tabular-nums">{ourBrand?.avgPosition ? `#${ourBrand.avgPosition.toFixed(1)}` : "—"}</p>
                       <p className="text-xs text-muted-foreground mt-1">in AI numbered lists</p>
-                    </div>
-                    <div className="p-5">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">GEO Score</p>
-                      <p className="text-4xl font-black tabular-nums" style={{ color: visColor }}>—</p>
-                      <p className="text-xs text-muted-foreground mt-1">run audit to score</p>
                     </div>
                     <div className="p-5">
                       <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Sentiment</p>
