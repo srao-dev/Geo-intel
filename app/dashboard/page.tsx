@@ -122,28 +122,31 @@ export default function DashboardPage() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      {showSetup && <SetupWizard onComplete={() => { setShowSetup(false); fetchData() }} onSaveExit={() => setShowSetup(false)} />}
-      <Sidebar />
+      {showSetup && <SetupWizard onComplete={() => { setShowSetup(false); if (user) getCompanies(user.id).then(data => { setCompanies(data); if (data.length > 0) setSelectedCompanyId(data[0].id) }) }} onSaveExit={() => setShowSetup(false)} />}
+      <Sidebar
+        companies={companies}
+        selectedCompanyId={selectedCompanyId || undefined}
+        onSelectCompany={setSelectedCompanyId}
+        onCreateNew={() => setShowSetup(true)}
+        onDeleteCompany={(id) => {
+          const remaining = companies.filter(c => c.id !== id)
+          setCompanies(remaining)
+          if (selectedCompanyId === id) {
+            setSelectedCompanyId(remaining.length > 0 ? remaining[0].id : null)
+            setStats(null)
+            setRankings([])
+          }
+        }}
+      />
       <main className="flex flex-1 flex-col overflow-hidden">
 
         {/* Header */}
         <div className="flex-shrink-0 border-b border-border bg-card px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div>
-              <h1 className="text-sm font-semibold text-card-foreground">AI Visibility Dashboard</h1>
-              {stats?.lastRunAt && <p className="text-xs text-muted-foreground">Last run: {formatLastRun(stats.lastRunAt)}</p>}
-            </div>
-            {companies.length > 1 && (
-              <select value={selectedCompanyId || ""} onChange={e => setSelectedCompanyId(e.target.value)}
-                className="text-xs border border-border rounded-lg px-2 py-1 bg-background text-card-foreground outline-none">
-                {companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
-            )}
+          <div>
+            <h1 className="text-sm font-semibold text-card-foreground">AI Visibility Dashboard</h1>
+            {stats?.lastRunAt && <p className="text-xs text-muted-foreground">Last run: {formatLastRun(stats.lastRunAt)}</p>}
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => setShowSetup(true)} className="flex items-center gap-1.5 text-xs text-muted-foreground border border-border rounded-lg px-3 py-1.5 hover:bg-muted transition-colors">
-              <Plus className="h-3.5 w-3.5" /> Add company
-            </button>
             <button onClick={fetchData} className="p-1.5 text-muted-foreground border border-border rounded-lg hover:bg-muted transition-colors">
               <RefreshCw className="h-3.5 w-3.5" />
             </button>
@@ -246,10 +249,6 @@ export default function DashboardPage() {
                         ))}
                       </div>
                   }
-                  <div className="mt-4 pt-4 border-t border-border">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">LLM Responses</p>
-                    <ResponseFeed responses={responses.slice(0, 3)} />
-                  </div>
                 </div>
 
                 {/* Recommendations */}
@@ -358,6 +357,12 @@ export default function DashboardPage() {
                     </tbody>
                   </table>
                 </div>
+              </div>
+
+              {/* Row 4 — LLM Responses */}
+              <div className="rounded-xl border border-border bg-card p-4">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">LLM Responses</p>
+                <ResponseFeed responses={responses} />
               </div>
 
             </div>
