@@ -219,8 +219,14 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Row 2 — SOV + Recommendations + Responses */}
+              {/* Row 2 — Visibility Trend + Share of Voice + Recommended Actions */}
               <div className="grid grid-cols-12 gap-4">
+
+                {/* Visibility trend */}
+                <div className="col-span-4 rounded-xl border border-border bg-card p-4">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Visibility Trend</p>
+                  <VisibilityWidget runs={visibilityRuns} />
+                </div>
 
                 {/* Share of Voice */}
                 <div className="col-span-3 rounded-xl border border-border bg-card p-4">
@@ -277,12 +283,6 @@ export default function DashboardPage() {
                       )
                     })}
                   </div>
-                </div>
-
-                {/* Visibility trend */}
-                <div className="col-span-4 rounded-xl border border-border bg-card p-4">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Visibility Trend</p>
-                  <VisibilityWidget runs={visibilityRuns} />
                 </div>
               </div>
 
