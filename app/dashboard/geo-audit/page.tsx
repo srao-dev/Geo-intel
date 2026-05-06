@@ -66,7 +66,7 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
         </span>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-card-foreground">{finding.title}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">{DIMENSION_LABELS[finding.dimension]} · {finding.effort} to fix</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{DIMENSION_LABELS[finding.dimension]}</p>
         </div>
         {open ? <ChevronUp className="h-4 w-4 flex-shrink-0 text-muted-foreground mt-0.5" /> : <ChevronDown className="h-4 w-4 flex-shrink-0 text-muted-foreground mt-0.5" />}
       </button>
@@ -82,7 +82,7 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
           </div>
           {!fix && (
             <button onClick={getFix} disabled={loadingFix} className="flex w-fit items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-60 transition-colors">
-              {loadingFix ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Generating...</> : <><Zap className="h-3.5 w-3.5" /> Get copy-paste fix</>}
+              {loadingFix ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Generating...</> : <><Zap className="h-3.5 w-3.5" /> Get fix</>}
             </button>
           )}
           {fix && (
@@ -149,12 +149,7 @@ function TechnicalAuditTab({ vertical }: { vertical: string }) {
             {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Analysing...</> : <>Run Audit <ArrowRight className="h-4 w-4" /></>}
           </button>
         </div>
-        <div className="flex gap-2 flex-wrap items-center">
-          <span className="text-xs text-muted-foreground">Try:</span>
-          {["hubspot.com", "notion.so", "monday.com", "zapier.com"].map(d => (
-            <button key={d} onClick={() => setUrl(d)} className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary hover:bg-primary/20 transition-colors">{d}</button>
-          ))}
-        </div>
+
       </div>
 
       {error && <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-center gap-2"><AlertCircle className="h-4 w-4 flex-shrink-0" />{error}</div>}
@@ -189,6 +184,37 @@ function TechnicalAuditTab({ vertical }: { vertical: string }) {
               </div>
             </div>
           </div>
+          {/* Crawl status strip */}
+          {report.raw_data && (
+            <div className="rounded-xl border border-border bg-card overflow-hidden">
+              <div className="px-5 py-3 border-b border-border flex items-center justify-between">
+                <p className="text-xs font-semibold text-card-foreground">AI Crawler Access</p>
+                <span className="text-xs text-muted-foreground">Critical for AI citation</span>
+              </div>
+              <div className="grid grid-cols-5 divide-x divide-border">
+                {[
+                  { label: "GPTBot", status: report.raw_data?.ai_bot_status?.GPTBot },
+                  { label: "PerplexityBot", status: report.raw_data?.ai_bot_status?.PerplexityBot },
+                  { label: "ClaudeBot", status: report.raw_data?.ai_bot_status?.ClaudeBot },
+                  { label: "Google-Extended", status: report.raw_data?.ai_bot_status?.["Google-Extended"] },
+                  { label: "LLMs.txt", status: report.raw_data?.has_llms_txt ? "found" : "missing" },
+                ].map(item => {
+                  const isGood = item.status === "allowed" || item.status === "found"
+                  const isBad = item.status === "blocked" || item.status === "missing"
+                  return (
+                    <div key={item.label} className="px-4 py-3 flex flex-col items-center gap-1.5">
+                      <div className={cn("w-2 h-2 rounded-full", isGood ? "bg-emerald-500" : isBad ? "bg-red-500" : "bg-amber-400")} />
+                      <p className="text-xs font-medium text-card-foreground text-center">{item.label}</p>
+                      <p className={cn("text-xs font-semibold capitalize", isGood ? "text-emerald-600" : isBad ? "text-red-600" : "text-amber-600")}>
+                        {item.status || "unknown"}
+                      </p>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
           {allFindings.length > 0 && (
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between px-1">

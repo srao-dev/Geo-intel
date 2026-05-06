@@ -116,8 +116,8 @@ robots.txt: ${data.robots_txt.slice(0, 400)}
 AI bot access: ${JSON.stringify(data.ai_bot_status)}
 llms.txt: ${data.has_llms_txt} | Sitemap: ${data.has_sitemap}
 SCORING: 85-100 clean robots, AI bots allowed, sitemap, llms.txt | 65-84 most bots allowed | 45-64 some blocked | 25-44 multiple blocked | 0-24 all blocked
-Only report ACTUAL problems. Max 2 findings.
-Return ONLY valid JSON: {"dimension":"geo-crawl","score":0,"grade":"","findings":[{"id":"crawl_001","title":"Problem","severity":"Critical|High|Medium","detail":"Detail","recommendation":"Action","effort":"Hours|Days|Weeks"}],"summary":"One sentence"}`,
+Only report ACTUAL problems. Max 2 findings. Each finding must be specific to THIS site — not generic advice. If no real issues found, return empty findings array.
+Return ONLY valid JSON: {"dimension":"geo-crawl","score":0,"grade":"","findings":[{"id":"crawl_001","title":"Problem","severity":"Critical|High|Medium","detail":"Detail","recommendation":"Action"}],"summary":"One sentence"}`,
 
   'geo-content': (data) => `You are a GEO content expert scoring how well this site's content is structured for AI citation.
 URL: ${data.url} | Vertical: ${data.vertical}
@@ -126,8 +126,8 @@ Meta: ${data.meta_description || 'Not found'}
 Headings: ${data.headings || 'Not found'}
 Content: ${data.text_content.slice(0, 2000) || 'Not available'}
 SCORING: 85-100 clear entity, FAQ, specific value props | 65-84 good structure | 45-64 basic but generic | 25-44 vague | 0-24 minimal
-Only report REAL problems. Max 2 findings.
-Return ONLY valid JSON: {"dimension":"geo-content","score":0,"grade":"","findings":[{"id":"content_001","title":"Problem","severity":"Critical|High|Medium","detail":"Detail","recommendation":"Action","effort":"Hours|Days|Weeks"}],"summary":"One sentence"}`,
+Only report REAL, SPECIFIC problems found on THIS site. Max 2 findings. Each finding must be specific to THIS site — not generic advice. If no real issues found, return empty findings array. Each finding must reference something specific you found — not a generic best practice. If the site is doing well on this dimension, return an empty findings array and a high score.
+Return ONLY valid JSON: {"dimension":"geo-content","score":0,"grade":"","findings":[{"id":"content_001","title":"Problem","severity":"Critical|High|Medium","detail":"Detail","recommendation":"Action"}],"summary":"One sentence"}`,
 
   'geo-schema': (data) => `You are a GEO schema expert scoring structured data implementation.
 URL: ${data.url}
@@ -135,16 +135,16 @@ ${data.fetch_note}
 Schema types found: ${JSON.stringify(data.schema_types)}
 FAQPage: ${data.has_faq_schema} | SoftwareApp: ${data.has_software_schema} | Organization: ${data.has_org_schema} | sameAs: ${data.has_same_as}
 SCORING: 85-100 FAQPage+SoftwareApp+Org+sameAs | 65-84 Org+sameAs | 45-64 basic | 25-44 minimal | 0-24 none
-Max 2 findings.
-Return ONLY valid JSON: {"dimension":"geo-schema","score":0,"grade":"","findings":[{"id":"schema_001","title":"Missing X","severity":"Critical|High|Medium","detail":"Impact","recommendation":"Action","effort":"Hours|Days|Weeks"}],"summary":"One sentence"}`,
+Max 2 findings. Each finding must be specific to THIS site — not generic advice. If no real issues found, return empty findings array.
+Return ONLY valid JSON: {"dimension":"geo-schema","score":0,"grade":"","findings":[{"id":"schema_001","title":"Missing X","severity":"Critical|High|Medium","detail":"Impact","recommendation":"Action"}],"summary":"One sentence"}`,
 
   'geo-authority': (data) => `You are a GEO authority expert scoring how credible AI engines perceive this brand.
 URL: ${data.url} | Vertical: ${data.vertical}
 ${data.fetch_note}
 Content: ${data.text_content.slice(0, 800) || 'Use training knowledge'}
 SCORING: 85-100 analyst recognition, G2, Wikipedia, certs | 65-84 known brand, some recognition | 45-64 growing, review presence | 25-44 limited signals | 0-24 unknown
-Max 2 findings.
-Return ONLY valid JSON: {"dimension":"geo-authority","score":0,"grade":"","findings":[{"id":"authority_001","title":"Missing X","severity":"High|Medium","detail":"Gap","recommendation":"Action","effort":"Hours|Days|Weeks"}],"summary":"One sentence"}`,
+Max 2 findings. Each finding must be specific to THIS site — not generic advice. If no real issues found, return empty findings array.
+Return ONLY valid JSON: {"dimension":"geo-authority","score":0,"grade":"","findings":[{"id":"authority_001","title":"Missing X","severity":"High|Medium","detail":"Gap","recommendation":"Action"}],"summary":"One sentence"}`,
 
   'geo-competitive': (data) => `You are a GEO competitive positioning expert.
 URL: ${data.url} | Vertical: ${data.vertical}
@@ -152,8 +152,8 @@ ${data.fetch_note}
 Content: ${data.text_content.slice(0, 1200)}
 Headings: ${data.headings}
 SCORING: 85-100 comparison pages, vertical pages, problem-led | 65-84 good category positioning | 45-64 basic | 25-44 generic | 0-24 extremely vague
-Max 2 findings.
-Return ONLY valid JSON: {"dimension":"geo-competitive","score":0,"grade":"","findings":[{"id":"competitive_001","title":"Missing X","severity":"Critical|High|Medium","detail":"Gap","recommendation":"Page to create","effort":"Hours|Days|Weeks"}],"summary":"One sentence"}`,
+Max 2 findings. Each finding must be specific to THIS site — not generic advice. If no real issues found, return empty findings array.
+Return ONLY valid JSON: {"dimension":"geo-competitive","score":0,"grade":"","findings":[{"id":"competitive_001","title":"Missing X","severity":"Critical|High|Medium","detail":"Gap","recommendation":"Page to create"}],"summary":"One sentence"}`,
 }
 
 async function runAgent(name: string, pageData: any) {
@@ -202,9 +202,9 @@ function synthesise(url: string, results: Record<string, any>) {
 
   return {
     url, composite_score: composite, grade, dimension_scores: dimensionScores,
-    critical_findings: allFindings.filter(f => f.severity === 'Critical').slice(0, 3),
-    high_findings: allFindings.filter(f => f.severity === 'High').slice(0, 4),
-    quick_wins: allFindings.filter(f => f.effort === 'Hours' && !criticalAndHighTitles.has(f.title)).slice(0, 3),
+    critical_findings: allFindings.filter(f => f.severity === 'Critical').slice(0, 2),
+    high_findings: allFindings.filter(f => f.severity === 'High').slice(0, 3),
+    quick_wins: allFindings.filter(f => f.severity === 'Medium' && !criticalAndHighTitles.has(f.title)).slice(0, 3),
     all_findings: allFindings,
   }
 }
