@@ -180,7 +180,7 @@ export default function DashboardPage() {
               <div className="grid grid-cols-12 gap-4">
 
                 {/* Big visibility number */}
-                <div className="col-span-2 rounded-xl border border-border bg-card p-5 flex flex-col items-center justify-center text-center">
+                <div className="col-span-4 rounded-xl border border-border bg-card p-5 flex flex-col items-center justify-center text-center">
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Mention Rate</p>
                   <div className="flex items-end gap-2">
                     <p className="text-5xl font-black tabular-nums leading-none" style={{ color: (stats?.totalResponses ?? 0) > 0 ? visColor : "hsl(var(--muted-foreground))" }}>
@@ -206,7 +206,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Status strip */}
-                <div className="col-span-10 rounded-xl border border-border bg-card">
+                <div className="col-span-8 rounded-xl border border-border bg-card">
                   <div className="grid grid-cols-3 h-full divide-x divide-border">
                     <div className="p-5">
                       <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Your Rank</p>
