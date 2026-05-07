@@ -8,6 +8,40 @@ import { saveCompany } from "@/lib/queries"
 
 const VERTICALS = ["SaaS", "Automation", "Agency", "Ecommerce", "Other"]
 
+const MODEL_GROUPS = [
+  {
+    provider: "ChatGPT",
+    color: "bg-emerald-100 text-emerald-700",
+    models: [
+      { label: "GPT 5.3", slug: "GPT-5.3", provider: "openai" },
+      { label: "GPT 5.5", slug: "GPT-5.5", provider: "openai" },
+    ],
+  },
+  {
+    provider: "Claude",
+    color: "bg-orange-100 text-orange-700",
+    models: [
+      { label: "Sonnet 4.6", slug: "Claude Sonnet 4.6", provider: "anthropic" },
+      { label: "Opus 4.6", slug: "Claude Opus 4.6", provider: "anthropic" },
+      { label: "Haiku 4.5", slug: "Claude Haiku 4.5", provider: "anthropic" },
+    ],
+  },
+  {
+    provider: "Perplexity",
+    color: "bg-purple-100 text-purple-700",
+    models: [
+      { label: "Sonar", slug: "Sonar", provider: "perplexity" },
+    ],
+  },
+  {
+    provider: "Gemini",
+    color: "bg-blue-100 text-blue-700",
+    models: [
+      { label: "Gemini 3 Flash", slug: "Gemini 3 Flash", provider: "google" },
+    ],
+  },
+]
+
 
 interface SetupWizardProps {
   onComplete: () => void
@@ -36,6 +70,13 @@ export function SetupWizard({ onComplete, onSaveExit }: SetupWizardProps) {
   // Step 3 — Prompts
   const [prompts, setPrompts] = useState<string[]>([])
   const [customPrompt, setCustomPrompt] = useState("")
+
+  // Step 4 — Models
+  const [selectedModels, setSelectedModels] = useState<string[]>([])
+
+  function toggleModel(slug: string) {
+    setSelectedModels(prev => prev.includes(slug) ? prev.filter(s => s !== slug) : [...prev, slug])
+  }
 
   function addCompetitor() {
     setCompetitors(prev => [...prev, { name: "", url: "" }])
@@ -116,12 +157,9 @@ export function SetupWizard({ onComplete, onSaveExit }: SetupWizardProps) {
         icpDescription: geography,
         competitors: competitors.filter(c => c.name.trim()).map(c => c.name),
         prompts,
-        selectedModels: [
-          { provider: "openai", model: "gpt-4o" },
-          { provider: "anthropic", model: "claude-3-5-sonnet-20241022" },
-          { provider: "google", model: "gemini-1.5-pro" },
-          { provider: "perplexity", model: "sonar" },
-        ],
+        selectedModels: MODEL_GROUPS.flatMap(g => g.models)
+          .filter(m => selectedModels.includes(m.slug))
+          .map(m => ({ provider: m.provider, model: m.slug })),
       })
       onComplete()
     } catch (err: any) {
@@ -131,8 +169,11 @@ export function SetupWizard({ onComplete, onSaveExit }: SetupWizardProps) {
     }
   }
 
-  const steps = ["Company", "Competitors", "Prompts"]
-  const canNext = step === 0 ? !!companyName.trim() && !!websiteUrl.trim() : step === 1 ? true : prompts.length > 0
+  const steps = ["Company", "Competitors", "Prompts", "Models"]
+  const canNext = step === 0 ? !!companyName.trim() && !!websiteUrl.trim()
+    : step === 1 ? true
+    : step === 2 ? prompts.length > 0
+    : selectedModels.length > 0
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
@@ -289,6 +330,40 @@ export function SetupWizard({ onComplete, onSaveExit }: SetupWizardProps) {
               </div>
               {prompts.length > 0 && (
                 <p className="text-xs text-[#3B5BDB] font-medium">{prompts.length} prompt{prompts.length > 1 ? "s" : ""} added</p>
+              )}
+            </div>
+          )}
+
+          {/* Step 3 — Models */}
+          {step === 3 && (
+            <div className="flex flex-col gap-4">
+              <p className="text-xs text-gray-500">Select the AI models you want to track your brand across.</p>
+              {MODEL_GROUPS.map(group => (
+                <div key={group.provider}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${group.color}`}>{group.provider}</span>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    {group.models.map(model => {
+                      const selected = selectedModels.includes(model.slug)
+                      return (
+                        <button
+                          key={model.slug}
+                          onClick={() => toggleModel(model.slug)}
+                          className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors ${selected ? "border-[#3B5BDB] bg-blue-50" : "border-gray-200 hover:bg-gray-50"}`}
+                        >
+                          <div className={`flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border ${selected ? "bg-[#3B5BDB] border-[#3B5BDB]" : "border-gray-300"}`}>
+                            {selected && <Check className="h-2.5 w-2.5 text-white" />}
+                          </div>
+                          <span className="text-xs text-gray-800 font-medium">{model.label}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
+              {selectedModels.length > 0 && (
+                <p className="text-xs text-[#3B5BDB] font-medium">{selectedModels.length} model{selectedModels.length > 1 ? "s" : ""} selected</p>
               )}
             </div>
           )}
