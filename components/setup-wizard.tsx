@@ -19,6 +19,7 @@ export function SetupWizard({ onComplete, onSaveExit }: SetupWizardProps) {
   const [step, setStep] = useState(0)
   const [loading, setLoading] = useState(false)
   const [generatingCompetitors, setGeneratingCompetitors] = useState(false)
+  const [generatingPrompts, setGeneratingPrompts] = useState(false)
 
   const [error, setError] = useState("")
 
@@ -70,6 +71,29 @@ export function SetupWizard({ onComplete, onSaveExit }: SetupWizardProps) {
       setError(err.message || "Something went wrong")
     }
     setGeneratingCompetitors(false)
+  }
+
+  async function handleGeneratePrompts() {
+    setGeneratingPrompts(true)
+    setError("")
+    try {
+      const res = await fetch("/api/generate-prompts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ companyName, websiteUrl, description, geography }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || "Failed to generate prompts")
+      } else if (data.prompts?.length) {
+        setPrompts(data.prompts)
+      } else {
+        setError(data.error || "No prompts returned")
+      }
+    } catch (err: any) {
+      setError(err.message || "Something went wrong")
+    }
+    setGeneratingPrompts(false)
   }
 
   function addCustomPrompt() {
@@ -239,7 +263,16 @@ export function SetupWizard({ onComplete, onSaveExit }: SetupWizardProps) {
           {/* Step 2 — Prompts */}
           {step === 2 && (
             <div className="flex flex-col gap-3">
-              <p className="text-xs text-gray-500">Add the questions your buyers ask AI engines. We'll track these across ChatGPT, Perplexity, Gemini and Claude.</p>
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-gray-500">Add the questions your buyers ask AI engines. We'll track these across ChatGPT, Perplexity, Gemini and Claude.</p>
+                <button
+                  onClick={handleGeneratePrompts}
+                  disabled={generatingPrompts || !companyName.trim()}
+                  className="flex items-center gap-1.5 rounded-lg border border-[#3B5BDB] px-3 py-1.5 text-xs font-semibold text-[#3B5BDB] hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors whitespace-nowrap ml-3 flex-shrink-0"
+                >
+                  {generatingPrompts ? "Generating…" : "✦ Generate"}
+                </button>
+              </div>
               <div className="flex gap-2">
                 <input value={customPrompt} onChange={e => setCustomPrompt(e.target.value)} onKeyDown={e => e.key === "Enter" && addCustomPrompt()} placeholder="e.g. Best AI agent evaluation tools?" className="flex-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-blue-100 focus:border-[#3B5BDB]" />
                 <button onClick={addCustomPrompt} disabled={!customPrompt.trim()} className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 disabled:opacity-50 transition-colors">Add</button>
