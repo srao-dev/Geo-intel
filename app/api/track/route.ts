@@ -35,7 +35,11 @@ async function queryOpenRouter(prompt: string, modelSlug: string) {
         'HTTP-Referer': 'https://geointel.app',
         'X-Title': 'GeoIntel',
       },
-      body: JSON.stringify({ model: modelSlug, messages: [{ role: 'user', content: prompt }] }),
+      body: JSON.stringify({
+        model: modelSlug,
+        messages: [{ role: 'user', content: prompt }],
+        plugins: [{ id: 'web', max_results: 5 }],
+      }),
       signal: controller.signal,
     })
     clearTimeout(timeout)
