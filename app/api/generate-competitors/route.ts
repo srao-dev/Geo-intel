@@ -5,14 +5,32 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 export async function POST(req: NextRequest) {
   try {
-    const { companyName, description, industry, geography } = await req.json()
+    const { companyName, websiteUrl, description, industry, geography } = await req.json()
     if (!companyName) return NextResponse.json({ error: 'companyName required' }, { status: 400 })
 
-    const geoContext = geography && geography !== 'Worldwide' ? ` operating in ${geography}` : ''
-    const prompt = `List 5 direct competitors of "${companyName}"${description ? ` (${description})` : ''}${industry ? ` in the ${industry} industry` : ''}${geoContext}.
+    const prompt = `You are a competitive intelligence analyst. Identify 5 direct and indirect competitors for the given company.
 
-Respond with ONLY a raw JSON array of 5 strings. No explanation, no markdown, no extra text.
-["name1", "name2", "name3", "name4", "name5"]`
+**Company Details:**
+- Name: ${companyName}
+- Website: ${websiteUrl || 'Not provided'}
+- Description: ${description || 'Not provided'}
+- Geography: ${geography || 'Worldwide'}
+
+**Requirements:**
+1. Return exactly 5 competitors (prioritize direct market competitors)
+2. For each competitor, provide:
+   - Company name
+   - Website (if available)
+
+3. Consider both:
+   - Direct competitors (same market, same customers)
+   - Adjacent competitors (overlapping customer segments or offerings)
+
+4. Ensure competitors operate in the same geography or serve it significantly
+
+**Output Format:**
+Return ONLY a JSON array with no extra text or markdown:
+[{"name": "Company A", "website": "https://companya.com"}, {"name": "Company B", "website": "https://companyb.com"}]`
 
     const response = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
@@ -27,16 +45,15 @@ Respond with ONLY a raw JSON array of 5 strings. No explanation, no markdown, no
     raw = raw.replace(/```[a-z]*\n?/g, '').replace(/```/g, '').trim()
 
     // Try to extract a JSON array
-    const match = raw.match(/\[[\s\S]*?\]/)
+    const match = raw.match(/\[[\s\S]*\]/)
     if (match) {
-      const competitors: string[] = JSON.parse(match[0])
-      return NextResponse.json({ competitors: competitors.slice(0, 5), debug: { prompt, raw: rawText } })
-    }
-
-    // Fallback: extract quoted strings
-    const quoted = [...raw.matchAll(/"([^"]+)"/g)].map(m => m[1]).filter(Boolean)
-    if (quoted.length > 0) {
-      return NextResponse.json({ competitors: quoted.slice(0, 5), debug: { prompt, raw: rawText } })
+      const parsed = JSON.parse(match[0])
+      const competitors = parsed.slice(0, 5).map((item: any) =>
+        typeof item === 'object'
+          ? { name: item.name || '', url: item.website || '' }
+          : { name: item, url: '' }
+      )
+      return NextResponse.json({ competitors, debug: { prompt, raw: rawText } })
     }
 
     return NextResponse.json({ error: 'Could not parse competitors from response', debug: { prompt, raw: rawText } })

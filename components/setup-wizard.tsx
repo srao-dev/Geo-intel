@@ -89,14 +89,14 @@ export function SetupWizard({ onComplete, onSaveExit }: SetupWizardProps) {
       const res = await fetch("/api/generate-competitors", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ companyName, description, industry: vertical, geography }),
+        body: JSON.stringify({ companyName, websiteUrl, description, industry: vertical, geography }),
       })
       const data = await res.json()
       if (data.debug) setCompetitorDebug(data.debug)
       if (!res.ok) {
         setError(data.error || "Failed to generate competitors")
       } else if (data.competitors?.length) {
-        setCompetitors(data.competitors.map((name: string) => ({ name, url: "" })))
+        setCompetitors(data.competitors.map((c: any) => ({ name: c.name || c, url: c.url || "" })))
       } else {
         setError(data.error || "No competitors returned — try adding a description")
       }
