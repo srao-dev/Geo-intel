@@ -63,6 +63,7 @@ export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth()
   const [showSetup, setShowSetup] = useState(false)
   const [activeTab, setActiveTab] = useState<"visibility" | "prompts" | "citations">("visibility")
+  const [showCompetitors, setShowCompetitors] = useState(false)
   const [companies, setCompanies] = useState<{ id: string; name: string }[]>([])
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null)
   const [selectedModel, setSelectedModel] = useState("all")
@@ -239,8 +240,18 @@ export default function DashboardPage() {
                         )}
                       </div>
                     </div>
+                    <button
+                      onClick={() => setShowCompetitors(s => !s)}
+                      className={cn("text-xs font-medium rounded-lg px-3 py-1.5 border transition-colors",
+                        showCompetitors
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "text-muted-foreground border-border hover:bg-muted"
+                      )}
+                    >
+                      {showCompetitors ? "Hide Competitors" : "Show Competitors"}
+                    </button>
                   </div>
-                  <VisibilityWidget runs={visibilityRuns} />
+                  <VisibilityWidget runs={visibilityRuns} showCompetitors={showCompetitors} />
                 </div>
 
                 {/* Visibility Rank (30%) */}

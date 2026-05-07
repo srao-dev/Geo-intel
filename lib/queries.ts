@@ -170,21 +170,18 @@ export async function saveResponse(response: {
 // ─── Stats ────────────────────────────────────────────────────────────────────
 
 export async function getVisibilityPerRun(companyId: string) {
-  // Get company name for matching
-  const { data: company } = await supabase.from('companies').select('name').eq('id', companyId).single()
-  const companyName = company?.name || ''
+  const [companyRes, competitorsRes, runsRes] = await Promise.all([
+    supabase.from('companies').select('name').eq('id', companyId).single(),
+    supabase.from('competitors').select('name').eq('company_id', companyId),
+    supabase.from('runs').select('id, created_at, completed_at').eq('company_id', companyId).eq('status', 'completed').order('created_at', { ascending: true }),
+  ])
 
-  // Get all completed runs ordered by date
-  const { data: runs } = await supabase
-    .from('runs')
-    .select('id, created_at, completed_at')
-    .eq('company_id', companyId)
-    .eq('status', 'completed')
-    .order('created_at', { ascending: true })
+  const companyName = companyRes.data?.name || ''
+  const competitorNames = competitorsRes.data?.map(c => c.name) || []
+  const runs = runsRes.data || []
 
-  if (!runs?.length) return []
+  if (!runs.length) return []
 
-  // For each run, count visibility
   const results = await Promise.all(runs.map(async run => {
     const { data: responses } = await supabase
       .from('raw_responses')
@@ -194,14 +191,24 @@ export async function getVisibilityPerRun(companyId: string) {
       .not('response_text', 'is', null)
 
     const total = responses?.length || 0
-    const mentions = responses?.filter(r => r.response_text?.toLowerCase().includes(companyName.toLowerCase())).length || 0
-    const visibility = total > 0 ? Math.round((mentions / total) * 100) : 0
+    const texts = responses?.map(r => r.response_text?.toLowerCase() || '') || []
+
+    const brandMentions = texts.filter(t => t.includes(companyName.toLowerCase())).length
+    const visibility = total > 0 ? Math.round((brandMentions / total) * 100) : 0
+
+    // Competitor visibility per run
+    const competitors: Record<string, number> = {}
+    competitorNames.forEach(name => {
+      const mentions = texts.filter(t => t.includes(name.toLowerCase())).length
+      competitors[name] = total > 0 ? Math.round((mentions / total) * 100) : 0
+    })
 
     return {
       runId: run.id,
       date: run.completed_at || run.created_at,
       visibility,
       total,
+      competitors,
     }
   }))
 

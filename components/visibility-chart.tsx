@@ -9,6 +9,7 @@ interface RunData {
   date: string
   visibility: number
   total: number
+  competitors?: Record<string, number>
 }
 
 function formatDate(iso: string) {
@@ -87,34 +88,31 @@ function Scorecard({ runs }: { runs: RunData[] }) {
 
 // ─── Trend Chart ──────────────────────────────────────────────────────────────
 
-function TrendChart({ runs }: { runs: RunData[] }) {
-  const chartData = runs.map(r => ({ date: formatDate(r.date), visibility: r.visibility }))
+const COMPETITOR_COLORS = ["#f97316", "#8b5cf6", "#06b6d4", "#ec4899", "#84cc16"]
+
+function TrendChart({ runs, showCompetitors }: { runs: RunData[], showCompetitors: boolean }) {
+  const competitorNames = showCompetitors
+    ? Object.keys(runs[0]?.competitors || {})
+    : []
+
+  const chartData = runs.map(r => {
+    const point: Record<string, any> = { date: formatDate(r.date), visibility: r.visibility }
+    if (showCompetitors && r.competitors) {
+      competitorNames.forEach(name => { point[name] = r.competitors![name] ?? 0 })
+    }
+    return point
+  })
 
   return (
     <ResponsiveContainer width="100%" height={140}>
       <LineChart data={chartData} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-        <XAxis
-          dataKey="date"
-          tick={{ fontSize: 11, fill: "#6b7280" }}
-          axisLine={false}
-          tickLine={false}
-        />
-        <YAxis
-          domain={[0, 100]}
-          tick={{ fontSize: 11, fill: "#6b7280" }}
-          axisLine={false}
-          tickLine={false}
-          tickFormatter={v => `${v}%`}
-        />
-        <Line
-          type="monotone"
-          dataKey="visibility"
-          stroke="#3B5BDB"
-          strokeWidth={2.5}
-          dot={{ fill: "#3B5BDB", r: 4, strokeWidth: 0 }}
-          activeDot={{ r: 6, strokeWidth: 0 }}
-        />
+        <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#6b7280" }} axisLine={false} tickLine={false} />
+        <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: "#6b7280" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} />
+        <Line type="monotone" dataKey="visibility" stroke="#3B5BDB" strokeWidth={2.5} dot={{ fill: "#3B5BDB", r: 4, strokeWidth: 0 }} activeDot={{ r: 6, strokeWidth: 0 }} />
+        {showCompetitors && competitorNames.map((name, i) => (
+          <Line key={name} type="monotone" dataKey={name} stroke={COMPETITOR_COLORS[i % COMPETITOR_COLORS.length]} strokeWidth={1.5} strokeDasharray="4 2" dot={false} />
+        ))}
       </LineChart>
     </ResponsiveContainer>
   )
@@ -122,7 +120,7 @@ function TrendChart({ runs }: { runs: RunData[] }) {
 
 // ─── Main export ─────────────────────────────────────────────────────────────
 
-export function VisibilityWidget({ runs }: { runs: RunData[] }) {
+export function VisibilityWidget({ runs, showCompetitors }: { runs: RunData[], showCompetitors: boolean }) {
   if (runs.length === 0) {
     return (
       <div className="flex flex-col gap-2 p-2">
@@ -132,5 +130,5 @@ export function VisibilityWidget({ runs }: { runs: RunData[] }) {
     )
   }
 
-  return hasEnoughForChart(runs) ? <TrendChart runs={runs} /> : <Scorecard runs={runs} />
+  return hasEnoughForChart(runs) ? <TrendChart runs={runs} showCompetitors={showCompetitors} /> : <Scorecard runs={runs} />
 }
