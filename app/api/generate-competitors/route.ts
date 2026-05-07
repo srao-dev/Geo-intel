@@ -20,9 +20,8 @@ Respond with ONLY a raw JSON array of 5 strings. No explanation, no markdown, no
       messages: [{ role: 'user', content: prompt }],
     })
 
-    let raw = response.content[0].type === 'text' ? response.content[0].text.trim() : ''
-    console.log('[generate-competitors] prompt:', prompt)
-    console.log('[generate-competitors] raw:', raw)
+    const rawText = response.content[0].type === 'text' ? response.content[0].text.trim() : ''
+    let raw = rawText
 
     // Strip markdown code fences
     raw = raw.replace(/```[a-z]*\n?/g, '').replace(/```/g, '').trim()
@@ -31,16 +30,16 @@ Respond with ONLY a raw JSON array of 5 strings. No explanation, no markdown, no
     const match = raw.match(/\[[\s\S]*?\]/)
     if (match) {
       const competitors: string[] = JSON.parse(match[0])
-      return NextResponse.json({ competitors: competitors.slice(0, 5) })
+      return NextResponse.json({ competitors: competitors.slice(0, 5), debug: { prompt, raw: rawText } })
     }
 
     // Fallback: extract quoted strings
     const quoted = [...raw.matchAll(/"([^"]+)"/g)].map(m => m[1]).filter(Boolean)
     if (quoted.length > 0) {
-      return NextResponse.json({ competitors: quoted.slice(0, 5) })
+      return NextResponse.json({ competitors: quoted.slice(0, 5), debug: { prompt, raw: rawText } })
     }
 
-    return NextResponse.json({ error: 'Could not parse competitors from response', raw })
+    return NextResponse.json({ error: 'Could not parse competitors from response', debug: { prompt, raw: rawText } })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
