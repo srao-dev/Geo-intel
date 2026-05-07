@@ -304,26 +304,26 @@ export default function DashboardPage() {
                     <p className="text-xs text-muted-foreground">No data yet</p>
                   ) : (() => {
                     const maxMentions = Math.max(...rankings.map(x => x.mentionCount || 0), 1)
-                    const colors = ["bg-primary", "bg-blue-500", "bg-purple-500", "bg-emerald-500", "bg-orange-500"]
+                    const colors = ["#3B5BDB", "#3b82f6", "#8b5cf6", "#10b981", "#f97316"]
                     return (
                       <div className="flex flex-col gap-4">
                         {rankings.map((r, i) => (
                           <div key={r.name}>
                             <div className="flex items-center justify-between mb-1.5">
                               <div className="flex items-center gap-2">
-                                <div className={cn("h-2 w-2 rounded-full flex-shrink-0", colors[i % colors.length])} />
-                                <span className={cn("text-xs truncate max-w-40", r.isOurBrand ? "font-semibold text-card-foreground" : "text-muted-foreground")}>
-                                  {r.name}{r.isOurBrand && <span className="ml-1 text-primary text-[10px]">YOU</span>}
+                                <div className="h-2 w-2 rounded-full flex-shrink-0" style={{ backgroundColor: colors[i % colors.length] }} />
+                                <span className={cn("text-xs truncate max-w-40", r.isOurBrand ? "font-semibold text-gray-900" : "text-gray-500")}>
+                                  {r.name}{r.isOurBrand && <span className="ml-1 text-[10px]" style={{ color: "#3B5BDB" }}>YOU</span>}
                                 </span>
                               </div>
                               <div className="flex items-baseline gap-1">
-                                <span className="text-sm font-bold tabular-nums text-card-foreground">{r.mentionCount || 0}</span>
-                                <span className="text-[10px] text-muted-foreground">/ {r.totalResponses}</span>
+                                <span className="text-sm font-bold tabular-nums text-gray-900">{r.mentionCount || 0}</span>
+                                <span className="text-[10px] text-gray-400">/ {r.totalResponses}</span>
                               </div>
                             </div>
-                            <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-                              <div className={cn("h-full rounded-full transition-all duration-700", colors[i % colors.length])}
-                                style={{ width: `${((r.mentionCount || 0) / maxMentions) * 100}%` }} />
+                            <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
+                              <div className="h-full rounded-full transition-all duration-700"
+                                style={{ width: `${((r.mentionCount || 0) / maxMentions) * 100}%`, backgroundColor: colors[i % colors.length] }} />
                             </div>
                           </div>
                         ))}
