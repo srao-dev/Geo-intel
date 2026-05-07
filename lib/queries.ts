@@ -89,14 +89,14 @@ export async function saveCompany(userId: string, payload: {
   // Sync prompts
   await supabase.from('prompts').delete().eq('company_id', companyId)
   if (prompts.length > 0) {
-    await supabase.from('prompts').insert(prompts.map(text => ({ company_id: companyId, text, source: 'user' })))
+    await supabase.from('prompts').insert(prompts.map(text => ({ company_id: companyId, text, source: 'user', is_active: true })))
   }
 
   // Sync tracked models
   await supabase.from('tracked_models').delete().eq('company_id', companyId)
   if (selectedModels.length > 0) {
     await supabase.from('tracked_models').insert(
-      selectedModels.map(({ provider, model }) => ({ company_id: companyId, provider, model_slug: model, grounding: 'native' }))
+      selectedModels.map(({ provider, model }) => ({ company_id: companyId, provider, model_slug: model, grounding: 'native', is_active: true }))
     )
   }
 
