@@ -5,10 +5,10 @@ const MODEL_SLUGS: Record<string, string> = {
   'GPT-5.3': 'openai/gpt-5.3-chat',
   'GPT-5.5': 'openai/gpt-5.5',
   'Claude Sonnet 4.6': 'anthropic/claude-sonnet-4.6',
-  'Claude Opus 4.6': 'anthropic/claude-opus-4.6',
-  'Claude Haiku 4.5': 'anthropic/claude-haiku-4.5',
+  'Claude Opus 4.6': 'anthropic/claude-opus-4.6-fast',
+  'Claude Haiku 4.5': 'anthropic/claude-haiku-latest',
   'Sonar': 'perplexity/sonar',
-  'Gemini 3 Flash': 'google/gemini-3-flash-preview',
+  'Gemini 3 Flash': 'google/gemini-flash-latest',
 }
 
 function getServiceClient() {
