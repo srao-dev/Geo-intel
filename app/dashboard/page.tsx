@@ -264,28 +264,30 @@ export default function DashboardPage() {
                     <p className="text-xs text-muted-foreground">No data yet</p>
                   ) : (
                     <div className="flex flex-col gap-3">
-                      {sorted.map((entry, i) => (
-                        <div key={entry.name} className={cn("flex items-center gap-3 rounded-lg px-3 py-2.5", entry.isOurBrand && "bg-primary/5 border border-primary/20")}>
+                      {sorted.map((entry, i) => {
+                        const barColor = entry.isOurBrand ? "#3B5BDB" : i === 0 ? "#3b82f6" : i === 1 ? "#8b5cf6" : "#818cf8"
+                        return (
+                        <div key={entry.name} className="flex items-center gap-3 rounded-lg px-3 py-2.5"
+                          style={entry.isOurBrand ? { backgroundColor: "rgba(59,91,219,0.05)", border: "1px solid rgba(59,91,219,0.2)" } : {}}>
                           <span className={cn("text-sm font-black tabular-nums w-6 flex-shrink-0",
-                            i === 0 ? "text-amber-500" : i === 1 ? "text-gray-400" : "text-muted-foreground"
+                            i === 0 ? "text-amber-500" : i === 1 ? "text-gray-400" : "text-gray-400"
                           )}>#{i + 1}</span>
                           <div className="flex-1 min-w-0">
-                            <p className={cn("text-xs font-semibold truncate", entry.isOurBrand ? "text-primary" : "text-card-foreground")}>
+                            <p className="text-xs font-semibold truncate" style={{ color: entry.isOurBrand ? "#3B5BDB" : "#1a1a1a" }}>
                               {entry.name}{entry.isOurBrand && " ★"}
                             </p>
-                            <div className="mt-1 h-1.5 w-full rounded-full bg-muted overflow-hidden">
-                              <div className={cn("h-full rounded-full transition-all duration-700",
-                                entry.isOurBrand ? "bg-primary" :
-                                i === 0 ? "bg-blue-500" : i === 1 ? "bg-purple-500" : "bg-indigo-400"
-                              )} style={{ width: `${maxVis > 0 ? (entry.visibility / maxVis) * 100 : 0}%` }} />
+                            <div className="mt-1 h-1.5 w-full rounded-full bg-gray-100 overflow-hidden">
+                              <div className="h-full rounded-full transition-all duration-700"
+                                style={{ width: `${maxVis > 0 ? (entry.visibility / maxVis) * 100 : 0}%`, backgroundColor: barColor }} />
                             </div>
                           </div>
                           <span className={cn("text-xs font-bold tabular-nums flex-shrink-0",
                             entry.visibility >= 60 ? "text-emerald-600" :
-                            entry.visibility >= 30 ? "text-amber-600" : "text-muted-foreground"
+                            entry.visibility >= 30 ? "text-amber-600" : "text-gray-400"
                           )}>{entry.visibility > 0 ? `${entry.visibility}%` : "—"}</span>
                         </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   )}
                 </div>
@@ -380,10 +382,13 @@ export default function DashboardPage() {
                   {sorted.length === 0
                     ? <p className="text-xs text-muted-foreground">Run tracking to see data</p>
                     : <div className="flex flex-col gap-3">
-                        {sorted.map((entry, i) => (
+                        {sorted.map((entry, i) => {
+                          const barColor = entry.isOurBrand ? "#3B5BDB" : i === 0 ? "#3b82f6" : i === 1 ? "#8b5cf6" : "#818cf8"
+                          return (
                           <div key={entry.name}>
                             <div className="flex items-center justify-between mb-1">
-                              <span className={cn("text-xs truncate max-w-28", entry.isOurBrand ? "font-semibold text-primary" : "text-muted-foreground")}>
+                              <span className={cn("text-xs truncate max-w-28", entry.isOurBrand ? "font-semibold" : "text-gray-500")}
+                                style={entry.isOurBrand ? { color: "#3B5BDB" } : {}}>
                                 {entry.name}{entry.isOurBrand && " ★"}
                               </span>
                               <span className={cn("text-xs font-bold tabular-nums",
@@ -391,14 +396,13 @@ export default function DashboardPage() {
                                 entry.visibility >= 30 ? "text-amber-600" : "text-red-500"
                               )}>{entry.visibility}%</span>
                             </div>
-                            <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-                              <div className={cn("h-full rounded-full transition-all duration-700",
-                                entry.isOurBrand ? "bg-primary" :
-                                i === 0 ? "bg-blue-500" : i === 1 ? "bg-purple-500" : "bg-indigo-400"
-                              )} style={{ width: `${maxVis > 0 ? (entry.visibility / maxVis) * 100 : 0}%` }} />
+                            <div className="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
+                              <div className="h-full rounded-full transition-all duration-700"
+                                style={{ width: `${maxVis > 0 ? (entry.visibility / maxVis) * 100 : 0}%`, backgroundColor: barColor }} />
                             </div>
                           </div>
-                        ))}
+                          )
+                        })}
                       </div>
                   }
                 </div>
