@@ -287,7 +287,7 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Row 3 — Share of Voice + Recommended Actions */}
+              {/* Row 3 — Share of Voice + Brand Rankings */}
               <div className="grid grid-cols-12 gap-4">
                 {/* Share of Voice */}
                 <div className="col-span-4 rounded-xl border border-border bg-card p-4">
@@ -318,35 +318,8 @@ export default function DashboardPage() {
                   }
                 </div>
 
-                {/* Recommended Actions */}
-                <div className="col-span-8 rounded-xl border border-border bg-card p-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Recommended Actions</p>
-                    <button onClick={() => router.push("/dashboard/geo-audit")} className="flex items-center gap-1 text-xs text-primary font-medium hover:underline">
-                      Full audit <ExternalLink className="h-3 w-3" />
-                    </button>
-                  </div>
-                  <div className="flex flex-col gap-0">
-                    {recs.map((rec, i) => (
-                      <div key={i}
-                        onClick={() => rec.href !== "#run" && router.push(rec.href)}
-                        className="flex items-start gap-3 py-3 border-b border-border last:border-0 cursor-pointer hover:bg-muted/30 -mx-4 px-4 transition-colors rounded-lg">
-                        <span className={cn("flex-shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded mt-0.5 whitespace-nowrap", PBADGE[rec.priority])}>
-                          {rec.priority === "quick" ? "Quick win" : rec.priority.charAt(0).toUpperCase() + rec.priority.slice(1)}
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold text-card-foreground">{rec.title}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{rec.detail}</p>
-                        </div>
-                        <span className="text-xs text-primary font-medium flex-shrink-0 self-center whitespace-nowrap">{rec.action} →</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Row 3 — Brand rankings table */}
-              <div className="rounded-xl border border-border bg-card overflow-hidden">
+                {/* Brand Rankings */}
+                <div className="col-span-8 rounded-xl border border-border bg-card overflow-hidden">
                 <div className="px-5 py-3 border-b border-border flex items-center justify-between">
                   <div>
                     <p className="text-sm font-semibold text-card-foreground">Brand Rankings</p>
@@ -416,8 +389,35 @@ export default function DashboardPage() {
                   </table>
                 </div>
               </div>
+              </div>
 
-              {/* Row 4 — LLM Responses */}
+              {/* Row 4 — Recommended Actions */}
+              <div className="rounded-xl border border-border bg-card p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Recommended Actions</p>
+                  <button onClick={() => router.push("/dashboard/geo-audit")} className="flex items-center gap-1 text-xs text-primary font-medium hover:underline">
+                    Full audit <ExternalLink className="h-3 w-3" />
+                  </button>
+                </div>
+                <div className="flex flex-col gap-0">
+                  {recs.map((rec, i) => (
+                    <div key={i}
+                      onClick={() => rec.href !== "#run" && router.push(rec.href)}
+                      className="flex items-start gap-3 py-3 border-b border-border last:border-0 cursor-pointer hover:bg-muted/30 -mx-4 px-4 transition-colors rounded-lg">
+                      <span className={cn("flex-shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded mt-0.5 whitespace-nowrap", PBADGE[rec.priority])}>
+                        {rec.priority === "quick" ? "Quick win" : rec.priority.charAt(0).toUpperCase() + rec.priority.slice(1)}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold text-card-foreground">{rec.title}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{rec.detail}</p>
+                      </div>
+                      <span className="text-xs text-primary font-medium flex-shrink-0 self-center whitespace-nowrap">{rec.action} →</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Row 5 — LLM Responses */}
               <div className="rounded-xl border border-border bg-card p-4">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">LLM Responses</p>
                 <ResponseFeed responses={responses} />
