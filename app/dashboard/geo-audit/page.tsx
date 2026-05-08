@@ -415,6 +415,7 @@ export default function GeoAuditV2() {
 
           {/* Intro - only show when no report and not loading */}
           {!report && !loading && (
+            <>
 
               {/* Feature cards */}
               <div className="grid grid-cols-3 gap-3">
