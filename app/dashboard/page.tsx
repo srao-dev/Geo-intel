@@ -331,7 +331,7 @@ export default function DashboardV2() {
             </div>
           </div>
           <div className="flex items-center gap-6 px-5">
-            {["Visibility", "Prompts"].map(tab => (
+            {["Visibility", "Prompts", "Citations"].map(tab => (
               <button key={tab} onClick={() => setActiveTab(tab)} className="px-1 text-sm py-2 transition-colors"
                 style={activeTab === tab ? { fontWeight: 700, color: BRAND, borderBottom: `2px solid ${BRAND}` } : { fontWeight: 500, color: "#64748b" }}>
                 {tab}
