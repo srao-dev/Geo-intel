@@ -326,13 +326,23 @@ export default function GeoAuditV2() {
               <p className="text-xs text-slate-400 mt-1 font-medium">Analyse your AI search readiness</p>
             </div>
           </div>
-          <div className="flex items-center gap-6 px-5">
-            {["Technical Audit", "Content Analysis"].map(tab => (
-              <button key={tab} onClick={() => setActiveTab(tab)} className="px-1 text-sm font-medium py-2.5 transition-colors"
-                style={activeTab === tab ? { fontWeight: 700, color: BRAND, borderBottom: `2px solid ${BRAND}` } : { color: "#64748b" }}>
-                {tab}
-              </button>
-            ))}
+          <div className="flex items-center gap-4 px-5">
+            <div className="flex bg-slate-100/80 p-1 rounded-2xl border border-slate-200/40 shadow-sm">
+              {["Technical Audit", "Content Analysis"].map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-8 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${
+                    activeTab === tab
+                      ? "bg-white shadow-md scale-[1.02]"
+                      : "text-slate-400 hover:text-slate-600"
+                  }`}
+                  style={activeTab === tab ? { color: BRAND } : {}}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
           </div>
         </header>
 
