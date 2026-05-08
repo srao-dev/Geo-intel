@@ -300,11 +300,6 @@ export default function GeoAuditV2() {
                   <ClipboardList className="w-4 h-4" /> Geo Audit
                 </a>
               </li>
-              <li>
-                <a href="#" className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-sm font-medium transition-colors text-[#434654] hover:text-[#0b1c30] hover:bg-[#002b92]/5">
-                  <BarChart2 className="w-4 h-4" /> Citations
-                </a>
-              </li>
             </ul>
           </div>
         </nav>
