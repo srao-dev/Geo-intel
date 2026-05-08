@@ -109,6 +109,7 @@ export default function DashboardV2() {
   const { user, loading: authLoading, signOut } = useAuth()
   const [showSetup, setShowSetup] = useState(false)
   const [showCompetitors, setShowCompetitors] = useState(false)
+  const [chartPeriod, setChartPeriod] = useState<"7d" | "30d" | "ytd">("30d")
   const [activeTab, setActiveTab] = useState("Visibility")
   const [companies, setCompanies] = useState<{ id: string; name: string }[]>([])
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null)
@@ -341,32 +342,51 @@ export default function DashboardV2() {
                 <div className="col-span-8"
                   onMouseEnter={() => setHoveredCard("mention")}
                   onMouseLeave={() => setHoveredCard(null)}>
-                  <div className="rounded-xl flex flex-col min-h-[220px] overflow-hidden" style={cardStyle("mention")}>
+                  <div className="rounded-xl flex flex-col min-h-[320px] overflow-hidden" style={cardStyle("mention")}>
                     <div className="px-4 py-2.5 border-b border-slate-200/60 flex items-center justify-between" style={{ background: "rgba(255,255,255,0.5)" }}>
-                      <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider">Mention Rate</h3>
-                      <label className="flex items-center gap-1.5 cursor-pointer">
-                        <input type="checkbox" checked={showCompetitors} onChange={e => setShowCompetitors(e.target.checked)} className="h-3 w-3 rounded" style={{ accentColor: BRAND }} />
-                        <span className="text-sm text-slate-400">Show Competitors</span>
-                      </label>
-                    </div>
-                    {loading ? <CardSkeleton rows={2} /> : (
-                      <div className="p-4 flex flex-col flex-1">
-                        <div className="flex items-baseline gap-2 mb-1">
-                          <span className="text-5xl font-extrabold text-slate-900">{hasData ? `${visibility}%` : "0%"}</span>
-                          {mentionDelta !== null && (
-                            <span className={`flex items-center gap-0.5 text-xs font-medium ${mentionDelta > 0 ? "text-emerald-600" : mentionDelta < 0 ? "text-red-500" : "text-slate-400"}`}>
-                              {mentionDelta > 0 ? <ArrowUp className="h-3 w-3" /> : mentionDelta < 0 ? <ArrowDown className="h-3 w-3" /> : null}
-                              {mentionDelta !== 0 ? `${Math.abs(mentionDelta)}% vs prev` : "vs prev period"}
+                      <div className="flex items-center gap-3">
+                        <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider">Mention Rate</h3>
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="text-xl font-extrabold text-slate-900">{hasData ? `${visibility}%` : "—"}</span>
+                          {mentionDelta !== null && mentionDelta !== 0 && (
+                            <span className={`flex items-center gap-0.5 text-xs font-medium ${mentionDelta > 0 ? "text-emerald-600" : "text-red-500"}`}>
+                              {mentionDelta > 0 ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />}
+                              {Math.abs(mentionDelta)}%
                             </span>
                           )}
                         </div>
-                        {!hasData && <p className="text-xs text-slate-400 mb-3">{selectedCompanyName} hasn't appeared in any AI responses yet</p>}
-                        <div className="border-t border-slate-100 pt-3 mt-2 flex-1">
-                          <div className="flex items-center justify-between mb-2">
-                            <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wider">Visibility Trend</h4>
-                            {lastRun && <span className="text-xs font-medium text-slate-400">Last run: {lastRun}</span>}
-                          </div>
-                          <VisibilityWidget runs={visibilityRuns} showCompetitors={showCompetitors} />
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <select
+                          value={chartPeriod}
+                          onChange={e => setChartPeriod(e.target.value as any)}
+                          className="text-xs border border-slate-200 rounded-lg px-2 py-1 bg-white text-slate-500 outline-none"
+                        >
+                          <option value="7d">Last 7 days</option>
+                          <option value="30d">Last 30 days</option>
+                          <option value="ytd">Year to date</option>
+                        </select>
+                        <label className="flex items-center gap-1.5 cursor-pointer">
+                          <input type="checkbox" checked={showCompetitors} onChange={e => setShowCompetitors(e.target.checked)} className="h-3 w-3 rounded" style={{ accentColor: BRAND }} />
+                          <span className="text-sm text-slate-400">Competitors</span>
+                        </label>
+                      </div>
+                    </div>
+                    {loading ? <CardSkeleton rows={2} /> : (
+                      <div className="p-4 flex flex-col flex-1">
+                        {!hasData && <p className="text-xs text-slate-400 mb-2">{selectedCompanyName} hasn't appeared in any AI responses yet</p>}
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Visibility Trend</h4>
+                          {lastRun && <span className="text-xs font-medium text-slate-400">Last run: {lastRun}</span>}
+                        </div>
+                        <div className="flex-1">
+                          <VisibilityWidget runs={(() => {
+                            const now = Date.now()
+                            if (chartPeriod === "7d") return visibilityRuns.filter(r => now - new Date(r.date).getTime() <= 7 * 86400000)
+                            if (chartPeriod === "30d") return visibilityRuns.filter(r => now - new Date(r.date).getTime() <= 30 * 86400000)
+                            const startOfYear = new Date(new Date().getFullYear(), 0, 1).getTime()
+                            return visibilityRuns.filter(r => new Date(r.date).getTime() >= startOfYear)
+                          })()} showCompetitors={showCompetitors} />
                         </div>
                       </div>
                     )}
