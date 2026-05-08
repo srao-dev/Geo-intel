@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Play, RefreshCw, ExternalLink, ChevronDown, ArrowUp, ArrowDown, Eye, ClipboardList, BarChart2, Clock, Zap, LogOut, Radio, Trophy, Hash, Target, LayoutList, Lightbulb, MessageSquare } from "lucide-react"
+import { Plus, Play, RefreshCw, ExternalLink, ChevronDown, ArrowUp, ArrowDown, Eye, ClipboardList, Clock, Zap, LogOut, Radio, Trophy, Hash, Target, LayoutList, Lightbulb, MessageSquare } from "lucide-react"
 import { useAuth } from "@/lib/auth-context"
 import { getCompanies, getDashboardStats, getRankings, getResponses, getVisibilityPerRun } from "@/lib/queries"
 import { VisibilityWidget } from "@/components/visibility-chart"
@@ -279,7 +279,6 @@ export default function DashboardV2() {
               {[
                 { label: "AI Visibility", icon: <Eye className="w-4 h-4" />, href: "/dashboard" },
                 { label: "Geo Audit", icon: <ClipboardList className="w-4 h-4" />, href: "/dashboard/geo-audit" },
-                { label: "Citations", icon: <BarChart2 className="w-4 h-4" />, href: "#" },
               ].map(item => (
                 <li key={item.label}>
                   <a href={item.href} className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-sm font-medium transition-all text-[#434654] hover:text-[#0b1c30] hover:bg-[#002b92]/5">
@@ -332,7 +331,7 @@ export default function DashboardV2() {
             </div>
           </div>
           <div className="flex items-center gap-6 px-5">
-            {["Visibility", "Prompts", "Citations"].map(tab => (
+            {["Visibility", "Prompts"].map(tab => (
               <button key={tab} onClick={() => setActiveTab(tab)} className="px-1 text-sm py-2 transition-colors"
                 style={activeTab === tab ? { fontWeight: 700, color: BRAND, borderBottom: `2px solid ${BRAND}` } : { fontWeight: 500, color: "#64748b" }}>
                 {tab}
