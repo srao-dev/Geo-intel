@@ -436,35 +436,7 @@ export default function GeoAuditV2() {
                   </div>
 
                   {/* Speech bubble */}
-                  <div className="flex-1">
-                    <div className="bg-white/80 rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm border border-white/60 mb-4">
-                      <p className="text-sm font-bold text-slate-900 mb-1">Hi! I am Radar, your GEO analyst.</p>
-                      <p className="text-sm text-slate-500 leading-relaxed">
-                        Enter any website URL and I will audit it across 5 GEO dimensions. You will get a score, specific findings, and copy-paste fixes ready to implement.
-                      </p>
-                    </div>
-                    {/* Stats row */}
-                    <div className="flex items-center gap-8 px-1">
-                      {[
-                        { value: "0-100", label: "GEO Score", color: BRAND },
-                        { value: "5", label: "Dimensions", color: "#7c3aed" },
-                        { value: "Same day", label: "Fixes ready", color: "#059669" },
-                      ].map((stat, i) => (
-                        <div key={stat.label} className="flex items-center gap-3">
-                          {i > 0 && <div className="w-px h-6 bg-indigo-200" />}
-                          <div>
-                            <p className="text-base font-extrabold" style={{ color: stat.color }}>{stat.value}</p>
-                            <p className="text-xs text-slate-400">{stat.label}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              {/* Feature cards */}
-              <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-3 gap-3">
                 {[
                   {
                     title: "Real data",
