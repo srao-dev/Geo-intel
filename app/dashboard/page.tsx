@@ -331,10 +331,14 @@ export default function DashboardV2() {
             </div>
           </div>
           <div className="flex items-center gap-6 px-5">
-            {["Visibility", "Prompts", "Citations"].map(tab => (
-              <button key={tab} onClick={() => setActiveTab(tab)} className="px-1 text-sm py-2 transition-colors"
-                style={activeTab === tab ? { fontWeight: 700, color: BRAND, borderBottom: `2px solid ${BRAND}` } : { fontWeight: 500, color: "#64748b" }}>
-                {tab}
+            {[
+              { label: "Visibility", icon: <Eye className="h-3.5 w-3.5" /> },
+              { label: "Prompts", icon: <MessageSquare className="h-3.5 w-3.5" /> },
+              { label: "Citations", icon: <ClipboardList className="h-3.5 w-3.5" /> },
+            ].map(({ label, icon }) => (
+              <button key={label} onClick={() => setActiveTab(label)} className="flex items-center gap-1.5 px-1 text-sm py-2 transition-colors"
+                style={activeTab === label ? { fontWeight: 700, color: BRAND, borderBottom: `2px solid ${BRAND}` } : { fontWeight: 500, color: "#64748b" }}>
+                {icon}{label}
               </button>
             ))}
           </div>
