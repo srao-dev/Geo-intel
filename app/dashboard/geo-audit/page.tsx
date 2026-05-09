@@ -99,7 +99,7 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
           </span>
           <div>
             <h3 className="text-base font-bold text-slate-900">{finding.title}</h3>
-            <p className="text-xs text-slate-400 font-medium uppercase tracking-wider mt-0.5">{DIMENSION_LABELS[finding.dimension]}</p>
+            <p className="text-sm text-slate-500 font-medium uppercase tracking-wider mt-0.5">{DIMENSION_LABELS[finding.dimension]}</p>
           </div>
         </div>
         {open ? <ChevronUp className="h-4 w-4 text-slate-400 flex-shrink-0" /> : <ChevronDown className="h-4 w-4 text-slate-400 flex-shrink-0" />}
@@ -118,7 +118,7 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
           <p className="text-xs text-slate-400 italic border-t border-slate-100 pt-2 mt-1">⚠ Analysis based on automated page scan — verify specific observations before acting.</p>
           {!fix ? (
             <button onClick={getFix} disabled={loadingFix}
-              className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold hover:text-white transition-all shadow-sm"
+              className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-sm font-bold hover:text-white transition-all shadow-sm"
               style={{ color: BRAND }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = BRAND; (e.currentTarget as HTMLElement).style.color = "white" }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = "white"; (e.currentTarget as HTMLElement).style.color = BRAND }}>
@@ -150,7 +150,7 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
                       {fix.seo_title && (
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-semibold text-slate-600 w-24 flex-shrink-0">SEO title</span>
-                          <span className="text-xs text-slate-600">{fix.seo_title}</span>
+                          <span className="text-sm text-slate-600">{fix.seo_title}</span>
                         </div>
                       )}
                       {fix.meta_description && (
@@ -215,7 +215,7 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
               {fix.code && fix.code.includes('ADD_YOUR_') && (
                 <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 flex items-start gap-2 mt-2">
                   <span className="flex-shrink-0 text-sm">⚠️</span>
-                  <p className="text-xs text-amber-700 leading-relaxed">Replace all <strong>ADD_YOUR_*_URL</strong> placeholders with your actual verified social profile URLs before implementing.</p>
+                  <p className="text-sm text-amber-700 leading-relaxed">Replace all <strong>ADD_YOUR_*_URL</strong> placeholders with your actual verified social profile URLs before implementing.</p>
                 </div>
               )}
             </div>
@@ -397,7 +397,7 @@ export default function GeoAuditV2() {
           <div className="px-5 flex items-center justify-between h-16 pt-2">
             <div>
               <h2 className="font-bold text-slate-900 text-2xl leading-none">GEO Audit</h2>
-              <p className="text-xs text-slate-400 mt-1 font-medium">Analyse your AI search readiness</p>
+              <p className="text-sm text-slate-500 mt-1 font-medium">Analyse your AI search readiness</p>
             </div>
           </div>
           <div className="flex items-center gap-4 px-5">
@@ -428,7 +428,7 @@ export default function GeoAuditV2() {
 
           {/* URL Input — prominent search bar */}
           <section className="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Enter a URL to audit</p>
+            <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Enter a URL to audit</p>
             <div className="flex gap-3">
               <div className="relative flex-1">
                 <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
