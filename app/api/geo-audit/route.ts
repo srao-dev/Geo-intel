@@ -115,7 +115,12 @@ HTML size: ${data.html_size_kb}KB | JS SPA: ${data.has_js_spa}
 robots.txt: ${data.robots_txt.slice(0, 400)}
 AI bot access: ${JSON.stringify(data.ai_bot_status)}
 llms.txt: ${data.has_llms_txt} | Sitemap: ${data.has_sitemap}
-SCORING: 85-100 clean robots, AI bots allowed, sitemap, llms.txt | 65-84 most bots allowed | 45-64 some blocked | 25-44 multiple blocked | 0-24 all blocked
+SCORING: 85-100 AI bots explicitly allowed + sitemap + llms.txt | 65-84 AI bots implicitly allowed via wildcard (not explicitly listed) | 45-64 some AI bots blocked | 25-44 multiple AI bots blocked | 0-24 all AI bots blocked
+IMPORTANT DISTINCTION:
+- "explicitly allowed" = User-agent: GPTBot with Allow: / present in robots.txt → score 85-100
+- "implicitly allowed" = User-agent: * with empty or no Disallow, GPTBot not mentioned → score 65-84, flag as informational not Critical/High
+- "blocked" = User-agent: GPTBot with Disallow: / present → score 0-44, flag as Critical or High
+- Never flag implicit allowance as a Critical or High finding — it is not a blocking issue, just a best practice to be explicit
 Only report ACTUAL problems. Max 2 findings. Each finding must be specific to THIS site — not generic advice. If no real issues found, return empty findings array.
 - NEVER make observations about content frequency (e.g. "appears twice") — you may miscount
 - Finding titles must use sentence case — only capitalise the first word and proper nouns (e.g. "No schema markup detected" not "No Schema Markup Detected")
