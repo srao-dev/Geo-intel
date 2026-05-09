@@ -417,66 +417,69 @@ export default function GeoAuditV2() {
           {!report && !loading && (
             <>
 
-              {/* Preview of results */}
-              <div className="relative" style={{ maxWidth: 860 }}>
-                {/* Radar mascot - top right */}
-                <div className="absolute -top-10 right-4 flex items-end gap-2 z-10">
-                  <div className="bg-white border border-slate-200 rounded-2xl rounded-br-none px-3 py-2 shadow-sm">
+                            {/* Preview of results */}
+              <div style={{ maxWidth: 720 }}>
+                {/* Radar above with speech bubble */}
+                <div className="flex items-end gap-3 mb-3 px-2">
+                  <svg width="44" height="50" viewBox="0 0 56 56">
+                    <line x1="28" y1="14" x2="28" y2="4" stroke={BRAND} strokeWidth="1.5" strokeLinecap="round"/>
+                    <circle cx="28" cy="3" r="2.5" fill={BRAND} opacity="0.8"/>
+                    <rect x="12" y="14" width="32" height="28" rx="9" fill="#eef1fd" stroke={BRAND} strokeWidth="1.5"/>
+                    <circle cx="22" cy="25" r="4" fill="white"/><circle cx="34" cy="25" r="4" fill="white"/>
+                    <circle cx="23" cy="25" r="2" fill={BRAND}/><circle cx="35" cy="25" r="2" fill={BRAND}/>
+                    <path d="M22 34 Q28 38 34 34" fill="none" stroke={BRAND} strokeWidth="1.5" strokeLinecap="round"/>
+                    <rect x="4" y="20" width="8" height="4" rx="2" fill="#eef1fd" stroke={BRAND} strokeWidth="1"/>
+                    <rect x="44" y="20" width="8" height="4" rx="2" fill="#eef1fd" stroke={BRAND} strokeWidth="1"/>
+                  </svg>
+                  <div className="bg-white border border-slate-200 rounded-2xl rounded-bl-none px-4 py-2 shadow-sm mb-1">
                     <p className="text-xs font-medium text-slate-600">Here is what your audit will show...</p>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <svg width="56" height="60" viewBox="0 0 56 56">
-                      <line x1="28" y1="14" x2="28" y2="4" stroke={BRAND} strokeWidth="1.5" strokeLinecap="round"/>
-                      <circle cx="28" cy="3" r="2.5" fill={BRAND} opacity="0.8"/>
-                      <rect x="12" y="14" width="32" height="28" rx="9" fill="#eef1fd" stroke={BRAND} strokeWidth="1.5"/>
-                      <circle cx="22" cy="25" r="4" fill="white"/><circle cx="34" cy="25" r="4" fill="white"/>
-                      <circle cx="23" cy="25" r="2" fill={BRAND}/><circle cx="35" cy="25" r="2" fill={BRAND}/>
-                      <path d="M22 34 Q28 38 34 34" fill="none" stroke={BRAND} strokeWidth="1.5" strokeLinecap="round"/>
-                      <rect x="4" y="20" width="8" height="4" rx="2" fill="#eef1fd" stroke={BRAND} strokeWidth="1"/>
-                      <rect x="44" y="20" width="8" height="4" rx="2" fill="#eef1fd" stroke={BRAND} strokeWidth="1"/>
-                    </svg>
-                    <span className="text-[9px] font-bold mt-0.5" style={{ color: BRAND }}>Radar</span>
                   </div>
                 </div>
 
                 {/* Faded preview card */}
-                <div className="rounded-xl overflow-hidden border border-slate-200 opacity-60 pointer-events-none select-none">
+                <div className="rounded-xl overflow-hidden border border-slate-200 shadow-sm opacity-60 pointer-events-none select-none">
+                  {/* Sample badge */}
+                  <div className="px-5 py-2 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Sample result</span>
+                    <span className="text-[10px] text-slate-400">Your results will appear here after running an audit</span>
+                  </div>
                   {/* Score row */}
-                  <div className="p-4 border-b border-slate-100 flex items-start gap-6 bg-white">
-                    <div>
+                  <div className="p-5 border-b border-slate-100 flex items-start gap-8 bg-white">
+                    <div className="flex-shrink-0">
                       <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">GEO Score</p>
                       <div className="flex items-baseline gap-3">
                         <span className="text-5xl font-extrabold text-slate-200 leading-none">—</span>
                         <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-400 border border-slate-200">Your score</span>
                       </div>
                     </div>
-                    <div className="flex-1 pl-6 border-l border-slate-100">
-                      {[
-                        { label: "Competitive", val: 47, color: "#cbd5e1" },
-                        { label: "Content", val: 37, color: "#cbd5e1" },
-                        { label: "Authority", val: 33, color: "#cbd5e1" },
-                        { label: "Schema", val: 24, color: "#cbd5e1" },
-                        { label: "Crawlability", val: 53, color: "#cbd5e1" },
-                      ].map(d => (
-                        <div key={d.label} className="flex items-center gap-2 mb-1.5">
-                          <span className="text-[10px] text-slate-400 w-20 flex-shrink-0">{d.label}</span>
-                          <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
-                            <div className="h-full rounded-full" style={{ width: `${d.val}%`, background: d.color }} />
+                    <div className="flex-1">
+                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Dimensions</p>
+                      <div className="flex flex-col gap-2">
+                        {[
+                          { label: "Competitive", val: 47 },
+                          { label: "Content",     val: 37 },
+                          { label: "Authority",   val: 33 },
+                          { label: "Schema",      val: 24 },
+                          { label: "Crawlability",val: 53 },
+                        ].map(d => (
+                          <div key={d.label} className="flex items-center gap-3">
+                            <span className="text-[10px] text-slate-400 w-20 flex-shrink-0">{d.label}</span>
+                            <div className="w-48 h-2 rounded-full bg-slate-100 overflow-hidden">
+                              <div className="h-full rounded-full bg-slate-200" style={{ width: `${d.val}%` }} />
+                            </div>
                           </div>
-                          <span className="text-[10px] font-semibold text-slate-700 w-6 text-right">{d.val}</span>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   </div>
-
                   {/* Findings */}
-                  <div className="p-4 bg-white border-b border-slate-100">
+                  <div className="p-5 bg-white border-b border-slate-100">
                     <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-3">Findings & fixes</p>
                     <div className="flex flex-col gap-2">
                       {[
-                        { sev: "Critical", label: "No FAQPage schema detected", bg: "#fef2f2", border: "#fecaca", stripe: "#dc2626", color: "#dc2626", badgeBg: "#fee2e2" },
-                        { sev: "High", label: "Entity definition too vague for AI citation", bg: "#fff7ed", border: "#fed7aa", stripe: "#ea580c", color: "#ea580c", badgeBg: "#ffedd5" },
-                        { sev: "Medium", label: "Missing sameAs links in Organization schema", bg: "#fffbeb", border: "#fde68a", stripe: "#f59e0b", color: "#b45309", badgeBg: "#fef3c7" },
+                        { sev: "Critical", label: "No FAQPage schema detected",              bg: "#fef2f2", border: "#fecaca", stripe: "#dc2626", color: "#dc2626", badgeBg: "#fee2e2" },
+                        { sev: "High",     label: "Entity definition too vague for AI citation", bg: "#fff7ed", border: "#fed7aa", stripe: "#ea580c", color: "#ea580c", badgeBg: "#ffedd5" },
+                        { sev: "Medium",   label: "Missing sameAs links in Organization schema", bg: "#fffbeb", border: "#fde68a", stripe: "#f59e0b", color: "#b45309", badgeBg: "#fef3c7" },
                       ].map(f => (
                         <div key={f.sev} className="flex items-center justify-between rounded-lg px-3 py-2"
                           style={{ background: f.bg, border: `1px solid ${f.border}`, borderLeft: `3px solid ${f.stripe}` }}>
@@ -489,16 +492,13 @@ export default function GeoAuditV2() {
                       ))}
                     </div>
                   </div>
-
                   {/* Lock bar */}
-                  <div className="px-4 py-3 bg-slate-50 flex items-center gap-2">
+                  <div className="px-5 py-3 bg-slate-50 flex items-center gap-2">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                     <span className="text-xs text-slate-400">Run an audit to see your real results — takes about 30 seconds</span>
                   </div>
                 </div>
               </div>
-            </>
-          )}
 
           {/* Report */}
           {report && !loading && (
