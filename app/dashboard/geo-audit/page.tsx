@@ -144,6 +144,12 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
                   <span className="flex-shrink-0 font-bold" style={{ color: BRAND }}>{i + 1}.</span>{step}
                 </div>
               ))}
+              {fix.code && fix.code.includes('ADD_YOUR_') && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 flex items-start gap-2 mt-2">
+                  <span className="flex-shrink-0 text-sm">⚠️</span>
+                  <p className="text-xs text-amber-700 leading-relaxed">Replace all <strong>ADD_YOUR_*_URL</strong> placeholders with your actual verified social profile URLs before implementing.</p>
+                </div>
+              )}
             </div>
           )}
         </div>
