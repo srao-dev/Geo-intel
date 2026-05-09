@@ -115,6 +115,7 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Recommendation</p>
             <p className="text-sm text-slate-600 leading-relaxed">{finding.recommendation}</p>
           </div>
+          <p className="text-xs text-slate-400 italic border-t border-slate-100 pt-2 mt-1">⚠ Analysis based on automated page scan — verify specific observations before acting.</p>
           {!fix ? (
             <button onClick={getFix} disabled={loadingFix}
               className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold hover:text-white transition-all shadow-sm"
