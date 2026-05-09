@@ -321,6 +321,53 @@ export async function getRankings(companyId: string) {
     .map((r, i) => ({ ...r, rank: i + 1 }))
 }
 
+export async function getPromptStats(companyId: string) {
+  const [companyRes, promptsRes] = await Promise.all([
+    supabase.from('companies').select('name').eq('id', companyId).single(),
+    supabase.from('prompts').select('id, text').eq('company_id', companyId).eq('is_active', true),
+  ])
+
+  const companyName = companyRes.data?.name || ''
+  const prompts = promptsRes.data || []
+  if (!prompts.length) return []
+
+  const { data: responses } = await supabase
+    .from('raw_responses')
+    .select('prompt_id, response_text, requested_model, positions_json')
+    .eq('company_id', companyId)
+    .eq('status', 'success')
+    .not('response_text', 'is', null)
+    .limit(500)
+
+  return prompts.map(prompt => {
+    const pr = (responses || []).filter(r => r.prompt_id === prompt.id)
+    const total = pr.length
+    const mentioning = pr.filter(r => r.response_text?.toLowerCase().includes(companyName.toLowerCase()))
+    const mentionCount = mentioning.length
+    const mentionRate = total > 0 ? Math.round((mentionCount / total) * 100) : 0
+    const positions = pr.map(r => r.positions_json?.[companyName]).filter((p): p is number => typeof p === 'number' && p > 0)
+    const avgPosition = positions.length > 0
+      ? parseFloat((positions.reduce((a, b) => a + b, 0) / positions.length).toFixed(1))
+      : null
+    const models = [...new Set(mentioning.map(r => r.requested_model).filter(Boolean))]
+    const health: 'Strong' | 'Average' | 'Weak' | 'Dead' =
+      mentionRate >= 60 ? 'Strong' : mentionRate >= 30 ? 'Average' : mentionRate >= 10 ? 'Weak' : 'Dead'
+    return { id: prompt.id, text: prompt.text, mentionRate, avgPosition, models, totalResponses: total, mentionCount, health }
+  }).sort((a, b) => b.mentionRate - a.mentionRate)
+}
+
+export async function getPromptResponses(promptId: string, limit = 5) {
+  const { data } = await supabase
+    .from('raw_responses')
+    .select('id, response_text, requested_model, created_at')
+    .eq('prompt_id', promptId)
+    .eq('status', 'success')
+    .not('response_text', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(limit)
+  return data || []
+}
+
 export async function saveAnalysisResult(userId: string, url: string, analysis: any) {
   const { supabase } = await import("./supabase")
   await supabase.from("analysis_cache").upsert({
