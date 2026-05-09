@@ -54,7 +54,7 @@ function ScoreBar({ score: rawScore, dimension }: { score: any; dimension: strin
   const textColor = score >= 70 ? "#059669" : score >= 50 ? "#d97706" : "#dc2626"
   return (
     <div className="flex items-center gap-3">
-      <span className="w-24 flex-shrink-0 text-sm font-medium text-slate-500">{DIMENSION_LABELS[dimension]}</span>
+      <span className="w-24 flex-shrink-0 text-sm font-semibold text-slate-600">{DIMENSION_LABELS[dimension]}</span>
       <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
         <div className="h-full rounded-full transition-all duration-700" style={{ width: `${score}%`, backgroundColor: color }} />
       </div>
@@ -98,7 +98,7 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
             {finding.severity}
           </span>
           <div>
-            <h3 className="text-sm font-bold text-slate-900">{finding.title}</h3>
+            <h3 className="text-base font-bold text-slate-900">{finding.title}</h3>
             <p className="text-xs text-slate-400 font-medium uppercase tracking-wider mt-0.5">{DIMENSION_LABELS[finding.dimension]}</p>
           </div>
         </div>
@@ -108,12 +108,12 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
       {open && (
         <div className="px-4 pb-4 pt-2 space-y-3 border-t border-slate-200/30">
           <div>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">The Problem</p>
-            <p className="text-sm text-slate-600 leading-relaxed">{finding.detail}</p>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">The Problem</p>
+            <p className="text-sm text-slate-700 leading-relaxed">{finding.detail}</p>
           </div>
           <div>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Recommendation</p>
-            <p className="text-sm text-slate-600 leading-relaxed">{finding.recommendation}</p>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Recommendation</p>
+            <p className="text-sm text-slate-700 leading-relaxed">{finding.recommendation}</p>
           </div>
           <p className="text-xs text-slate-400 italic border-t border-slate-100 pt-2 mt-1">⚠ Analysis based on automated page scan — verify specific observations before acting.</p>
           {!fix ? (
@@ -126,8 +126,8 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
             </button>
           ) : (
             <div className="rounded-xl p-4 flex flex-col gap-3" style={{ backgroundColor: BRAND_LIGHT, border: "1px solid rgba(0,62,199,0.2)" }}>
-              <p className="text-xs font-bold uppercase tracking-wider" style={{ color: BRAND }}>Generated Fix</p>
-              <p className="text-sm text-slate-700 leading-relaxed">{fix.summary}</p>
+              <p className="text-sm font-bold uppercase tracking-wider" style={{ color: BRAND }}>Generated Fix</p>
+              <p className="text-sm text-slate-800 leading-relaxed">{fix.summary}</p>
 
               {/* Comparison page brief */}
               {fix.fix_type === "comparison" && (
@@ -137,25 +137,25 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
                     <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 flex flex-col gap-1.5">
                       {fix.target_page && (
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-slate-500 w-24 flex-shrink-0">URL slug</span>
+                          <span className="text-sm font-semibold text-slate-600 w-24 flex-shrink-0">URL slug</span>
                           <code className="text-xs font-mono text-blue-600 bg-blue-50 px-2 py-0.5 rounded">{fix.target_page}</code>
                         </div>
                       )}
                       {fix.target_query && (
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-slate-500 w-24 flex-shrink-0">AI query</span>
+                          <span className="text-sm font-semibold text-slate-600 w-24 flex-shrink-0">AI query</span>
                           <span className="text-xs text-slate-600 italic">"{fix.target_query}"</span>
                         </div>
                       )}
                       {fix.seo_title && (
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-slate-500 w-24 flex-shrink-0">SEO title</span>
+                          <span className="text-sm font-semibold text-slate-600 w-24 flex-shrink-0">SEO title</span>
                           <span className="text-xs text-slate-600">{fix.seo_title}</span>
                         </div>
                       )}
                       {fix.meta_description && (
                         <div className="flex items-start gap-2">
-                          <span className="text-xs font-bold text-slate-500 w-24 flex-shrink-0 mt-0.5">Meta desc</span>
+                          <span className="text-sm font-semibold text-slate-600 w-24 flex-shrink-0 mt-0.5">Meta desc</span>
                           <span className="text-xs text-slate-600 leading-relaxed">{fix.meta_description}</span>
                         </div>
                       )}
