@@ -94,7 +94,7 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
     }}>
       <button onClick={() => setOpen(o => !o)} className="w-full flex items-center justify-between p-3 text-left hover:bg-white/20 transition-colors">
         <div className="flex items-center gap-3">
-          <span className="px-1.5 py-0.5 rounded text-xs font-bold uppercase tracking-tight" style={{ backgroundColor: cfg.badgeBg, color: cfg.badgeColor }}>
+          <span className="py-0.5 rounded text-xs font-bold uppercase tracking-tight text-center flex-shrink-0" style={{ backgroundColor: cfg.badgeBg, color: cfg.badgeColor, width: "64px" }}>
             {finding.severity}
           </span>
           <div>
