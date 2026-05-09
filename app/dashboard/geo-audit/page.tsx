@@ -418,14 +418,14 @@ export default function GeoAuditV2() {
             <>
 
               {/* Preview of results */}
-              <div className="relative">
+              <div className="relative" style={{ maxWidth: 640 }}>
                 {/* Radar mascot - top right */}
                 <div className="absolute -top-10 right-4 flex items-end gap-2 z-10">
                   <div className="bg-white border border-slate-200 rounded-2xl rounded-br-none px-3 py-2 shadow-sm">
                     <p className="text-xs font-medium text-slate-600">Here is what your audit will show...</p>
                   </div>
                   <div className="flex flex-col items-center">
-                    <svg width="40" height="44" viewBox="0 0 56 56">
+                    <svg width="56" height="60" viewBox="0 0 56 56">
                       <line x1="28" y1="14" x2="28" y2="4" stroke={BRAND} strokeWidth="1.5" strokeLinecap="round"/>
                       <circle cx="28" cy="3" r="2.5" fill={BRAND} opacity="0.8"/>
                       <rect x="12" y="14" width="32" height="28" rx="9" fill="#eef1fd" stroke={BRAND} strokeWidth="1.5"/>
