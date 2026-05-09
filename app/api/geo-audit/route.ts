@@ -115,7 +115,7 @@ HTML size: ${data.html_size_kb}KB | JS SPA: ${data.has_js_spa}
 robots.txt: ${data.robots_txt.slice(0, 400)}
 AI bot access: ${JSON.stringify(data.ai_bot_status)}
 llms.txt: ${data.has_llms_txt} | Sitemap: ${data.has_sitemap}
-LLMS.TXT RULE: If has_llms_txt is false, always include a Medium finding titled "llms.txt file not found" with recommendation to create one at the root domain. llms.txt is a new standard that tells AI engines what content they can use — missing it is a missed GEO opportunity. This should always be flagged regardless of other findings.
+LLMS.TXT RULE: If has_llms_txt is false, you MUST always include a Medium finding titled "llms.txt file not found" — this is MANDATORY and counts OUTSIDE the 2 finding limit. Do not skip this finding even if you already have 2 findings. llms.txt is a new standard that tells AI engines what content they can use — missing it is a missed GEO opportunity.
 SCORING: 85-100 AI bots explicitly allowed + sitemap + llms.txt | 65-84 AI bots implicitly allowed via wildcard (not explicitly listed) | 45-64 some AI bots blocked | 25-44 multiple AI bots blocked | 0-24 all AI bots blocked
 IMPORTANT DISTINCTION:
 - "explicitly allowed" = User-agent: GPTBot with Allow: / present in robots.txt → score 85-100
