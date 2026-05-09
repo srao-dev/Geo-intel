@@ -126,7 +126,11 @@ Meta: ${data.meta_description || 'Not found'}
 Headings: ${data.headings || 'Not found'}
 Content: ${data.text_content.slice(0, 2000) || 'Not available'}
 SCORING: 85-100 clear entity, FAQ, specific value props | 65-84 good structure | 45-64 basic but generic | 25-44 vague | 0-24 minimal
-Only report REAL, SPECIFIC problems found on THIS site. Max 2 findings. Each finding must be specific to THIS site — not generic advice. If no real issues found, return empty findings array. Each finding must reference something specific you found — not a generic best practice. If the site is doing well on this dimension, return an empty findings array and a high score.
+Only report REAL, SPECIFIC problems found on THIS site. Max 2 findings. Each finding must be specific to THIS site — not generic advice. If no real issues found, return empty findings array.
+- NEVER make observations about content frequency (e.g. "appears twice") — you may miscount
+- NEVER invent specific numbers or percentages not explicitly present in the content provided
+- NEVER reference specific company names, customer names, or case studies unless they appear word-for-word in the content provided
+- If you are not 100% certain a specific observation is accurate, state it as a general pattern instead Each finding must reference something specific you found — not a generic best practice. If the site is doing well on this dimension, return an empty findings array and a high score.
 Return ONLY valid JSON: {"dimension":"geo-content","score":0,"grade":"","findings":[{"id":"content_001","title":"Problem","severity":"Critical|High|Medium","detail":"Detail","recommendation":"Action"}],"summary":"One sentence"}`,
 
   'geo-schema': (data) => `You are a GEO schema expert scoring structured data implementation.
