@@ -52,7 +52,7 @@ export default function AuthPage() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/20 border border-primary/30">
             <span className="text-sm font-bold text-primary">G</span>
           </div>
-          <span className="text-lg font-bold text-white">GeoIntel</span>
+          <span className="text-lg font-bold text-white">CiteIQ</span>
         </div>
 
         {/* Main copy */}
@@ -135,7 +135,7 @@ export default function AuthPage() {
         </div>
 
         <div className="relative">
-          <p className="text-xs text-gray-600">© 2025 GeoIntel · Beta pricing — $15/mo</p>
+          <p className="text-xs text-gray-600">© 2025 CiteIQ · Beta pricing — $15/mo</p>
         </div>
       </div>
 
@@ -147,7 +147,7 @@ export default function AuthPage() {
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 border border-primary/20">
               <span className="text-xs font-bold text-primary">G</span>
             </div>
-            <span className="text-base font-bold text-card-foreground">GeoIntel</span>
+            <span className="text-base font-bold text-card-foreground">CiteIQ</span>
           </div>
 
           {checkEmail ? (
@@ -163,7 +163,7 @@ export default function AuthPage() {
                   {mode === "signup" ? "Create your account" : "Welcome back"}
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  {mode === "signup" ? "Start tracking your AI visibility — free" : "Sign in to your GeoIntel dashboard"}
+                  {mode === "signup" ? "Start tracking your AI visibility — free" : "Sign in to your CiteIQ dashboard"}
                 </p>
               </div>
 

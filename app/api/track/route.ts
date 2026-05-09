@@ -32,8 +32,8 @@ async function queryOpenRouter(prompt: string, modelSlug: string) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
-        'HTTP-Referer': 'https://geointel.app',
-        'X-Title': 'GeoIntel',
+        'HTTP-Referer': 'https://citeiq.app',
+        'X-Title': 'CiteIQ',
       },
       body: JSON.stringify({
         model: modelSlug,

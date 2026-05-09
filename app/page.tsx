@@ -152,7 +152,7 @@ export default function LandingPage() {
               <ellipse cx="28" cy="12" rx="5" ry="3" fill="none" stroke="#3B5BDB" strokeWidth="1.5"/>
             </svg>
           </div>
-          <span style={{ fontWeight: 800, fontSize: 17, letterSpacing: "-0.03em", color: "#111827" }}>GeoIntel</span>
+          <span style={{ fontWeight: 800, fontSize: 17, letterSpacing: "-0.03em", color: "#111827" }}>CiteIQ</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
           <a href="#how-it-works" style={{ fontSize: 13, color: "#374151", textDecoration: "none", fontWeight: 500 }}>How it works</a>
@@ -180,7 +180,7 @@ export default function LandingPage() {
             <span style={{ color: "#3B5BDB" }}>Fix it today.</span>
           </h1>
           <p style={{ fontSize: 18, color: "#6b7280", marginBottom: 36, lineHeight: 1.7, maxWidth: 480 }}>
-            Your buyers are asking ChatGPT, Perplexity and Gemini which tool to use. Are you showing up? GeoIntel tells you exactly where you stand, why competitors rank above you, and gives you copy-paste fixes to change that.
+            Your buyers are asking ChatGPT, Perplexity and Gemini which tool to use. Are you showing up? CiteIQ tells you exactly where you stand, why competitors rank above you, and gives you copy-paste fixes to change that.
           </p>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 32 }}>
             <button onClick={() => setModal("signup")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "14px 32px", borderRadius: 10, background: "#3B5BDB", color: "white", fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer" }}>
@@ -263,7 +263,7 @@ export default function LandingPage() {
         <div style={{ maxWidth: 860, margin: "0 auto", textAlign: "center" }}>
           <div style={{ fontSize: 11, fontWeight: 600, color: "#2dd4bf", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 16 }}>Where your buyers are searching</div>
           <h2 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 800, color: "white", letterSpacing: "-0.03em", marginBottom: 12, lineHeight: 1.15 }}>Your buyers search AI before<br />they ever visit your website</h2>
-          <p style={{ fontSize: 16, color: "#9896b0", marginBottom: 56, maxWidth: 500, margin: "0 auto 56px" }}>AI search has become the new first touch in B2B. GeoIntel tracks all 4 engines and tells you exactly what to fix to show up.</p>
+          <p style={{ fontSize: 16, color: "#9896b0", marginBottom: 56, maxWidth: 500, margin: "0 auto 56px" }}>AI search has become the new first touch in B2B. CiteIQ tracks all 4 engines and tells you exactly what to fix to show up.</p>
 
           <div style={{ position: "relative", height: 340 }}>
             <svg width="100%" height="340" viewBox="0 0 800 340" style={{ overflow: "visible" }}>
@@ -410,7 +410,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer style={{ borderTop: "1px solid #e5e7eb", padding: "16px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", background: "#fafafa" }}>
-        <span style={{ fontSize: 12, color: "#9ca3af" }}>GeoIntel</span>
+        <span style={{ fontSize: 12, color: "#9ca3af" }}>CiteIQ</span>
         <div style={{ display: "flex", gap: 20 }}>
           {[["Terms", "/terms"], ["Privacy", "/privacy"]].map(([l, h]) => (
             <Link key={l} href={h} style={{ fontSize: 12, color: "#9ca3af" }}>{l}</Link>

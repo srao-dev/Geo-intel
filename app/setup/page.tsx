@@ -61,7 +61,7 @@ export default function SetupPage() {
         <div style={{ width: 34, height: 34, background: "var(--accent-dim)", border: "1px solid var(--accent)", borderRadius: 9, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Radio size={16} color="var(--accent)" />
         </div>
-        <span style={{ fontSize: 18, fontWeight: 700, color: "var(--text)", letterSpacing: "-0.03em" }}>GeoIntel</span>
+        <span style={{ fontSize: 18, fontWeight: 700, color: "var(--text)", letterSpacing: "-0.03em" }}>CiteIQ</span>
       </div>
 
       {/* Progress */}

@@ -7,7 +7,7 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 async function fetchPage(url: string): Promise<string> {
   try {
     const res = await fetch(url, {
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; GeoIntelBot/1.0)" },
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; CiteIQBot/1.0)" },
       signal: AbortSignal.timeout(8000),
     })
     if (!res.ok) return ""
@@ -53,7 +53,7 @@ async function discoverAndFetch(domain: string): Promise<{ pages: Record<string,
   const base = "https://" + domain.replace(/^https?:\/\//, "").split("/")[0]
 
   const homepageRaw = await fetch(base, {
-    headers: { "User-Agent": "Mozilla/5.0 (compatible; GeoIntelBot/1.0)" },
+    headers: { "User-Agent": "Mozilla/5.0 (compatible; CiteIQBot/1.0)" },
     signal: AbortSignal.timeout(8000),
   }).then(r => r.text()).catch(() => "")
 
