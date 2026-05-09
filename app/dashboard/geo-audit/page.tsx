@@ -485,7 +485,14 @@ export default function GeoAuditV2() {
                 {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Analysing...</> : <>Analyse <ArrowRight className="h-4 w-4" /></>}
               </button>
             </div>
-            <p className="mt-2 text-xs text-slate-400 px-1">Works best on specific content pages, not section homepages like /blog or /resources</p>
+            <div className="mt-4 flex items-center gap-2 flex-wrap px-1">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex-shrink-0 mr-1">Scans across:</p>
+              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-semibold" style={{ background: "#eef1fd", borderColor: "#3B5BDB40", color: "#3B5BDB" }}>📊 Competitive</span>
+              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-semibold" style={{ background: "#faf5ff", borderColor: "#7c3aed40", color: "#7c3aed" }}>📝 Content</span>
+              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-semibold" style={{ background: "#ecfeff", borderColor: "#0891b240", color: "#0891b2" }}>⭐ Authority</span>
+              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-semibold" style={{ background: "#fff7ed", borderColor: "#ea580c40", color: "#ea580c" }}>🔧 Schema</span>
+              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-semibold" style={{ background: "#ecfdf5", borderColor: "#05996940", color: "#059669" }}>🤖 Crawlability</span>
+            </div>
           </section>
 
           {/* Error */}
