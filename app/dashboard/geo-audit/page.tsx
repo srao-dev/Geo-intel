@@ -245,9 +245,6 @@ export default function GeoAuditV2() {
   const [cached, setCached] = useState(false)
   const [cachedAt, setCachedAt] = useState<string | null>(null)
   const [auditHistory, setAuditHistory] = useState<any[]>([])
-  const [cached, setCached] = useState(false)
-  const [cachedAt, setCachedAt] = useState<string | null>(null)
-  const [auditHistory, setAuditHistory] = useState<any[]>([])
 
   // Content Analysis state
   const [caUrl, setCaUrl] = useState("")
