@@ -10,28 +10,53 @@ function getServiceClient() {
 
 function extractPositionsByMention(responseText: string, brands: string[]): Record<string, number | null> {
   const normalized = responseText.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
-  const text = normalized.toLowerCase()
+  const lines = normalized.toLowerCase().split('\n')
   const result: Record<string, number | null> = {}
   brands.forEach(b => { result[b] = null })
 
-  // Extract all numbered list lines: "1. ...", "1) ...", "1: ..."
-  const listLines: { num: number; content: string }[] = []
-  const lineRe = /^[ \t]*(\d+)[.):] ?(.+)$/gm
-  let m: RegExpExecArray | null
-  while ((m = lineRe.exec(text)) !== null) {
-    listLines.push({ num: parseInt(m[1], 10), content: m[2] })
+  // Strategy 1: numbered list ("1. Brand", "**1. Brand**", "### 1. Brand")
+  let foundNumbered = false
+  for (const brand of brands) {
+    const bl = brand.toLowerCase()
+    for (const line of lines) {
+      if (!line.includes(bl)) continue
+      const numMatch = line.match(/^[ \t*#_>]{0,8}(\d+)[.):\-]/)
+      if (numMatch) {
+        result[brand] = parseInt(numMatch[1], 10)
+        foundNumbered = true
+        break
+      }
+    }
   }
+  if (foundNumbered) return result
 
-  if (listLines.length > 0) {
+  // Strategy 2: markdown table rows
+  const isSeparator = (l: string) => /^\|[\-:\|\s]+\|$/.test(l.trim())
+  const tableRows = lines.filter(l => l.trim().startsWith('|') && !isSeparator(l))
+  if (tableRows.length > 1) {
+    const dataRows = tableRows.slice(1) // skip header row
     for (const brand of brands) {
       const bl = brand.toLowerCase()
-      const found = listLines.find(line => line.content.includes(bl))
-      if (found) result[brand] = found.num
+      const idx = dataRows.findIndex(row => row.includes(bl))
+      if (idx !== -1) result[brand] = idx + 1
+    }
+    if (brands.some(b => result[b] !== null)) return result
+  }
+
+  // Strategy 3: bullet list ("- Brand", "* Brand", "• Brand")
+  // * followed by space = bullet; ** = bold (not a bullet)
+  const bulletRows = lines.filter(l => /^[ \t]*[-•→][ \t]+\S/.test(l) || /^[ \t]*\*[ \t]+\S/.test(l))
+  if (bulletRows.length > 0) {
+    for (const brand of brands) {
+      const bl = brand.toLowerCase()
+      const idx = bulletRows.findIndex(row => row.includes(bl))
+      if (idx !== -1) result[brand] = idx + 1
     }
     if (brands.some(b => result[b] !== null)) return result
   }
 
   // Fallback: rank by order of first mention among tracked brands
+  const text = normalized.toLowerCase()
   const indices: { brand: string; idx: number }[] = []
   for (const brand of brands) {
     const idx = text.indexOf(brand.toLowerCase())
@@ -81,7 +106,22 @@ export async function POST(req: NextRequest) {
       }))
     }
 
-    return NextResponse.json({ success: true, processed, brands: allBrands })
+    // Return first 3 samples for debugging
+    const { data: sample } = await db
+      .from('raw_responses')
+      .select('id, response_text, positions_json')
+      .eq('company_id', companyId)
+      .eq('status', 'success')
+      .not('response_text', 'is', null)
+      .limit(3)
+
+    const debug = (sample || []).map(r => ({
+      id: r.id,
+      positions: r.positions_json,
+      preview: r.response_text?.slice(0, 300),
+    }))
+
+    return NextResponse.json({ success: true, processed, brands: allBrands, debug })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
