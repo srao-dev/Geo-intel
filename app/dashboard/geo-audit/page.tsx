@@ -99,7 +99,7 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
           </span>
           <div>
             <h3 className="text-sm font-bold text-slate-900 leading-snug">{finding.title}</h3>
-            <p className="text-sm text-slate-500 font-medium uppercase tracking-wider mt-0.5">{DIMENSION_LABELS[finding.dimension]}</p>
+
           </div>
         </div>
         {open ? <ChevronUp className="h-4 w-4 text-slate-400 flex-shrink-0" /> : <ChevronDown className="h-4 w-4 text-slate-400 flex-shrink-0" />}

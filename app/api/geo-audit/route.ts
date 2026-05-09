@@ -239,6 +239,26 @@ function synthesise(url: string, results: Record<string, any>) {
   const allFindings: any[] = []
   const seen = new Set()
 
+  // Hardcode llms.txt finding if missing — AI agents keep dropping it
+  const crawlResult = results['geo-crawl']
+  if (crawlResult && pageData.has_llms_txt === false) {
+    if (!crawlResult.findings) crawlResult.findings = []
+    const alreadyHasLlms = crawlResult.findings.some((f: any) =>
+      f.title?.toLowerCase().includes('llms')
+    )
+    if (!alreadyHasLlms) {
+      crawlResult.findings.push({
+        id: 'crawl_llms',
+        title: 'llms.txt file not found',
+        severity: 'Medium',
+        detail: `${url} does not have an llms.txt file at the domain root. This new standard tells AI engines what content they can use and which pages are most important.`,
+        recommendation: `Create an llms.txt file at ${new URL(url).origin}/llms.txt describing your company, key pages, and content AI engines are permitted to use. Use the Get Fix button to generate the file content.`,
+        effort: 'Hours',
+        estimated_impact: 'Direct communication channel with AI crawlers'
+      })
+    }
+  }
+
   for (const [agent, weight] of Object.entries(weights)) {
     const r = results[agent] || {}
     composite += (r.score || 0) * weight
