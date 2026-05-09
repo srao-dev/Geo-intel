@@ -229,7 +229,7 @@ async function runAgent(name: string, pageData: any) {
   try { return JSON.parse(raw) } catch { return { dimension: name, score: 0, grade: 'F', findings: [], summary: 'Parse error' } }
 }
 
-function synthesise(url: string, results: Record<string, any>) {
+function synthesise(url: string, results: Record<string, any>, hasLlmsTxt: boolean = true) {
   const weights: Record<string, number> = {
     'geo-competitive': 0.25, 'geo-content': 0.25,
     'geo-authority': 0.20, 'geo-schema': 0.20, 'geo-crawl': 0.10,
@@ -241,7 +241,7 @@ function synthesise(url: string, results: Record<string, any>) {
 
   // Hardcode llms.txt finding if missing — AI agents keep dropping it
   const crawlResult = results['geo-crawl']
-  if (crawlResult && pageData.has_llms_txt === false) {
+  if (crawlResult && hasLlmsTxt === false) {
     if (!crawlResult.findings) crawlResult.findings = []
     const alreadyHasLlms = crawlResult.findings.some((f: any) =>
       f.title?.toLowerCase().includes('llms')
