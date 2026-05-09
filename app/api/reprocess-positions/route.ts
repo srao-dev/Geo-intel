@@ -8,20 +8,36 @@ function getServiceClient() {
   )
 }
 
+function escapeRegex(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 function extractPositionsByMention(responseText: string, brands: string[]): Record<string, number | null> {
   const text = responseText.toLowerCase()
-  const mentionIndices: { brand: string; index: number }[] = []
-
-  for (const brand of brands) {
-    const index = text.indexOf(brand.toLowerCase())
-    if (index !== -1) mentionIndices.push({ brand, index })
-  }
-
-  mentionIndices.sort((a, b) => a.index - b.index)
-
   const result: Record<string, number | null> = {}
   brands.forEach(b => { result[b] = null })
-  mentionIndices.forEach((item, i) => { result[item.brand] = i + 1 })
+
+  // Try numbered-list position first: "5. Salesforce", "5) Salesforce", "5: Salesforce"
+  let foundNumbered = false
+  for (const brand of brands) {
+    const escaped = escapeRegex(brand.toLowerCase())
+    const m = text.match(new RegExp(`(?:^|\\n)[ \\t]*(\\d+)[.):][ \\t]*(?:[*_#]{0,3}[ \\t]*)?${escaped}`, 'm'))
+    if (m) {
+      result[brand] = parseInt(m[1], 10)
+      foundNumbered = true
+    }
+  }
+
+  if (foundNumbered) return result
+
+  // Fallback: rank by order of first mention among tracked brands
+  const indices: { brand: string; idx: number }[] = []
+  for (const brand of brands) {
+    const idx = text.indexOf(brand.toLowerCase())
+    if (idx !== -1) indices.push({ brand, idx })
+  }
+  indices.sort((a, b) => a.idx - b.idx)
+  indices.forEach((item, i) => { result[item.brand] = i + 1 })
 
   return result
 }

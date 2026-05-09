@@ -8,30 +8,40 @@ function getServiceClient() {
   )
 }
 
-// Derive position from order of first mention in the response text.
-// Brands are ranked 1, 2, 3... based on where they first appear.
-// Brands not mentioned at all get null.
+function escapeRegex(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+// Extract brand positions from AI response text.
+// Priority: numbered list position ("5. Salesforce" → 5).
+// Fallback: rank by order of first mention among tracked brands only.
 function extractPositionsByMention(responseText: string, brands: string[]): Record<string, number | null> {
   const text = responseText.toLowerCase()
+  const result: Record<string, number | null> = {}
+  brands.forEach(b => { result[b] = null })
 
-  const mentionIndices: { brand: string; index: number }[] = []
-
+  // Try to extract numbered-list position: "1. Brand", "1) Brand", "1: Brand"
+  // Allows optional markdown formatting between number and brand name
+  let foundNumbered = false
   for (const brand of brands) {
-    const index = text.indexOf(brand.toLowerCase())
-    if (index !== -1) {
-      mentionIndices.push({ brand, index })
+    const escaped = escapeRegex(brand.toLowerCase())
+    const m = text.match(new RegExp(`(?:^|\\n)[ \\t]*(\\d+)[.):][ \\t]*(?:[*_#]{0,3}[ \\t]*)?${escaped}`, 'm'))
+    if (m) {
+      result[brand] = parseInt(m[1], 10)
+      foundNumbered = true
     }
   }
 
-  // Sort by first appearance
-  mentionIndices.sort((a, b) => a.index - b.index)
+  if (foundNumbered) return result
 
-  // Assign positions 1, 2, 3...
-  const result: Record<string, number | null> = {}
-  brands.forEach(b => { result[b] = null })
-  mentionIndices.forEach((item, i) => {
-    result[item.brand] = i + 1
-  })
+  // Fallback: rank by order of first mention among tracked brands
+  const indices: { brand: string; idx: number }[] = []
+  for (const brand of brands) {
+    const idx = text.indexOf(brand.toLowerCase())
+    if (idx !== -1) indices.push({ brand, idx })
+  }
+  indices.sort((a, b) => a.idx - b.idx)
+  indices.forEach((item, i) => { result[item.brand] = i + 1 })
 
   return result
 }
