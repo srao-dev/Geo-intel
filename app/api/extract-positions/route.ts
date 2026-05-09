@@ -8,31 +8,31 @@ function getServiceClient() {
   )
 }
 
-function escapeRegex(s: string) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
 // Extract brand positions from AI response text.
-// Priority: numbered list position ("5. Salesforce" → 5).
+// Priority: find brand anywhere within a numbered list line ("5. **Salesforce** - leader" → 5).
 // Fallback: rank by order of first mention among tracked brands only.
 function extractPositionsByMention(responseText: string, brands: string[]): Record<string, number | null> {
-  const text = responseText.toLowerCase()
+  const normalized = responseText.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+  const text = normalized.toLowerCase()
   const result: Record<string, number | null> = {}
   brands.forEach(b => { result[b] = null })
 
-  // Try to extract numbered-list position: "1. Brand", "1) Brand", "1: Brand"
-  // Allows optional markdown formatting between number and brand name
-  let foundNumbered = false
-  for (const brand of brands) {
-    const escaped = escapeRegex(brand.toLowerCase())
-    const m = text.match(new RegExp(`(?:^|\\n)[ \\t]*(\\d+)[.):][ \\t]*(?:[*_#]{0,3}[ \\t]*)?${escaped}`, 'm'))
-    if (m) {
-      result[brand] = parseInt(m[1], 10)
-      foundNumbered = true
-    }
+  // Extract all numbered list lines: "1. ...", "1) ...", "1: ..."
+  const listLines: { num: number; content: string }[] = []
+  const lineRe = /^[ \t]*(\d+)[.):] ?(.+)$/gm
+  let m: RegExpExecArray | null
+  while ((m = lineRe.exec(text)) !== null) {
+    listLines.push({ num: parseInt(m[1], 10), content: m[2] })
   }
 
-  if (foundNumbered) return result
+  if (listLines.length > 0) {
+    for (const brand of brands) {
+      const bl = brand.toLowerCase()
+      const found = listLines.find(line => line.content.includes(bl))
+      if (found) result[brand] = found.num
+    }
+    if (brands.some(b => result[b] !== null)) return result
+  }
 
   // Fallback: rank by order of first mention among tracked brands
   const indices: { brand: string; idx: number }[] = []
