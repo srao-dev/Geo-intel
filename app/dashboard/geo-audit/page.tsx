@@ -744,23 +744,7 @@ export default function GeoAuditV2() {
               {/* Intro */}
               {!caAnalysis && !caLoading && !caBlocked && (
                 <>
-                  {/* Radar card */}
-                  <section className="rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 60%, #ede9fe 100%)', border: '1px solid rgba(99,102,241,0.12)' }}>
-                    <div className="p-6 flex items-start gap-6">
-                      <div className="flex-shrink-0 flex flex-col items-center gap-1">
-                        <svg width="72" height="72" viewBox="0 0 56 56" style={{ animation: "float 3s ease-in-out infinite" }}>
-                          <rect x="12" y="22" width="32" height="28" rx="8" fill="#eef1fd" stroke={BRAND} strokeWidth="1.5"/>
-                          <circle cx="21" cy="33" r="4" fill="white"/><circle cx="35" cy="33" r="4" fill="white"/>
-                          <circle cx="21" cy="33" r="2" fill={BRAND}/><circle cx="35" cy="33" r="2" fill={BRAND}/>
-                          <path d="M22 41 Q28 46 34 41" fill="none" stroke={BRAND} strokeWidth="1.5" strokeLinecap="round"/>
-                          <line x1="28" y1="22" x2="28" y2="12" stroke={BRAND} strokeWidth="1.5" strokeLinecap="round"/>
-                          <ellipse cx="28" cy="10" rx="7" ry="4" fill="none" stroke={BRAND} strokeWidth="1.5" style={{ transformOrigin: "28px 10px", animation: "spin 3s linear infinite" }}/>
-                          <rect x="4" y="28" width="8" height="4" rx="2" fill="#eef1fd" stroke={BRAND} strokeWidth="1"/>
-                          <rect x="44" y="28" width="8" height="4" rx="2" fill="#eef1fd" stroke={BRAND} strokeWidth="1"/>
-                        </svg>
-                        <style>{"@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}} @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}"}</style>
-                        <span className="text-xs font-bold" style={{ color: BRAND }}>Radar</span>
-                    {/* Hero text */}
+                  {/* Hero text */}
                   <div className="text-center py-4">
                     <h2 className="text-xl font-bold text-slate-900 mb-2">Why isn't this page being cited by AI?</h2>
                     <p className="text-sm text-slate-500 max-w-lg mx-auto leading-relaxed">Paste any blog post, case study, whitepaper or FAQ page URL. Get a citation score, exact gaps, and copy-paste fixes in under 30 seconds.</p>
