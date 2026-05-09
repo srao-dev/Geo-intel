@@ -368,13 +368,22 @@ export async function getPromptResponses(promptId: string, limit = 5) {
   return data || []
 }
 
+function extractCitationCount(rawResponse: any, responseText: string): number {
+  if (!rawResponse) return 0
+  // Perplexity/Sonar: top-level citations array
+  if (Array.isArray(rawResponse.citations)) return rawResponse.citations.length
+  // Other models: count URLs in response text
+  const urls = responseText?.match(/https?:\/\/[^\s\)\]>]+/g)
+  return urls?.length || 0
+}
+
 export async function getPromptModelBreakdown(companyId: string, promptId: string) {
   const { data: company } = await supabase.from('companies').select('name').eq('id', companyId).single()
   const companyName = company?.name || ''
 
   const { data: responses } = await supabase
     .from('raw_responses')
-    .select('id, response_text, requested_model, positions_json, created_at')
+    .select('id, response_text, requested_model, positions_json, raw_response, created_at')
     .eq('company_id', companyId)
     .eq('prompt_id', promptId)
     .eq('status', 'success')
@@ -398,14 +407,16 @@ export async function getPromptModelBreakdown(companyId: string, promptId: strin
     })
     const mentionCount = mentionedRows.length
 
-    // Position from latest response
+    // Total citations across all responses for this model
+    const citationCount = rows.reduce((sum, r) => sum + extractCitationCount(r.raw_response, r.response_text || ''), 0)
+
     const latest = rows[0]
     const pos = latest.positions_json?.[companyName]
     const position = (typeof pos === 'number' && pos > 0) ? pos : null
     const isHM = pos === -1
     const preview = latest.response_text?.split('\n').find((l: string) => l.trim().length > 20)?.slice(0, 120) || ''
 
-    return { model, total, mentionCount, position, isHM, preview, responseText: latest.response_text, id: latest.id }
+    return { model, total, mentionCount, citationCount, position, isHM, preview, responseText: latest.response_text, id: latest.id }
   })
 }
 
