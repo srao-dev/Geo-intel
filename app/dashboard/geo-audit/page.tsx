@@ -418,7 +418,7 @@ export default function GeoAuditV2() {
             <>
 
               {/* Preview of results */}
-              <div className="relative" style={{ maxWidth: 640 }}>
+              <div className="relative" style={{ maxWidth: 860 }}>
                 {/* Radar mascot - top right */}
                 <div className="absolute -top-10 right-4 flex items-end gap-2 z-10">
                   <div className="bg-white border border-slate-200 rounded-2xl rounded-br-none px-3 py-2 shadow-sm">
@@ -446,8 +446,8 @@ export default function GeoAuditV2() {
                     <div>
                       <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">GEO Score</p>
                       <div className="flex items-baseline gap-3">
-                        <span className="text-5xl font-extrabold text-slate-900 leading-none">62</span>
-                        <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">Needs work</span>
+                        <span className="text-5xl font-extrabold text-slate-200 leading-none">—</span>
+                        <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-400 border border-slate-200">Your score</span>
                       </div>
                     </div>
                     <div className="flex-1 pl-6 border-l border-slate-100">
