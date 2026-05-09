@@ -249,6 +249,7 @@ export default function GeoAuditV2() {
   const [caAnalysis, setCaAnalysis] = useState<any>(null)
   const [caError, setCaError] = useState("")
   const [caBlocked, setCaBlocked] = useState(false)
+  const [caShowPaste, setCaShowPaste] = useState(false)
   const [caPasted, setCaPasted] = useState("")
 
   const runContentAnalysis = async (usePasted = false) => {
@@ -696,6 +697,42 @@ export default function GeoAuditV2() {
                   </button>
                 </div>
                 <p className="mt-2 text-xs text-slate-400 px-1">Works best on specific content pages — blog posts, case studies, whitepapers, FAQs</p>
+
+                {/* Optional paste for better results */}
+                <div className="mt-3">
+                  <button
+                    onClick={() => setCaShowPaste(!caShowPaste)}
+                    className="flex items-center gap-2 text-sm font-medium px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition-colors"
+                    style={{ color: BRAND }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+                    {caShowPaste ? "Hide paste option" : "Paste content for deeper analysis"}
+                    <span className="text-xs px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600 font-semibold">Optional</span>
+                  </button>
+                  {caShowPaste && (
+                    <div className="mt-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
+                      <p className="text-sm font-semibold text-blue-800 mb-1">Paste article text for better results</p>
+                      <p className="text-xs text-blue-600 mb-3">Open the page in your browser → Select all text (Cmd+A) → Copy → Paste below. This gives accurate results for JS-rendered pages and reveals statistics, author info, and content quality gaps.</p>
+                      <textarea
+                        value={caPasted}
+                        onChange={e => setCaPasted(e.target.value)}
+                        placeholder="Paste the full article text here..."
+                        rows={5}
+                        className="w-full rounded-lg border border-blue-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder:text-slate-400 outline-none focus:border-blue-400 resize-none"
+                      />
+                      {caPasted.trim().length > 100 && (
+                        <button
+                          onClick={() => runContentAnalysis(true)}
+                          disabled={caLoading}
+                          className="mt-2 flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-white disabled:opacity-50 transition-all"
+                          style={{ background: BRAND }}
+                        >
+                          {caLoading ? "Analysing..." : <>Analyse with pasted content <ArrowRight className="h-4 w-4" /></>}
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
               </section>
 
               {/* Error */}
