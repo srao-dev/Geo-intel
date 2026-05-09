@@ -416,89 +416,97 @@ export default function GeoAuditV2() {
           {/* Intro - only show when no report and not loading */}
           {!report && !loading && (
             <>
+              {/* Radar intro - speech bubble style */}
+              <section className="rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 60%, #ede9fe 100%)', border: '1px solid rgba(99,102,241,0.12)' }}>
+                <div className="p-6 flex items-start gap-6">
+                  {/* Avatar */}
+                  <div className="flex-shrink-0 flex flex-col items-center gap-1">
+                    <svg width="72" height="72" viewBox="0 0 56 56" style={{ animation: "float 3s ease-in-out infinite" }}>
+                      <rect x="12" y="22" width="32" height="28" rx="8" fill="#eef1fd" stroke={BRAND} strokeWidth="1.5"/>
+                      <circle cx="21" cy="33" r="4" fill="white"/><circle cx="35" cy="33" r="4" fill="white"/>
+                      <circle cx="21" cy="33" r="2" fill={BRAND}/><circle cx="35" cy="33" r="2" fill={BRAND}/>
+                      <path d="M22 41 Q28 46 34 41" fill="none" stroke={BRAND} strokeWidth="1.5" strokeLinecap="round"/>
+                      <line x1="28" y1="22" x2="28" y2="12" stroke={BRAND} strokeWidth="1.5" strokeLinecap="round"/>
+                      <ellipse cx="28" cy="10" rx="7" ry="4" fill="none" stroke={BRAND} strokeWidth="1.5" style={{ transformOrigin: "28px 10px", animation: "spin 3s linear infinite" }}/>
+                      <rect x="4" y="28" width="8" height="4" rx="2" fill="#eef1fd" stroke={BRAND} strokeWidth="1"/>
+                      <rect x="44" y="28" width="8" height="4" rx="2" fill="#eef1fd" stroke={BRAND} strokeWidth="1"/>
+                    </svg>
+                    <style>{"@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}} @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}"}</style>
+                    <span className="text-xs font-bold" style={{ color: BRAND }}>Radar</span>
+                  </div>
 
-                            {/* Preview of results */}
-              <div style={{ maxWidth: 720 }}>
-                {/* Radar above with speech bubble */}
-                <div className="flex items-end gap-3 mb-3 px-2">
-                  <svg width="44" height="50" viewBox="0 0 56 56">
-                    <line x1="28" y1="14" x2="28" y2="4" stroke={BRAND} strokeWidth="1.5" strokeLinecap="round"/>
-                    <circle cx="28" cy="3" r="2.5" fill={BRAND} opacity="0.8"/>
-                    <rect x="12" y="14" width="32" height="28" rx="9" fill="#eef1fd" stroke={BRAND} strokeWidth="1.5"/>
-                    <circle cx="22" cy="25" r="4" fill="white"/><circle cx="34" cy="25" r="4" fill="white"/>
-                    <circle cx="23" cy="25" r="2" fill={BRAND}/><circle cx="35" cy="25" r="2" fill={BRAND}/>
-                    <path d="M22 34 Q28 38 34 34" fill="none" stroke={BRAND} strokeWidth="1.5" strokeLinecap="round"/>
-                    <rect x="4" y="20" width="8" height="4" rx="2" fill="#eef1fd" stroke={BRAND} strokeWidth="1"/>
-                    <rect x="44" y="20" width="8" height="4" rx="2" fill="#eef1fd" stroke={BRAND} strokeWidth="1"/>
-                  </svg>
-                  <div className="bg-white border border-slate-200 rounded-2xl rounded-bl-none px-4 py-2 shadow-sm mb-1">
-                    <p className="text-xs font-medium text-slate-600">Here is what your audit will show...</p>
-                  </div>
-                </div>
-
-                {/* Faded preview card */}
-                <div className="rounded-xl overflow-hidden border border-slate-200 shadow-sm opacity-60 pointer-events-none select-none">
-                  {/* Sample badge */}
-                  <div className="px-5 py-2 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Example</span>
-                    <span className="text-[10px] text-slate-400">Your results will appear here after running an audit</span>
-                  </div>
-                  {/* Score row */}
-                  <div className="p-5 border-b border-slate-100 flex items-start gap-8 bg-white">
-                    <div className="flex-shrink-0">
-                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">GEO Score</p>
-                      <div className="flex items-baseline gap-3">
-                        <span className="text-5xl font-extrabold text-slate-200 leading-none">—</span>
-                        <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-400 border border-slate-200">Your score</span>
-                      </div>
+                  {/* Speech bubble */}
+                  <div className="flex-1">
+                    <div className="bg-white/80 rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm border border-white/60 mb-4">
+                      <p className="text-sm font-bold text-slate-900 mb-1">Hi! I am Radar, your GEO analyst.</p>
+                      <p className="text-sm text-slate-500 leading-relaxed">
+                        Enter any website URL and I will audit it across 5 GEO dimensions. You will get a score, specific findings, and copy-paste fixes ready to implement.
+                      </p>
                     </div>
-                    <div className="flex-1">
-                      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Dimensions</p>
-                      <div className="flex flex-col gap-2">
-                        {[
-                          { label: "Competitive", val: 47 },
-                          { label: "Content",     val: 37 },
-                          { label: "Authority",   val: 33 },
-                          { label: "Schema",      val: 24 },
-                          { label: "Crawlability",val: 53 },
-                        ].map(d => (
-                          <div key={d.label} className="flex items-center gap-3">
-                            <span className="text-[10px] text-slate-400 w-20 flex-shrink-0">{d.label}</span>
-                            <div className="w-48 h-2 rounded-full bg-slate-100 overflow-hidden">
-                              <div className="h-full rounded-full bg-slate-200" style={{ width: `${d.val}%` }} />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  {/* Findings */}
-                  <div className="p-5 bg-white border-b border-slate-100">
-                    <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-3">Findings & fixes</p>
-                    <div className="flex flex-col gap-2">
+                    {/* Stats row */}
+                    <div className="flex items-center gap-8 px-1">
                       {[
-                        { sev: "Critical", label: "No FAQPage schema detected",              bg: "#fef2f2", border: "#fecaca", stripe: "#dc2626", color: "#dc2626", badgeBg: "#fee2e2" },
-                        { sev: "High",     label: "Entity definition too vague for AI citation", bg: "#fff7ed", border: "#fed7aa", stripe: "#ea580c", color: "#ea580c", badgeBg: "#ffedd5" },
-                        { sev: "Medium",   label: "Missing sameAs links in Organization schema", bg: "#fffbeb", border: "#fde68a", stripe: "#f59e0b", color: "#b45309", badgeBg: "#fef3c7" },
-                      ].map(f => (
-                        <div key={f.sev} className="flex items-center justify-between rounded-lg px-3 py-2"
-                          style={{ background: f.bg, border: `1px solid ${f.border}`, borderLeft: `3px solid ${f.stripe}` }}>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded" style={{ background: f.badgeBg, color: f.color }}>{f.sev}</span>
-                            <span className="text-xs font-medium text-slate-700">{f.label}</span>
+                        { value: "0-100", label: "GEO Score", color: BRAND },
+                        { value: "5", label: "Dimensions", color: "#7c3aed" },
+                        { value: "Same day", label: "Fixes ready", color: "#059669" },
+                      ].map((stat, i) => (
+                        <div key={stat.label} className="flex items-center gap-3">
+                          {i > 0 && <div className="w-px h-6 bg-indigo-200" />}
+                          <div>
+                            <p className="text-base font-extrabold" style={{ color: stat.color }}>{stat.value}</p>
+                            <p className="text-xs text-slate-400">{stat.label}</p>
                           </div>
-                          <span className="text-xs font-semibold ml-4 flex-shrink-0" style={{ color: f.color }}>Get fix →</span>
                         </div>
                       ))}
                     </div>
                   </div>
-                  {/* Lock bar */}
-                  <div className="px-5 py-3 bg-slate-50 flex items-center gap-2">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    <span className="text-xs text-slate-400">Run an audit to see your real results — takes about 30 seconds</span>
-                  </div>
                 </div>
+              </section>
+
+              {/* Feature cards */}
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  {
+                    title: "Real data",
+                    icon: "🔍",
+                    num: "01",
+                    color: BRAND,
+                    bg: "#eff6ff",
+                    border: "#bfdbfe",
+                    detail: "We fetch your site, check robots.txt, extract schema and analyse content structure.",
+                  },
+                  {
+                    title: "5 dimensions scored",
+                    icon: "📊",
+                    num: "02",
+                    color: "#ea580c",
+                    bg: "#fff7ed",
+                    border: "#fed7aa",
+                    detail: "Crawlability, content depth, schema markup, authority signals and competitive positioning.",
+                  },
+                  {
+                    title: "Fixes ready to ship",
+                    icon: "⚡",
+                    num: "03",
+                    color: "#059669",
+                    bg: "#ecfdf5",
+                    border: "#a7f3d0",
+                    detail: "Every finding has a copy-paste fix — schema JSON-LD, robots.txt snippets, content rewrites.",
+                  },
+                ].map(card => (
+                  <div key={card.title} className="rounded-xl p-5 flex flex-col gap-3 hover:shadow-md transition-all cursor-default"
+                    style={{ backgroundColor: card.bg, border: `1px solid ${card.border}` }}>
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl">{card.icon}</span>
+                      <span className="text-xs font-bold opacity-30" style={{ color: card.color }}>{card.num}</span>
+                    </div>
+                    <h3 className="text-sm font-bold text-slate-800 mb-1">{card.title}</h3>
+                    <p className="text-sm text-slate-500 leading-relaxed">{card.detail}</p>
+                  </div>
+                ))}
               </div>
+            </>
+          )}
 
           {/* Report */}
           {report && !loading && (
@@ -576,8 +584,7 @@ export default function GeoAuditV2() {
             </div>
           )}
 
-          </>
-          )}
+          </>}
 
           {/* Content Analysis Tab */}
           {activeTab === "Content Analysis" && (
