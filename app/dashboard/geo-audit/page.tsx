@@ -98,7 +98,7 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
             {finding.severity}
           </span>
           <div>
-            <h3 className="text-base font-bold text-slate-900">{finding.title}</h3>
+            <h3 className="text-sm font-bold text-slate-900 leading-snug">{finding.title}</h3>
             <p className="text-sm text-slate-500 font-medium uppercase tracking-wider mt-0.5">{DIMENSION_LABELS[finding.dimension]}</p>
           </div>
         </div>
@@ -497,7 +497,7 @@ export default function GeoAuditV2() {
                   { label: "Issues found", value: "—", sub: "Findings will appear here", color: "#dc2626", borderColor: "#dc2626" },
                   { label: "Crawlability", value: "—", sub: "Bot access status", color: "#059669", borderColor: "#059669" },
                 ].map((k, i) => (
-                  <div key={i} className="rounded-xl bg-white border border-slate-200 p-4 opacity-50" style={{ borderTop: `3px solid ${k.borderColor}` }}>
+                  <div key={i} className="rounded-xl bg-white border border-slate-200 p-4 opacity-40" style={{ borderTop: `3px solid ${k.borderColor}` }}>
                     <p className="text-xs text-slate-400 uppercase tracking-wider mb-2">{k.label}</p>
                     <p className="text-4xl font-bold text-slate-300 leading-none">{k.value}</p>
                     <p className="text-xs text-slate-400 mt-2">{k.sub}</p>
