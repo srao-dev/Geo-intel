@@ -220,6 +220,7 @@ export default function DashboardV2() {
   const [visibilityRuns, setVisibilityRuns] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [runLoading, setRunLoading] = useState(false)
+  const [reprocessLoading, setReprocessLoading] = useState(false)
   const [expandedResponse, setExpandedResponse] = useState<string | null>(null)
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
   const [barsVisible, setBarsVisible] = useState(false)
@@ -319,9 +320,17 @@ export default function DashboardV2() {
   }
 
   const handleReprocessPositions = async () => {
-    if (!selectedCompanyId) return
-    await fetch("/api/reprocess-positions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ companyId: selectedCompanyId }) })
-    setTimeout(fetchData, 2000)
+    if (!selectedCompanyId || reprocessLoading) return
+    setReprocessLoading(true)
+    setModelBreakdownCache({})
+    setPromptResponsesCache({})
+    setCitationStats(null)
+    try {
+      await fetch("/api/reprocess-positions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ companyId: selectedCompanyId }) })
+      await fetchData()
+    } finally {
+      setReprocessLoading(false)
+    }
   }
 
   if (authLoading || !user) return null
@@ -476,8 +485,8 @@ export default function DashboardV2() {
                 <option value="all">All models</option>
                 {(stats?.availableModels || []).map((m: string) => <option key={m} value={m}>{m}</option>)}
               </select>
-              <button onClick={async () => { await handleReprocessPositions(); fetchData() }} className="p-1.5 text-slate-400 border border-slate-200 rounded-md hover:bg-slate-50 transition-colors" title="Refresh and reprocess positions">
-                <RefreshCw className="h-3.5 w-3.5" />
+              <button onClick={handleReprocessPositions} disabled={reprocessLoading} className="p-1.5 text-slate-400 border border-slate-200 rounded-md hover:bg-slate-50 transition-colors disabled:opacity-50" title="Refresh and reprocess positions">
+                <RefreshCw className={`h-3.5 w-3.5 ${reprocessLoading ? "animate-spin" : ""}`} />
               </button>
               <button onClick={handleRunNow} disabled={runLoading} className="flex items-center gap-1.5 text-white px-3 py-1.5 rounded-md text-sm font-semibold transition-all shadow-sm disabled:opacity-70" style={{ backgroundColor: BRAND }}
                 title="Press R to run">
