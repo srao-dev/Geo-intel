@@ -35,8 +35,11 @@ Domain: ${domain} | Finding: ${finding.title} | Detail: ${finding.detail}
 RULES:
 - Maximum 3 instructions
 - No timeframes (no "weeks", "days", "hours")
-- Code field must be actual copy-paste content (real JSON-LD, real HTML, real text) not a description
-- Instructions must be specific actions, not projects
+- Instructions must be genuinely different from the recommendation — do not reword or repeat the finding or recommendation
+- Each instruction must be a specific, concrete action the user can do today — not a project or strategy
+- Do NOT repeat phrases from the problem or recommendation in the instructions
+- For value proposition fixes: suggest adding ONE concrete example alongside existing messaging, not replacing it entirely
+- Instructions should tell the user exactly what to write or where to look — not what to think about
 - MASTER RULE: For ANY value you cannot read directly from the page content provided — use a placeholder. Never guess, infer, or invent any value
 - This applies to: URLs, phone numbers, version numbers, ratings, counts, dates, prices, and statistics
 - Specific placeholders: social URLs → ADD_YOUR_LINKEDIN_URL / ADD_YOUR_TWITTER_URL / ADD_YOUR_YOUTUBE_URL / ADD_YOUR_FACEBOOK_URL | logo → ADD_YOUR_LOGO_URL | image → ADD_YOUR_PRODUCT_IMAGE_URL | phone → +1-ADD-YOUR-PHONE | release notes → ADD_YOUR_RELEASE_NOTES_URL | download/install → ADD_YOUR_DOWNLOAD_URL | version → ADD_YOUR_CURRENT_VERSION | ratings → ADD_YOUR_RATING / ADD_YOUR_REVIEW_COUNT | any other unverifiable URL → ADD_YOUR_[DESCRIPTION]_URL
