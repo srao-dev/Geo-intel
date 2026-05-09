@@ -8,62 +8,52 @@ function getServiceClient() {
   )
 }
 
+// Position values:
+//   positive integer = ranked position in a numbered list or table
+//   -1               = mentioned but not ranked (bullet, categorical, honorary, prose)
+//   null             = not mentioned at all
 function extractPositionsByMention(responseText: string, brands: string[]): Record<string, number | null> {
   const normalized = responseText.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
   const lines = normalized.toLowerCase().split('\n')
+  const text = normalized.toLowerCase()
   const result: Record<string, number | null> = {}
   brands.forEach(b => { result[b] = null })
 
   // Strategy 1: numbered list ("1. Brand", "**1. Brand**", "### 1. Brand")
-  let foundNumbered = false
+  let foundRanked = false
   for (const brand of brands) {
     const bl = brand.toLowerCase()
     for (const line of lines) {
       if (!line.includes(bl)) continue
-      const numMatch = line.match(/^[ \t*#_>]{0,8}(\d+)[.):\-]/)
-      if (numMatch) {
-        result[brand] = parseInt(numMatch[1], 10)
-        foundNumbered = true
+      const m = line.match(/^[ \t*#_>]{0,8}(\d+)[.):\-]/)
+      if (m) {
+        result[brand] = parseInt(m[1], 10)
+        foundRanked = true
         break
       }
     }
   }
-  if (foundNumbered) return result
 
   // Strategy 2: markdown table rows
-  const isSeparator = (l: string) => /^\|[\-:\|\s]+\|$/.test(l.trim())
-  const tableRows = lines.filter(l => l.trim().startsWith('|') && !isSeparator(l))
-  if (tableRows.length > 1) {
-    const dataRows = tableRows.slice(1) // skip header row
-    for (const brand of brands) {
-      const bl = brand.toLowerCase()
-      const idx = dataRows.findIndex(row => row.includes(bl))
-      if (idx !== -1) result[brand] = idx + 1
+  if (!foundRanked) {
+    const isSep = (l: string) => /^\|[\-:\|\s]+\|$/.test(l.trim())
+    const tableRows = lines.filter(l => l.trim().startsWith('|') && !isSep(l))
+    if (tableRows.length > 1) {
+      const dataRows = tableRows.slice(1)
+      for (const brand of brands) {
+        const bl = brand.toLowerCase()
+        const idx = dataRows.findIndex(row => row.includes(bl))
+        if (idx !== -1) { result[brand] = idx + 1; foundRanked = true }
+      }
     }
-    if (brands.some(b => result[b] !== null)) return result
   }
 
-  // Strategy 3: bullet list ("- Brand", "* Brand", "• Brand")
-  // * followed by space = bullet; ** = bold (not a bullet)
-  const bulletRows = lines.filter(l => /^[ \t]*[-•→][ \t]+\S/.test(l) || /^[ \t]*\*[ \t]+\S/.test(l))
-  if (bulletRows.length > 0) {
-    for (const brand of brands) {
-      const bl = brand.toLowerCase()
-      const idx = bulletRows.findIndex(row => row.includes(bl))
-      if (idx !== -1) result[brand] = idx + 1
-    }
-    if (brands.some(b => result[b] !== null)) return result
-  }
-
-  // Fallback: rank by order of first mention among tracked brands
-  const text = normalized.toLowerCase()
-  const indices: { brand: string; idx: number }[] = []
+  // Any brand mentioned in text but not given a ranked position -> -1 (HM)
   for (const brand of brands) {
-    const idx = text.indexOf(brand.toLowerCase())
-    if (idx !== -1) indices.push({ brand, idx })
+    if (result[brand] === null && text.includes(brand.toLowerCase())) {
+      result[brand] = -1
+    }
   }
-  indices.sort((a, b) => a.idx - b.idx)
-  indices.forEach((item, i) => { result[item.brand] = i + 1 })
 
   return result
 }
@@ -84,7 +74,6 @@ export async function POST(req: NextRequest) {
     const competitorNames = competitorsRes.data?.map(c => c.name) || []
     const allBrands = [companyName, ...competitorNames]
 
-    // Get ALL successful responses for this company
     const { data: responses } = await db
       .from('raw_responses')
       .select('id, response_text')
@@ -106,7 +95,6 @@ export async function POST(req: NextRequest) {
       }))
     }
 
-    // Return first 3 samples for debugging
     const { data: sample } = await db
       .from('raw_responses')
       .select('id, response_text, positions_json')

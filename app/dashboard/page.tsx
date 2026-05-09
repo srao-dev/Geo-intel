@@ -723,12 +723,13 @@ export default function DashboardV2() {
                         {loading ? <CardSkeleton /> : (
                           <div className="p-3 space-y-1.5 flex-1">
                             {rankings.map((r, i) => {
-                              const posLabel = r.avgPosition ? ('#' + r.avgPosition.toFixed(1)) : 'n/a'
+                              const posLabel = r.avgPosition ? ('#' + r.avgPosition.toFixed(1)) : r.visibility > 0 ? 'HM' : 'n/a'
                               const posStyle: React.CSSProperties = r.avgPosition
                                 ? r.avgPosition <= 2 ? { background: "#ecfdf5", color: "#059669" }
                                 : r.avgPosition <= 4 ? { background: "#fffbeb", color: "#d97706" }
                                 : { background: "#fef2f2", color: "#dc2626" }
-                                : { background: "#f1f5f9", color: "#64748b" }
+                                : r.visibility > 0 ? { background: "#f1f5f9", color: "#94a3b8", fontStyle: "italic" }
+                                : { background: "#f1f5f9", color: "#cbd5e1" }
                               return (
                                 <div key={r.name} className="flex items-center justify-between px-3 py-2 rounded-lg border border-slate-100/50 hover:bg-white/60 transition-colors">
                                   <div className="flex items-center gap-2">
@@ -799,7 +800,7 @@ export default function DashboardV2() {
                                       </span>
                                     </div>
                                   </td>
-                                  <td className="px-4 py-2.5 text-sm font-medium text-slate-500">{r.avgPosition ? `#${r.avgPosition.toFixed(1)}` : "n/a"}</td>
+                                  <td className="px-4 py-2.5 text-sm font-medium text-slate-500">{r.avgPosition ? `#${r.avgPosition.toFixed(1)}` : r.visibility > 0 ? <span className="italic text-slate-400">HM</span> : "n/a"}</td>
                                   <td className="px-4 py-2.5">
                                     <div className="flex gap-1 flex-wrap">
                                       {(r.models || []).map((m: string) => <ModelBadge key={m} model={m} />)}
