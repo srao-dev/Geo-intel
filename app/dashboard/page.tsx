@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Play, RefreshCw, ExternalLink, ChevronDown, ArrowUp, ArrowDown, Eye, ClipboardList, Clock, Zap, LogOut, Radio, Trophy, Hash, Target, LayoutList, Lightbulb, MessageSquare } from "lucide-react"
+import { Plus, Play, RefreshCw, ExternalLink, ChevronDown, ArrowUp, ArrowDown, Eye, ClipboardList, Clock, Zap, LogOut, Radio, Trophy, Hash, Target, LayoutList, Lightbulb, MessageSquare, Pencil, Trash2 } from "lucide-react"
 import { useAuth } from "@/lib/auth-context"
 import { getCompanies, getDashboardStats, getRankings, getResponses, getVisibilityPerRun, getPromptStats, getPromptResponses, getPromptModelBreakdown, getCitationStats } from "@/lib/queries"
 import { VisibilityWidget } from "@/components/visibility-chart"
@@ -283,6 +283,17 @@ export default function DashboardV2() {
     setTimeout(fetchData, 3000)
   }
 
+  const handleDeleteCompany = async (companyId: string, companyName: string) => {
+    if (!confirm(`Delete "${companyName}"? This cannot be undone.`)) return
+    const { deleteCompany } = await import("@/lib/queries")
+    await deleteCompany(companyId)
+    const updated = await import("@/lib/queries").then(m => m.getCompanies(user!.id))
+    setCompanies(updated)
+    if (selectedCompanyId === companyId) {
+      setSelectedCompanyId(updated[0]?.id || null)
+    }
+  }
+
   const handleReprocessPositions = async () => {
     if (!selectedCompanyId) return
     await fetch("/api/reprocess-positions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ companyId: selectedCompanyId }) })
@@ -361,15 +372,32 @@ export default function DashboardV2() {
                 const avatarBg = avatarColors[i % avatarColors.length]
                 return (
                   <li key={c.id}>
-                    <button onClick={() => { setSelectedCompanyId(c.id); localStorage.setItem('selectedCompanyId', c.id) }}
-                      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-sm font-medium transition-all text-left"
-                      style={isActive ? { backgroundColor: BRAND_ACTIVE, color: "white" } : { color: "#434654" }}>
-                      <div className="w-6 h-6 rounded-lg flex-shrink-0 flex items-center justify-center text-xs font-bold text-white"
-                        style={{ backgroundColor: isActive ? "rgba(255,255,255,0.25)" : avatarBg }}>
-                        {c.name.charAt(0).toUpperCase()}
+                    <div className="group flex items-center gap-1 px-1 rounded-md transition-all"
+                      style={isActive ? { backgroundColor: BRAND_ACTIVE } : {}}>
+                      <button onClick={() => { setSelectedCompanyId(c.id); localStorage.setItem('selectedCompanyId', c.id) }}
+                        className="flex-1 flex items-center gap-2.5 px-1.5 py-2 text-sm font-medium transition-all text-left min-w-0"
+                        style={isActive ? { color: "white" } : { color: "#434654" }}>
+                        <div className="w-6 h-6 rounded-lg flex-shrink-0 flex items-center justify-center text-xs font-bold text-white"
+                          style={{ backgroundColor: isActive ? "rgba(255,255,255,0.25)" : avatarBg }}>
+                          {c.name.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="truncate">{c.name}</span>
+                      </button>
+                      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 pr-1">
+                        <button onClick={() => setShowSetup(true)}
+                          className="p-1 rounded hover:bg-black/10 transition-colors"
+                          style={{ color: isActive ? "rgba(255,255,255,0.7)" : "#94a3b8" }}
+                          title="Edit">
+                          <Pencil className="h-3 w-3" />
+                        </button>
+                        <button onClick={() => handleDeleteCompany(c.id, c.name)}
+                          className="p-1 rounded hover:bg-red-100 transition-colors"
+                          style={{ color: isActive ? "rgba(255,255,255,0.7)" : "#94a3b8" }}
+                          title="Delete">
+                          <Trash2 className="h-3 w-3" />
+                        </button>
                       </div>
-                      <span className="truncate">{c.name}</span>
-                    </button>
+                    </div>
                   </li>
                 )
               })}
