@@ -430,7 +430,7 @@ export default function DashboardV2() {
                         <table className="w-full text-left">
                           <thead>
                             <tr className="border-b border-slate-100" style={{ background: "rgba(248,250,252,0.4)" }}>
-                              {["Health", "Prompt", "Mention Rate", "Avg Position", "Models", "Responses"].map(h => (
+                              {["Health", "Prompt", "Mention Rate", "Mentions", "Models", "Responses"].map(h => (
                                 <th key={h} className="px-4 py-2 text-xs font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">{h}</th>
                               ))}
                             </tr>
@@ -473,7 +473,8 @@ export default function DashboardV2() {
                                       </div>
                                     </td>
                                     <td className="px-4 py-3">
-                                      <span className="text-sm font-semibold text-slate-600">{p.avgPosition ? `#${p.avgPosition}` : "n/a"}</span>
+                                      <span className="text-sm font-semibold text-slate-700">{p.mentionCount}</span>
+                                      <span className="text-xs text-slate-400"> mentions</span>
                                     </td>
                                     <td className="px-4 py-3">
                                       <div className="flex gap-1 flex-wrap">
