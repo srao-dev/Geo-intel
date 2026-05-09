@@ -440,7 +440,7 @@ export default function GeoAuditV2() {
                 <div className="rounded-xl overflow-hidden border border-slate-200 shadow-sm opacity-60 pointer-events-none select-none">
                   {/* Sample badge */}
                   <div className="px-5 py-2 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Sample result</span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Example</span>
                     <span className="text-[10px] text-slate-400">Your results will appear here after running an audit</span>
                   </div>
                   {/* Score row */}
