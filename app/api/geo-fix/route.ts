@@ -70,6 +70,9 @@ RULES:
 - key_differentiators must be specific claims the domain can make (based on what you know about them), not generic placeholder text
 - seo_title and meta_description must be complete and ready to use
 - Do NOT repeat the finding or recommendation — this is a content brief, not a summary
+- NEVER include specific statistics, percentages, or numbers you cannot verify (e.g. do not write "40% faster" or "500+ connectors")
+- Instead, tell the user what type of stat to find and where: e.g. "Add your verified deployment time stat — check your published case studies or G2 reviews"
+- For differentiators, describe the advantage without inventing a number: e.g. "Faster deployment than competitors — add your verified timeline from case studies" not "8x faster"
 
 Return ONLY valid JSON:
 {
