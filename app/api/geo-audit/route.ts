@@ -115,8 +115,26 @@ HTML size: ${data.html_size_kb}KB | JS SPA: ${data.has_js_spa}
 robots.txt: ${data.robots_txt.slice(0, 400)}
 AI bot access: ${JSON.stringify(data.ai_bot_status)}
 llms.txt: ${data.has_llms_txt} | Sitemap: ${data.has_sitemap}
-SCORING: 85-100 clean robots, AI bots allowed, sitemap, llms.txt | 65-84 most bots allowed | 45-64 some blocked | 25-44 multiple blocked | 0-24 all blocked
+LLMS.TXT RULE: If has_llms_txt is false, always include a Medium finding titled "llms.txt file not found" with recommendation to create one at the root domain. llms.txt is a new standard that tells AI engines what content they can use — missing it is a missed GEO opportunity. This should always be flagged regardless of other findings.
+SCORING: 85-100 AI bots explicitly allowed + sitemap + llms.txt | 65-84 AI bots implicitly allowed via wildcard (not explicitly listed) | 45-64 some AI bots blocked | 25-44 multiple AI bots blocked | 0-24 all AI bots blocked
+IMPORTANT DISTINCTION:
+- "explicitly allowed" = User-agent: GPTBot with Allow: / present in robots.txt → score 85-100
+- "implicitly allowed" = User-agent: * with empty or no Disallow, GPTBot not mentioned → score 65-84, flag as informational not Critical/High
+- "blocked" = User-agent: GPTBot with Disallow: / present → score 0-44, flag as Critical or High
+- Never flag implicit allowance as a Critical or High finding — it is not a blocking issue, just a best practice to be explicit
+- CRITICAL: Blocking CCBot, PetalBot, Scrapy, img2dataset is CORRECT and should NOT be flagged as a problem — these are scrapers not LLM crawlers
+- Only flag as blocked if GPTBot, PerplexityBot, ClaudeBot or Google-Extended are explicitly blocked with Disallow: /
+- If those 4 bots are NOT mentioned in robots.txt but User-agent: * has empty Disallow, score must be 65-84 NOT below 50
 Only report ACTUAL problems. Max 2 findings. Each finding must be specific to THIS site — not generic advice. If no real issues found, return empty findings array.
+- NEVER make observations about content frequency (e.g. "appears twice") — you may miscount
+- Finding titles must use sentence case — only capitalise the first word and proper nouns (e.g. "No schema markup detected" not "No Schema Markup Detected")
+- NEVER conclude that visual elements are absent just because they are not in the crawled HTML — customer logos, testimonials, carousels, ratings, and trust badges are frequently loaded via JavaScript and will not appear in raw HTML
+- If something is not found in crawled content, phrase it as "not detected in crawled HTML — may be JavaScript-rendered" NOT "does not exist" or "is absent"
+- Only flag something as definitively missing if it is a text-based element that would always appear in raw HTML (e.g. meta tags, schema markup, heading text)
+- NEVER invent specific numbers or percentages not explicitly present in the content provided
+- NEVER reference specific company names, customer names, or case studies unless they appear word-for-word in the content provided
+- If you are not 100% certain a specific observation is accurate, state it as a general pattern instead
+
 Return ONLY valid JSON: {"dimension":"geo-crawl","score":0,"grade":"","findings":[{"id":"crawl_001","title":"Problem","severity":"Critical|High|Medium","detail":"Detail","recommendation":"Action"}],"summary":"One sentence"}`,
 
   'geo-content': (data) => `You are a GEO content expert scoring how well this site's content is structured for AI citation.
@@ -126,7 +144,23 @@ Meta: ${data.meta_description || 'Not found'}
 Headings: ${data.headings || 'Not found'}
 Content: ${data.text_content.slice(0, 2000) || 'Not available'}
 SCORING: 85-100 clear entity, FAQ, specific value props | 65-84 good structure | 45-64 basic but generic | 25-44 vague | 0-24 minimal
-Only report REAL, SPECIFIC problems found on THIS site. Max 2 findings. Each finding must be specific to THIS site — not generic advice. If no real issues found, return empty findings array. Each finding must reference something specific you found — not a generic best practice. If the site is doing well on this dimension, return an empty findings array and a high score.
+Only report REAL, SPECIFIC problems found on THIS site. Max 2 findings. Each finding must be specific to THIS site — not generic advice. If no real issues found, return empty findings array.
+- NEVER make observations about content frequency (e.g. "appears twice") — you may miscount
+- Finding titles must use sentence case — only capitalise the first word and proper nouns (e.g. "No schema markup detected" not "No Schema Markup Detected")
+- NEVER conclude that visual elements are absent just because they are not in the crawled HTML — customer logos, testimonials, carousels, ratings, and trust badges are frequently loaded via JavaScript and will not appear in raw HTML
+- If something is not found in crawled content, phrase it as "not detected in crawled HTML — may be JavaScript-rendered" NOT "does not exist" or "is absent"
+- Only flag something as definitively missing if it is a text-based element that would always appear in raw HTML (e.g. meta tags, schema markup, heading text)
+- NEVER invent specific numbers or percentages not explicitly present in the content provided
+- NEVER reference specific company names, customer names, or case studies unless they appear word-for-word in the content provided
+- If you are not 100% certain a specific observation is accurate, state it as a general pattern instead
+- NEVER make observations about content frequency (e.g. "appears twice") — you may miscount
+- Finding titles must use sentence case — only capitalise the first word and proper nouns (e.g. "No schema markup detected" not "No Schema Markup Detected")
+- NEVER conclude that visual elements are absent just because they are not in the crawled HTML — customer logos, testimonials, carousels, ratings, and trust badges are frequently loaded via JavaScript and will not appear in raw HTML
+- If something is not found in crawled content, phrase it as "not detected in crawled HTML — may be JavaScript-rendered" NOT "does not exist" or "is absent"
+- Only flag something as definitively missing if it is a text-based element that would always appear in raw HTML (e.g. meta tags, schema markup, heading text)
+- NEVER invent specific numbers or percentages not explicitly present in the content provided
+- NEVER reference specific company names, customer names, or case studies unless they appear word-for-word in the content provided
+- If you are not 100% certain a specific observation is accurate, state it as a general pattern instead Each finding must reference something specific you found — not a generic best practice. If the site is doing well on this dimension, return an empty findings array and a high score.
 Return ONLY valid JSON: {"dimension":"geo-content","score":0,"grade":"","findings":[{"id":"content_001","title":"Problem","severity":"Critical|High|Medium","detail":"Detail","recommendation":"Action"}],"summary":"One sentence"}`,
 
   'geo-schema': (data) => `You are a GEO schema expert scoring structured data implementation.
@@ -134,8 +168,16 @@ URL: ${data.url}
 ${data.fetch_note}
 Schema types found: ${JSON.stringify(data.schema_types)}
 FAQPage: ${data.has_faq_schema} | SoftwareApp: ${data.has_software_schema} | Organization: ${data.has_org_schema} | sameAs: ${data.has_same_as}
-SCORING: 85-100 FAQPage+SoftwareApp+Org+sameAs | 65-84 Org+sameAs | 45-64 basic | 25-44 minimal | 0-24 none
+SCORING: 85-100 FAQPage+SoftwareApp+Org+sameAs all present | 65-84 Org+sameAs present | 45-64 basic schema only | 25-44 minimal/broken | STRICT RULE: if schema_types is empty AND has_faq_schema=false AND has_software_schema=false AND has_org_schema=false then score MUST be 0 — not 10, not 15, exactly 0
 Max 2 findings. Each finding must be specific to THIS site — not generic advice. If no real issues found, return empty findings array.
+- NEVER make observations about content frequency (e.g. "appears twice") — you may miscount
+- Finding titles must use sentence case — only capitalise the first word and proper nouns (e.g. "No schema markup detected" not "No Schema Markup Detected")
+- NEVER conclude that visual elements are absent just because they are not in the crawled HTML — customer logos, testimonials, carousels, ratings, and trust badges are frequently loaded via JavaScript and will not appear in raw HTML
+- If something is not found in crawled content, phrase it as "not detected in crawled HTML — may be JavaScript-rendered" NOT "does not exist" or "is absent"
+- Only flag something as definitively missing if it is a text-based element that would always appear in raw HTML (e.g. meta tags, schema markup, heading text)
+- NEVER invent specific numbers or percentages not explicitly present in the content provided
+- NEVER reference specific company names, customer names, or case studies unless they appear word-for-word in the content provided
+- If you are not 100% certain a specific observation is accurate, state it as a general pattern instead
 Return ONLY valid JSON: {"dimension":"geo-schema","score":0,"grade":"","findings":[{"id":"schema_001","title":"Missing X","severity":"Critical|High|Medium","detail":"Impact","recommendation":"Action"}],"summary":"One sentence"}`,
 
   'geo-authority': (data) => `You are a GEO authority expert scoring how credible AI engines perceive this brand.
@@ -144,6 +186,14 @@ ${data.fetch_note}
 Content: ${data.text_content.slice(0, 800) || 'Use training knowledge'}
 SCORING: 85-100 analyst recognition, G2, Wikipedia, certs | 65-84 known brand, some recognition | 45-64 growing, review presence | 25-44 limited signals | 0-24 unknown
 Max 2 findings. Each finding must be specific to THIS site — not generic advice. If no real issues found, return empty findings array.
+- NEVER make observations about content frequency (e.g. "appears twice") — you may miscount
+- Finding titles must use sentence case — only capitalise the first word and proper nouns (e.g. "No schema markup detected" not "No Schema Markup Detected")
+- NEVER conclude that visual elements are absent just because they are not in the crawled HTML — customer logos, testimonials, carousels, ratings, and trust badges are frequently loaded via JavaScript and will not appear in raw HTML
+- If something is not found in crawled content, phrase it as "not detected in crawled HTML — may be JavaScript-rendered" NOT "does not exist" or "is absent"
+- Only flag something as definitively missing if it is a text-based element that would always appear in raw HTML (e.g. meta tags, schema markup, heading text)
+- NEVER invent specific numbers or percentages not explicitly present in the content provided
+- NEVER reference specific company names, customer names, or case studies unless they appear word-for-word in the content provided
+- If you are not 100% certain a specific observation is accurate, state it as a general pattern instead
 Return ONLY valid JSON: {"dimension":"geo-authority","score":0,"grade":"","findings":[{"id":"authority_001","title":"Missing X","severity":"High|Medium","detail":"Gap","recommendation":"Action"}],"summary":"One sentence"}`,
 
   'geo-competitive': (data) => `You are a GEO competitive positioning expert.
@@ -153,6 +203,14 @@ Content: ${data.text_content.slice(0, 1200)}
 Headings: ${data.headings}
 SCORING: 85-100 comparison pages, vertical pages, problem-led | 65-84 good category positioning | 45-64 basic | 25-44 generic | 0-24 extremely vague
 Max 2 findings. Each finding must be specific to THIS site — not generic advice. If no real issues found, return empty findings array.
+- NEVER make observations about content frequency (e.g. "appears twice") — you may miscount
+- Finding titles must use sentence case — only capitalise the first word and proper nouns (e.g. "No schema markup detected" not "No Schema Markup Detected")
+- NEVER conclude that visual elements are absent just because they are not in the crawled HTML — customer logos, testimonials, carousels, ratings, and trust badges are frequently loaded via JavaScript and will not appear in raw HTML
+- If something is not found in crawled content, phrase it as "not detected in crawled HTML — may be JavaScript-rendered" NOT "does not exist" or "is absent"
+- Only flag something as definitively missing if it is a text-based element that would always appear in raw HTML (e.g. meta tags, schema markup, heading text)
+- NEVER invent specific numbers or percentages not explicitly present in the content provided
+- NEVER reference specific company names, customer names, or case studies unless they appear word-for-word in the content provided
+- If you are not 100% certain a specific observation is accurate, state it as a general pattern instead
 Return ONLY valid JSON: {"dimension":"geo-competitive","score":0,"grade":"","findings":[{"id":"competitive_001","title":"Missing X","severity":"Critical|High|Medium","detail":"Gap","recommendation":"Page to create"}],"summary":"One sentence"}`,
 }
 
@@ -173,8 +231,8 @@ async function runAgent(name: string, pageData: any) {
 
 function synthesise(url: string, results: Record<string, any>) {
   const weights: Record<string, number> = {
-    'geo-competitive': 0.30, 'geo-content': 0.25,
-    'geo-authority': 0.20, 'geo-schema': 0.15, 'geo-crawl': 0.10,
+    'geo-competitive': 0.25, 'geo-content': 0.25,
+    'geo-authority': 0.20, 'geo-schema': 0.20, 'geo-crawl': 0.10,
   }
   let composite = 0
   const dimensionScores: Record<string, any> = {}

@@ -54,7 +54,7 @@ function ScoreBar({ score: rawScore, dimension }: { score: any; dimension: strin
   const textColor = score >= 70 ? "#059669" : score >= 50 ? "#d97706" : "#dc2626"
   return (
     <div className="flex items-center gap-3">
-      <span className="w-24 flex-shrink-0 text-sm font-medium text-slate-500">{DIMENSION_LABELS[dimension]}</span>
+      <span className="w-24 flex-shrink-0 text-sm font-semibold text-slate-600">{DIMENSION_LABELS[dimension]}</span>
       <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
         <div className="h-full rounded-full transition-all duration-700" style={{ width: `${score}%`, backgroundColor: color }} />
       </div>
@@ -98,8 +98,8 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
             {finding.severity}
           </span>
           <div>
-            <h3 className="text-sm font-bold text-slate-900">{finding.title}</h3>
-            <p className="text-xs text-slate-400 font-medium uppercase tracking-wider mt-0.5">{DIMENSION_LABELS[finding.dimension]}</p>
+            <h3 className="text-sm font-bold text-slate-900 leading-snug">{finding.title}</h3>
+            <p className="text-sm text-slate-500 font-medium uppercase tracking-wider mt-0.5">{DIMENSION_LABELS[finding.dimension]}</p>
           </div>
         </div>
         {open ? <ChevronUp className="h-4 w-4 text-slate-400 flex-shrink-0" /> : <ChevronDown className="h-4 w-4 text-slate-400 flex-shrink-0" />}
@@ -108,16 +108,17 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
       {open && (
         <div className="px-4 pb-4 pt-2 space-y-3 border-t border-slate-200/30">
           <div>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">The Problem</p>
-            <p className="text-sm text-slate-600 leading-relaxed">{finding.detail}</p>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">The Problem</p>
+            <p className="text-sm text-slate-700 leading-relaxed">{finding.detail}</p>
           </div>
           <div>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Recommendation</p>
-            <p className="text-sm text-slate-600 leading-relaxed">{finding.recommendation}</p>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Recommendation</p>
+            <p className="text-sm text-slate-700 leading-relaxed">{finding.recommendation}</p>
           </div>
+          <p className="text-xs text-slate-400 italic border-t border-slate-100 pt-2 mt-1">⚠ Analysis based on automated page scan — verify specific observations before acting.</p>
           {!fix ? (
             <button onClick={getFix} disabled={loadingFix}
-              className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold hover:text-white transition-all shadow-sm"
+              className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-sm font-bold hover:text-white transition-all shadow-sm"
               style={{ color: BRAND }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = BRAND; (e.currentTarget as HTMLElement).style.color = "white" }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = "white"; (e.currentTarget as HTMLElement).style.color = BRAND }}>
@@ -125,8 +126,75 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
             </button>
           ) : (
             <div className="rounded-xl p-4 flex flex-col gap-3" style={{ backgroundColor: BRAND_LIGHT, border: "1px solid rgba(0,62,199,0.2)" }}>
-              <p className="text-xs font-bold uppercase tracking-wider" style={{ color: BRAND }}>Generated Fix</p>
-              <p className="text-sm text-slate-700 leading-relaxed">{fix.summary}</p>
+              <p className="text-sm font-bold uppercase tracking-wider" style={{ color: BRAND }}>Generated Fix</p>
+              <p className="text-sm text-slate-800 leading-relaxed">{fix.summary}</p>
+
+              {/* Comparison page brief */}
+              {fix.fix_type === "comparison" && (
+                <div className="flex flex-col gap-3 mt-1">
+                  {/* Target page + query */}
+                  {(fix.target_page || fix.target_query) && (
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 flex flex-col gap-1.5">
+                      {fix.target_page && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-slate-600 w-24 flex-shrink-0">URL slug</span>
+                          <code className="text-xs font-mono text-blue-600 bg-blue-50 px-2 py-0.5 rounded">{fix.target_page}</code>
+                        </div>
+                      )}
+                      {fix.target_query && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-slate-600 w-24 flex-shrink-0">AI query</span>
+                          <span className="text-xs text-slate-600 italic">"{fix.target_query}"</span>
+                        </div>
+                      )}
+                      {fix.seo_title && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-slate-600 w-24 flex-shrink-0">SEO title</span>
+                          <span className="text-sm text-slate-600">{fix.seo_title}</span>
+                        </div>
+                      )}
+                      {fix.meta_description && (
+                        <div className="flex items-start gap-2">
+                          <span className="text-sm font-semibold text-slate-600 w-24 flex-shrink-0 mt-0.5">Meta desc</span>
+                          <span className="text-xs text-slate-600 leading-relaxed">{fix.meta_description}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Key differentiators */}
+                  {fix.key_differentiators?.length > 0 && (
+                    <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
+                      <p className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2">Key differentiators to highlight</p>
+                      <div className="flex flex-col gap-1.5">
+                        {fix.key_differentiators.map((d: string, i: number) => (
+                          <div key={i} className="flex items-start gap-2">
+                            <span className="text-blue-400 flex-shrink-0 font-bold text-xs mt-0.5">→</span>
+                            <p className="text-xs text-blue-800 leading-relaxed">{d}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Page structure */}
+                  {fix.page_structure?.length > 0 && (
+                    <div className="flex flex-col gap-2">
+                      <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Page structure</p>
+                      {fix.page_structure.map((s: any, i: number) => (
+                        <div key={i} className="rounded-lg border border-slate-200 bg-white p-3">
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <span className="text-xs font-black text-slate-300 w-5 flex-shrink-0">{i + 1}</span>
+                            <p className="text-xs font-bold text-slate-800">{s.section}</p>
+                          </div>
+                          <p className="text-xs text-slate-500 leading-relaxed pl-7">{s.content}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {fix.code && (
                 <div className="rounded-lg bg-slate-900 overflow-hidden">
                   <div className="flex items-center justify-between px-3 py-2 border-b border-slate-700">
@@ -144,6 +212,12 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
                   <span className="flex-shrink-0 font-bold" style={{ color: BRAND }}>{i + 1}.</span>{step}
                 </div>
               ))}
+              {fix.code && fix.code.includes('ADD_YOUR_') && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 flex items-start gap-2 mt-2">
+                  <span className="flex-shrink-0 text-sm">⚠️</span>
+                  <p className="text-sm text-amber-700 leading-relaxed">Replace all <strong>ADD_YOUR_*_URL</strong> placeholders with your actual verified social profile URLs before implementing.</p>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -210,15 +284,46 @@ export default function GeoAuditV2() {
     })
   }, [user])
 
-  const runAudit = async () => {
+  const [fromCache, setFromCache] = useState(false)
+
+  const runAudit = async (forceRefresh = false) => {
     if (!url.trim()) return
-    setLoading(true); setError(""); setReport(null)
+    setLoading(true); setError(""); setReport(null); setFromCache(false)
+
+    if (!forceRefresh && user) {
+      try {
+        const { supabase } = await import("@/lib/supabase")
+        const { data: hit } = await supabase
+          .from("audit_cache")
+          .select("report, audited_at")
+          .eq("user_id", user.id)
+          .eq("url", url.trim().toLowerCase())
+          .single()
+        if (hit?.report) {
+          setReport(hit.report)
+          setFromCache(true)
+          setLoading(false)
+          return
+        }
+      } catch {}
+    }
+
     try {
       const res = await fetch("/api/geo-audit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: url.trim(), vertical }) })
       const data = await res.json()
       if (data.report) {
         setReport(data.report)
-        if (user) await saveAnalysisResult(user.id, url.trim(), data.report)
+        if (user) {
+          try {
+            const { supabase } = await import("@/lib/supabase")
+            await supabase.from("audit_cache").upsert({
+              user_id: user.id,
+              url: url.trim().toLowerCase(),
+              report: data.report,
+              audited_at: new Date().toISOString(),
+            }, { onConflict: "user_id,url" })
+          } catch {}
+        }
       } else setError(data.error || "Audit failed")
     } catch { setError("Failed to connect to audit service") }
     setLoading(false)
@@ -318,16 +423,26 @@ export default function GeoAuditV2() {
           <div className="px-5 flex items-center justify-between h-16 pt-2">
             <div>
               <h2 className="font-bold text-slate-900 text-2xl leading-none">GEO Audit</h2>
-              <p className="text-xs text-slate-400 mt-1 font-medium">Analyse your AI search readiness</p>
+              <p className="text-sm text-slate-500 mt-1 font-medium">Analyse your AI search readiness</p>
             </div>
           </div>
-          <div className="flex items-center gap-6 px-5">
-            {["Technical Audit", "Content Analysis"].map(tab => (
-              <button key={tab} onClick={() => setActiveTab(tab)} className="px-1 text-sm font-medium py-2.5 transition-colors"
-                style={activeTab === tab ? { fontWeight: 700, color: BRAND, borderBottom: `2px solid ${BRAND}` } : { color: "#64748b" }}>
-                {tab}
-              </button>
-            ))}
+          <div className="flex items-center gap-4 px-5">
+            <div className="flex bg-slate-100/80 p-1 rounded-2xl border border-slate-200/40 shadow-sm">
+              {["Technical Audit", "Page Analyser"].map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-8 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 ${
+                    activeTab === tab
+                      ? "bg-white shadow-md scale-[1.02]"
+                      : "text-slate-400 hover:text-slate-600"
+                  }`}
+                  style={activeTab === tab ? { color: BRAND } : {}}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
           </div>
         </header>
 
@@ -339,7 +454,7 @@ export default function GeoAuditV2() {
 
           {/* URL Input — prominent search bar */}
           <section className="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Enter a URL to audit</p>
+            <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Enter a URL to audit</p>
             <div className="flex gap-3">
               <div className="relative flex-1">
                 <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
@@ -349,7 +464,7 @@ export default function GeoAuditV2() {
                   value={url}
                   onChange={e => setUrl(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && runAudit()}
-                  placeholder="e.g. noveum.ai/product or appian.com/platform"
+                  placeholder="e.g. appian.com"
                   className="w-full pl-11 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:bg-white transition-all placeholder:text-slate-400"
                   style={{ boxShadow: url ? `0 0 0 2px ${BRAND}30` : undefined, borderColor: url ? BRAND : undefined }}
                 />
@@ -365,7 +480,14 @@ export default function GeoAuditV2() {
                 {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Analysing...</> : <>Analyse <ArrowRight className="h-4 w-4" /></>}
               </button>
             </div>
-            <p className="mt-2 text-xs text-slate-400 px-1">Works best on specific content pages, not section homepages like /blog or /resources</p>
+            <div className="mt-4 flex items-center gap-2 flex-wrap px-1">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex-shrink-0 mr-1">Scans across:</p>
+              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-semibold" style={{ background: "#eef1fd", borderColor: "#3B5BDB40", color: "#3B5BDB" }}>📊 Competitive</span>
+              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-semibold" style={{ background: "#faf5ff", borderColor: "#7c3aed40", color: "#7c3aed" }}>📝 Content</span>
+              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-semibold" style={{ background: "#ecfeff", borderColor: "#0891b240", color: "#0891b2" }}>⭐ Authority</span>
+              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-semibold" style={{ background: "#fff7ed", borderColor: "#ea580c40", color: "#ea580c" }}>🔧 Schema</span>
+              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-sm font-semibold" style={{ background: "#ecfdf5", borderColor: "#05996940", color: "#059669" }}>🤖 Crawlability</span>
+            </div>
           </section>
 
           {/* Error */}
@@ -398,181 +520,151 @@ export default function GeoAuditV2() {
             </div>
           )}
 
-          {/* Intro - only show when no report and not loading */}
+          {/* ── Empty state ── */}
           {!report && !loading && (
-            <>
-              {/* Radar intro - speech bubble style */}
-              <section className="rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 60%, #ede9fe 100%)', border: '1px solid rgba(99,102,241,0.12)' }}>
-                <div className="p-6 flex items-start gap-6">
-                  {/* Avatar */}
-                  <div className="flex-shrink-0 flex flex-col items-center gap-1">
-                    <svg width="72" height="72" viewBox="0 0 56 56" style={{ animation: "float 3s ease-in-out infinite" }}>
-                      <rect x="12" y="22" width="32" height="28" rx="8" fill="#eef1fd" stroke={BRAND} strokeWidth="1.5"/>
-                      <circle cx="21" cy="33" r="4" fill="white"/><circle cx="35" cy="33" r="4" fill="white"/>
-                      <circle cx="21" cy="33" r="2" fill={BRAND}/><circle cx="35" cy="33" r="2" fill={BRAND}/>
-                      <path d="M22 41 Q28 46 34 41" fill="none" stroke={BRAND} strokeWidth="1.5" strokeLinecap="round"/>
-                      <line x1="28" y1="22" x2="28" y2="12" stroke={BRAND} strokeWidth="1.5" strokeLinecap="round"/>
-                      <ellipse cx="28" cy="10" rx="7" ry="4" fill="none" stroke={BRAND} strokeWidth="1.5" style={{ transformOrigin: "28px 10px", animation: "spin 3s linear infinite" }}/>
-                      <rect x="4" y="28" width="8" height="4" rx="2" fill="#eef1fd" stroke={BRAND} strokeWidth="1"/>
-                      <rect x="44" y="28" width="8" height="4" rx="2" fill="#eef1fd" stroke={BRAND} strokeWidth="1"/>
-                    </svg>
-                    <style>{"@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}} @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}"}</style>
-                    <span className="text-xs font-bold" style={{ color: BRAND }}>Radar</span>
-                  </div>
-
-                  {/* Speech bubble */}
-                  <div className="flex-1">
-                    <div className="bg-white/80 rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm border border-white/60 mb-4">
-                      <p className="text-sm font-bold text-slate-900 mb-1">Hi! I am Radar, your GEO analyst.</p>
-                      <p className="text-sm text-slate-500 leading-relaxed">
-                        Enter any website URL and I will audit it across 5 GEO dimensions. You will get a score, specific findings, and copy-paste fixes ready to implement.
-                      </p>
-                    </div>
-                    {/* Stats row */}
-                    <div className="flex items-center gap-8 px-1">
-                      {[
-                        { value: "0-100", label: "GEO Score", color: BRAND },
-                        { value: "5", label: "Dimensions", color: "#7c3aed" },
-                        { value: "Same day", label: "Fixes ready", color: "#059669" },
-                      ].map((stat, i) => (
-                        <div key={stat.label} className="flex items-center gap-3">
-                          {i > 0 && <div className="w-px h-6 bg-indigo-200" />}
-                          <div>
-                            <p className="text-base font-extrabold" style={{ color: stat.color }}>{stat.value}</p>
-                            <p className="text-xs text-slate-400">{stat.label}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              {/* Feature cards */}
-              <div className="grid grid-cols-3 gap-3">
+            <div className="flex flex-col gap-4">
+              {/* 3 KPI cards - example */}
+              <div className="grid grid-cols-2 gap-3">
                 {[
-                  {
-                    title: "Real data",
-                    icon: "🔍",
-                    num: "01",
-                    color: BRAND,
-                    bg: "#eff6ff",
-                    border: "#bfdbfe",
-                    detail: "We fetch your site, check robots.txt, extract schema and analyse content structure.",
-                  },
-                  {
-                    title: "5 dimensions scored",
-                    icon: "📊",
-                    num: "02",
-                    color: "#ea580c",
-                    bg: "#fff7ed",
-                    border: "#fed7aa",
-                    detail: "Crawlability, content depth, schema markup, authority signals and competitive positioning.",
-                  },
-                  {
-                    title: "Fixes ready to ship",
-                    icon: "⚡",
-                    num: "03",
-                    color: "#059669",
-                    bg: "#ecfdf5",
-                    border: "#a7f3d0",
-                    detail: "Every finding has a copy-paste fix — schema JSON-LD, robots.txt snippets, content rewrites.",
-                  },
-                ].map(card => (
-                  <div key={card.title} className="rounded-xl p-5 flex flex-col gap-3 hover:shadow-md transition-all cursor-default"
-                    style={{ backgroundColor: card.bg, border: `1px solid ${card.border}` }}>
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl">{card.icon}</span>
-                      <span className="text-xs font-bold opacity-30" style={{ color: card.color }}>{card.num}</span>
-                    </div>
-                    <h3 className="text-sm font-bold text-slate-800 mb-1">{card.title}</h3>
-                    <p className="text-sm text-slate-500 leading-relaxed">{card.detail}</p>
+                  { label: "GEO score", value: "—", sub: "Run audit to score", color: BRAND, borderColor: BRAND },
+                  { label: "Issues found", value: "—", sub: "Findings will appear here", color: "#dc2626", borderColor: "#dc2626" },
+                ].map((k, i) => (
+                  <div key={i} className="rounded-xl bg-white border border-slate-100 p-4 opacity-30" style={{ borderTop: `3px solid ${k.borderColor}` }}>
+                    <p className="text-xs text-slate-400 uppercase tracking-wider mb-2">{k.label}</p>
+                    <p className="text-4xl font-bold text-slate-300 leading-none">{k.value}</p>
+                    <p className="text-xs text-slate-400 mt-2">{k.sub}</p>
                   </div>
                 ))}
               </div>
-            </>
-          )}
 
-          {/* Report */}
-          {report && !loading && (
-            <div className="flex flex-col gap-3">
-
-              {/* Hero Score Grid */}
-              <div className="grid grid-cols-12 gap-3">
-
-                {/* GEO Score Card */}
-                <div className="col-span-4">
-                  <div className="rounded-xl h-full overflow-hidden" style={glassCard}>
-                    <div className="px-4 py-2.5 border-b border-slate-200/60" style={{ background: "rgba(255,255,255,0.5)" }}>
-                      <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest truncate">{report.url || domain}</h3>
+              {/* Terminal mockup */}
+              <div className="rounded-xl overflow-hidden w-full" style={{ background: "#0d1117", border: "1px solid #30363d" }}>
+                {/* Terminal header */}
+                <div className="flex items-center gap-2 px-4 py-3" style={{ background: "#161b22", borderBottom: "1px solid #30363d" }}>
+                  <div className="flex gap-1.5">
+                    <div className="w-3 h-3 rounded-full" style={{ background: "#ff5f57" }}></div>
+                    <div className="w-3 h-3 rounded-full" style={{ background: "#febc2e" }}></div>
+                    <div className="w-3 h-3 rounded-full" style={{ background: "#28c840" }}></div>
+                  </div>
+                  <span className="text-xs font-mono ml-2" style={{ color: "#8b949e" }}>terminal — geo-audit-log</span>
+                </div>
+                {/* Terminal body */}
+                <div className="p-4 font-mono text-xs space-y-2" style={{ minHeight: 360 }}>
+                  {[
+                    { time: "10:42:12", type: "INFO", color: "#3fb950", msg: "Starting GEO Audit sequence..." },
+                    { time: "10:42:13", type: "INFO", color: "#3fb950", msg: "Fetching page content and robots.txt..." },
+                    { time: "10:42:14", type: "INFO", color: "#3fb950", msg: "Running 5 dimension agents in parallel..." },
+                    { time: "10:42:15", type: "WARN", color: "#d29922", msg: "Schema — no JSON-LD detected in crawled HTML" },
+                    { time: "10:42:16", type: "INFO", color: "#3fb950", msg: "Competitive — checking comparison page coverage..." },
+                    { time: "10:42:17", type: "ERR", color: "#f85149", msg: "Schema — FAQPage, SoftwareApp, Organization all missing" },
+                    { time: "10:42:18", type: "INFO", color: "#3fb950", msg: "Crawlability — GPTBot implicitly allowed via wildcard" },
+                    { time: "10:42:19", type: "INFO", color: "#3fb950", msg: "Generating fixes and recommendations... done." },
+                  ].map((line, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <span style={{ color: "#8b949e" }}>{line.time}</span>
+                      <span className="font-bold px-1 rounded text-xs" style={{ color: line.color, background: line.color + "20" }}>[{line.type}]</span>
+                      <span style={{ color: "#e6edf3" }}>{line.msg}</span>
                     </div>
-                    <div className="p-5 flex items-center gap-4">
-                      <span className="text-6xl font-extrabold text-slate-900 leading-none tabular-nums">{report.composite_score}</span>
-                      <div>
-                        <p className="text-lg font-bold uppercase tracking-tight leading-tight" style={{ color: ss!.color }}>{ss!.label}</p>
-                        <p className="text-xs text-slate-400 font-medium mt-0.5">GEO Score / 100</p>
-                        <div className="flex gap-3 mt-3">
-                          <div className="text-center">
-                            <p className="text-lg font-extrabold text-red-500">{report.critical_findings?.length || 0}</p>
-                            <p className="text-xs text-slate-400">Critical</p>
-                          </div>
-                          <div className="text-center">
-                            <p className="text-lg font-extrabold text-orange-500">{report.high_findings?.length || 0}</p>
-                            <p className="text-xs text-slate-400">High</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                  ))}
+                  <div className="flex items-center gap-2 mt-2">
+                    <span style={{ color: "#3fb950" }}>_</span>
+                    <span className="text-xs" style={{ color: "#8b949e" }}>Waiting to start...</span>
                   </div>
                 </div>
-
-                {/* Dimension Scores Card */}
-                <div className="col-span-8">
-                  <div className="rounded-xl h-full overflow-hidden" style={glassCard}>
-                    <div className="px-4 py-2.5 border-b border-slate-200/60" style={{ background: "rgba(255,255,255,0.5)" }}>
-                      <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest">Dimension Scores</h3>
-                    </div>
-                    <div className="p-4 space-y-3">
-                      {Object.entries(report.dimension_scores || {}).map(([dim, data]: [string, any]) => {
-                        const s = typeof data === 'object' ? (data.score ?? 0) : (data as number)
-                        const barColor = s >= 70 ? "#10b981" : s >= 40 ? "#f97316" : "#ef4444"
-                        const textColor = s >= 70 ? "#059669" : s >= 40 ? "#ea580c" : "#dc2626"
-                        return (
-                          <div key={dim} className="grid grid-cols-12 items-center gap-3">
-                            <span className="col-span-2 text-sm font-semibold text-slate-600 truncate">{DIMENSION_LABELS[dim]}</span>
-                            <div className="col-span-9 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                              <div className="h-full rounded-full transition-all duration-700" style={{ width: `${s}%`, backgroundColor: barColor }} />
-                            </div>
-                            <span className="col-span-1 text-xs font-bold text-right tabular-nums" style={{ color: textColor }}>{s}</span>
-                          </div>
-                        )
-                      })}
-                    </div>
+                {/* Terminal footer */}
+                <div className="px-4 py-2 flex items-center justify-between" style={{ background: "#161b22", borderTop: "1px solid #30363d" }}>
+                  <span className="text-xs font-mono" style={{ color: "#8b949e" }}>Enter a domain above to run a real audit</span>
+                  <div className="flex items-center gap-4">
+                    <span className="text-xs font-mono" style={{ color: "#8b949e" }}>5 agents ready</span>
+                    <div className="w-2 h-2 rounded-full" style={{ background: "#3fb950" }}></div>
                   </div>
                 </div>
               </div>
+              <p className="text-sm text-center text-slate-500 font-medium">↑ Live audit log — enter a domain above to run your real audit</p>
+            </div>
+          )}
 
-              {/* Findings & Fixes */}
-              {allFindings.length > 0 && (
-                <section className="space-y-2">
-                  <div className="flex items-center justify-between px-1">
-                    <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider">Findings & Fixes</h2>
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{allFindings.length} issues found</span>
+          {/* ── Real results ── */}
+          {report && !loading && (
+            <div className="flex flex-col gap-4">
+              {/* 3 KPI cards */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-xl bg-white border border-slate-200 p-4" style={{ borderTop: `3px solid ${BRAND}` }}>
+                  <p className="text-xs text-slate-400 uppercase tracking-wider mb-2">GEO score</p>
+                  <p className="text-4xl font-bold leading-none" style={{ color: ss?.color || BRAND }}>{report.composite_score}</p>
+                  <p className="text-sm font-semibold mt-2" style={{ color: ss?.color || BRAND }}>{ss?.label}</p>
+                </div>
+                <div className="rounded-xl bg-white border border-slate-200 p-4" style={{ borderTop: "3px solid #dc2626" }}>
+                  <p className="text-xs text-slate-400 uppercase tracking-wider mb-2">Issues found</p>
+                  <p className="text-4xl font-bold text-slate-900 leading-none">{allFindings.length}</p>
+                  <p className="text-sm font-semibold text-red-500 mt-2">{report.critical_findings?.length || 0} critical · {report.high_findings?.length || 0} high</p>
+                </div>
+              </div>
+
+              {/* Two column - findings + scores */}
+              <div className="grid grid-cols-2 gap-4">
+                {/* Findings */}
+                <div className="rounded-xl bg-white border border-slate-200 overflow-hidden">
+                  <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                    <span className="text-sm font-semibold text-slate-700">Findings & fixes</span>
+                    <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">{allFindings.length} issues</span>
                   </div>
-                  <div className="space-y-2">
+                  <div className="flex flex-col">
                     {allFindings.map((f: any, i: number) => (
                       <FindingRow key={i} finding={f} domain={domain} vertical={vertical} />
                     ))}
                   </div>
-                </section>
-              )}
+                </div>
+
+                {/* Dimension scores */}
+                <div className="rounded-xl bg-white border border-slate-200 overflow-hidden">
+                  <div className="px-4 py-3 border-b border-slate-100">
+                    <span className="text-sm font-semibold text-slate-700">Dimension scores</span>
+                  </div>
+                  <div className="p-4 flex flex-col gap-4">
+                    {Object.entries(report.dimension_scores || {}).map(([dim, data]: [string, any]) => {
+                      const s = typeof data === "object" ? (data.score ?? 0) : (data as number)
+                      const barColor = s >= 70 ? "#059669" : s >= 40 ? "#ea580c" : "#dc2626"
+                      return (
+                        <div key={dim}>
+                          <div className="flex justify-between mb-1.5">
+                            <span className="text-sm text-slate-600">{DIMENSION_LABELS[dim]}</span>
+                            <span className="text-sm font-semibold" style={{ color: barColor }}>{s}</span>
+                          </div>
+                          <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                            <div className="h-full rounded-full transition-all duration-700" style={{ width: `${s}%`, backgroundColor: barColor }} />
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                  <div className="mx-4 mb-4 p-3 rounded-lg flex items-start gap-2" style={{ background: "#eef1fd" }}>
+                    <svg width="20" height="20" viewBox="0 0 56 56" className="flex-shrink-0 mt-0.5">
+                      <rect x="12" y="16" width="32" height="28" rx="8" fill="#eef1fd" stroke={BRAND} strokeWidth="2"/>
+                      <circle cx="22" cy="27" r="3" fill="white"/><circle cx="34" cy="27" r="3" fill="white"/>
+                      <circle cx="22" cy="27" r="1.5" fill={BRAND}/><circle cx="34" cy="27" r="1.5" fill={BRAND}/>
+                      <path d="M22 35 Q28 39 34 35" fill="none" stroke={BRAND} strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                    <p className="text-xs leading-relaxed" style={{ color: "#185FA5" }}>
+                      <strong>Radar says:</strong> {
+                        (() => {
+                          const scores = Object.entries(report.dimension_scores || {})
+                          const lowest = scores.sort(([,a]: any, [,b]: any) => (a.score ?? 0) - (b.score ?? 0))[0]
+                          if (lowest) return `${DIMENSION_LABELS[lowest[0]]} is your biggest gap — focus fixes here first for the most impact.`
+                          return "Focus on your lowest scoring dimension first for maximum impact."
+                        })()
+                      }
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
           </>}
 
           {/* Content Analysis Tab */}
-          {activeTab === "Content Analysis" && (
+          {activeTab === "Page Analyser" && (
             <div className="space-y-4">
 
               {/* URL Input */}
@@ -647,67 +739,43 @@ export default function GeoAuditV2() {
               {/* Intro */}
               {!caAnalysis && !caLoading && !caBlocked && (
                 <>
-                  {/* Radar card */}
-                  <section className="rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 60%, #ede9fe 100%)', border: '1px solid rgba(99,102,241,0.12)' }}>
-                    <div className="p-6 flex items-start gap-6">
-                      <div className="flex-shrink-0 flex flex-col items-center gap-1">
-                        <svg width="72" height="72" viewBox="0 0 56 56" style={{ animation: "float 3s ease-in-out infinite" }}>
-                          <rect x="12" y="22" width="32" height="28" rx="8" fill="#eef1fd" stroke={BRAND} strokeWidth="1.5"/>
-                          <circle cx="21" cy="33" r="4" fill="white"/><circle cx="35" cy="33" r="4" fill="white"/>
-                          <circle cx="21" cy="33" r="2" fill={BRAND}/><circle cx="35" cy="33" r="2" fill={BRAND}/>
-                          <path d="M22 41 Q28 46 34 41" fill="none" stroke={BRAND} strokeWidth="1.5" strokeLinecap="round"/>
-                          <line x1="28" y1="22" x2="28" y2="12" stroke={BRAND} strokeWidth="1.5" strokeLinecap="round"/>
-                          <ellipse cx="28" cy="10" rx="7" ry="4" fill="none" stroke={BRAND} strokeWidth="1.5" style={{ transformOrigin: "28px 10px", animation: "spin 3s linear infinite" }}/>
-                          <rect x="4" y="28" width="8" height="4" rx="2" fill="#eef1fd" stroke={BRAND} strokeWidth="1"/>
-                          <rect x="44" y="28" width="8" height="4" rx="2" fill="#eef1fd" stroke={BRAND} strokeWidth="1"/>
-                        </svg>
-                        <style>{"@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}} @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}"}</style>
-                        <span className="text-xs font-bold" style={{ color: BRAND }}>Radar</span>
-                      </div>
-                      <div className="flex-1">
-                        <div className="bg-white/80 rounded-2xl rounded-tl-sm px-5 py-4 shadow-sm border border-white/60 mb-4">
-                          <p className="text-sm font-bold text-slate-900 mb-1">Hi! I am Radar, your GEO analyst.</p>
-                          <p className="text-sm text-slate-500 leading-relaxed">
-                            Paste any content page URL and I will tell you exactly why AI engines are not citing it — and how to fix it. Works on blog posts, case studies, whitepapers, FAQs and comparison pages.
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-8 px-1">
-                          {[
-                            { value: "0-100", label: "GEO Score", color: BRAND },
-                            { value: "Specific", label: "Gaps found", color: "#7c3aed" },
-                            { value: "Same day", label: "Fixes ready", color: "#059669" },
-                          ].map((stat, i) => (
-                            <div key={stat.label} className="flex items-center gap-3">
-                              {i > 0 && <div className="w-px h-6 bg-indigo-200" />}
-                              <div>
-                                <p className="text-base font-extrabold" style={{ color: stat.color }}>{stat.value}</p>
-                                <p className="text-xs text-slate-400">{stat.label}</p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </section>
+                  {/* Hero text */}
+                  <div className="text-center py-4">
+                    <h2 className="text-xl font-bold text-slate-900 mb-2">Why isn't this page being cited by AI?</h2>
+                    <p className="text-sm text-slate-500 max-w-lg mx-auto leading-relaxed">Paste any blog post, case study, whitepaper or FAQ page URL. Get a citation score, exact gaps, and copy-paste fixes in under 30 seconds.</p>
+                  </div>
 
-                  {/* Feature cards — 4 columns */}
+                  {/* What you get cards */}
                   <div className="grid grid-cols-4 gap-3">
-                    {[
-                      { title: "Content type", icon: "📄", num: "01", color: BRAND, bg: "#eff6ff", border: "#bfdbfe", detail: "Blog, case study, whitepaper, FAQ — each scored differently" },
-                      { title: "GEO gaps", icon: "🔎", num: "02", color: "#ea580c", bg: "#fff7ed", border: "#fed7aa", detail: "Missing schema, weak entity definition, no AI-citable stats" },
-                      { title: "Rewrite briefs", icon: "✍️", num: "03", color: "#7c3aed", bg: "#f5f3ff", border: "#ddd6fe", detail: "Exact sentences to add or change — specific to the page" },
-                      { title: "Schema code", icon: "⚡", num: "04", color: "#059669", bg: "#ecfdf5", border: "#a7f3d0", detail: "Copy-paste JSON-LD ready to implement same day" },
-                    ].map(card => (
-                      <div key={card.title} className="rounded-xl p-4 flex flex-col gap-3 hover:shadow-md transition-all"
-                        style={{ backgroundColor: card.bg, border: `1px solid ${card.border}` }}>
-                        <div className="flex items-center justify-between">
-                          <span className="text-2xl">{card.icon}</span>
-                          <span className="text-xs font-bold opacity-30" style={{ color: card.color }}>{card.num}</span>
-                        </div>
-                        <h3 className="text-sm font-bold text-slate-800">{card.title}</h3>
-                        <p className="text-xs text-slate-500 leading-relaxed">{card.detail}</p>
-                      </div>
-                    ))}
+                    <div className="rounded-xl p-4 flex flex-col gap-2 border" style={{ background: "#eef1fd", borderColor: "#3B5BDB30" }}>
+                      <span className="text-2xl">🎯</span>
+                      <h3 className="text-sm font-bold" style={{ color: "#3B5BDB" }}>Citation score</h3>
+                      <p className="text-xs text-slate-500 leading-relaxed">0-100 score showing how likely AI engines are to cite this specific page</p>
+                    </div>
+                    <div className="rounded-xl p-4 flex flex-col gap-2 border" style={{ background: "#fff7ed", borderColor: "#ea580c30" }}>
+                      <span className="text-2xl">🔍</span>
+                      <h3 className="text-sm font-bold" style={{ color: "#ea580c" }}>Citation gaps</h3>
+                      <p className="text-xs text-slate-500 leading-relaxed">Exact reasons why AI engines skip this page — weak entity definition, missing stats, no schema</p>
+                    </div>
+                    <div className="rounded-xl p-4 flex flex-col gap-2 border" style={{ background: "#faf5ff", borderColor: "#7c3aed30" }}>
+                      <span className="text-2xl">✍️</span>
+                      <h3 className="text-sm font-bold" style={{ color: "#7c3aed" }}>Rewrite briefs</h3>
+                      <p className="text-xs text-slate-500 leading-relaxed">Before/after rewrites for specific sentences — copy, edit, publish</p>
+                    </div>
+                    <div className="rounded-xl p-4 flex flex-col gap-2 border" style={{ background: "#ecfdf5", borderColor: "#05996930" }}>
+                      <span className="text-2xl">⚡</span>
+                      <h3 className="text-sm font-bold" style={{ color: "#059669" }}>Quick wins</h3>
+                      <p className="text-xs text-slate-500 leading-relaxed">3 actions you can do today to improve citation chances — ranked by impact</p>
+                    </div>
+                  </div>
+
+                  {/* Differentiator note */}
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 px-5 py-4 flex items-start gap-3">
+                    <span className="text-lg flex-shrink-0">💡</span>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-700 mb-1">Different from Technical Audit</p>
+                      <p className="text-sm text-slate-500 leading-relaxed">Technical Audit checks if your <strong>website</strong> is accessible to AI crawlers. Page Analyser checks if your <strong>content</strong> is good enough for AI to actually quote. Both are needed for full AI visibility.</p>
+                    </div>
                   </div>
                 </>
               )}
