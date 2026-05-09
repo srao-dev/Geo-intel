@@ -354,33 +354,39 @@ export async function getCachedAnalysis(userId: string, url: string) {
 }
 
 export async function saveAuditResult(userId: string, url: string, report: any) {
-  const { supabase } = await import("./supabase")
-  await supabase.from("audit_cache").upsert({
-    user_id: userId,
-    url: url.toLowerCase().trim(),
-    report,
-    audited_at: new Date().toISOString(),
-  }, { onConflict: "user_id,url" })
+  try {
+    const { supabase } = await import("./supabase")
+    await supabase.from("audit_cache").upsert({
+      user_id: userId,
+      url: url.toLowerCase().trim(),
+      report,
+      audited_at: new Date().toISOString(),
+    }, { onConflict: "user_id,url" })
+  } catch { /* table may not exist yet */ }
 }
 
 export async function getCachedAudit(userId: string, url: string) {
-  const { supabase } = await import("./supabase")
-  const { data } = await supabase
-    .from("audit_cache")
-    .select("report, audited_at")
-    .eq("user_id", userId)
-    .eq("url", url.toLowerCase().trim())
-    .single()
-  return data
+  try {
+    const { supabase } = await import("./supabase")
+    const { data } = await supabase
+      .from("audit_cache")
+      .select("report, audited_at")
+      .eq("user_id", userId)
+      .eq("url", url.toLowerCase().trim())
+      .single()
+    return data
+  } catch { return null }
 }
 
 export async function getAuditHistory(userId: string, limit = 5) {
-  const { supabase } = await import("./supabase")
-  const { data } = await supabase
-    .from("audit_cache")
-    .select("url, report, audited_at")
-    .eq("user_id", userId)
-    .order("audited_at", { ascending: false })
-    .limit(limit)
-  return data || []
+  try {
+    const { supabase } = await import("./supabase")
+    const { data } = await supabase
+      .from("audit_cache")
+      .select("url, report, audited_at")
+      .eq("user_id", userId)
+      .order("audited_at", { ascending: false })
+      .limit(limit)
+    return data || []
+  } catch { return [] }
 }
