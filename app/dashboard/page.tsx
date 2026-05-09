@@ -537,9 +537,7 @@ export default function DashboardV2() {
                                                       <td className="px-3 py-2">
                                                         <span className="px-1.5 py-0.5 rounded text-xs font-semibold" style={statusStyle}>{statusLabel}</span>
                                                       </td>
-                                                      <td className="px-3 py-2 text-sm text-slate-500">
-                                                        <span className="font-semibold text-slate-700">{m.mentionCount}</span>/{m.total}
-                                                      </td>
+                                                      <td className="px-3 py-2 text-sm font-semibold text-slate-700">{m.mentionCount}</td>
                                                       <td className="px-3 py-2 text-sm font-semibold text-slate-600">{posLabel}</td>
                                                       <td className="px-3 py-2 text-xs text-slate-400 max-w-sm truncate">{m.preview || "—"}</td>
                                                     </tr>
