@@ -252,9 +252,11 @@ function synthesise(url: string, results: Record<string, any>, hasLlmsTxt: boole
   const crawlResult = results['geo-crawl']
   if (crawlResult && hasLlmsTxt === false) {
     if (!crawlResult.findings) crawlResult.findings = []
-    // Remove any AI-generated llms findings (they're often wrong) and replace with ours
-    crawlResult.findings = crawlResult.findings.filter((f: any) =>
-      !f.title?.toLowerCase().includes('llms')
+    // Remove ALL AI-generated llms findings and replace with our hardcoded correct one
+    crawlResult.findings = (crawlResult.findings || []).filter((f: any) =>
+      !f.title?.toLowerCase().includes('llms') && 
+      !f.detail?.toLowerCase().includes('llms.txt') &&
+      !f.recommendation?.toLowerCase().includes('llms.txt')
     )
     {
       crawlResult.findings.push({
