@@ -115,7 +115,7 @@ HTML size: ${data.html_size_kb}KB | JS SPA: ${data.has_js_spa}
 robots.txt: ${data.robots_txt.slice(0, 400)}
 AI bot access: ${JSON.stringify(data.ai_bot_status)}
 llms.txt: ${data.has_llms_txt} | Sitemap: ${data.has_sitemap}
-LLMS.TXT RULE: If has_llms_txt is false, you MUST always include a Medium finding titled "llms.txt file not found" — this is MANDATORY and counts OUTSIDE the 2 finding limit. Do not skip this finding even if you already have 2 findings. llms.txt is a new standard that tells AI engines what content they can use — missing it is a missed GEO opportunity.
+LLMS.TXT RULE: Do NOT report any findings about llms.txt — this is handled separately by the system. Do not mention llms.txt in any finding title or detail.
 SCORING: 85-100 AI bots explicitly allowed + sitemap + llms.txt | 65-84 AI bots implicitly allowed via wildcard (not explicitly listed) | 45-64 some AI bots blocked | 25-44 multiple AI bots blocked | 0-24 all AI bots blocked
 IMPORTANT DISTINCTION:
 - "explicitly allowed" = User-agent: GPTBot with Allow: / present in robots.txt → score 85-100
@@ -253,11 +253,12 @@ function synthesise(url: string, results: Record<string, any>, hasLlmsTxt: boole
   if (crawlResult && hasLlmsTxt === false) {
     if (!crawlResult.findings) crawlResult.findings = []
     // Remove ALL AI-generated llms findings and replace with our hardcoded correct one
-    crawlResult.findings = (crawlResult.findings || []).filter((f: any) =>
-      !f.title?.toLowerCase().includes('llms') && 
-      !f.detail?.toLowerCase().includes('llms.txt') &&
-      !f.recommendation?.toLowerCase().includes('llms.txt')
-    )
+    crawlResult.findings = (crawlResult.findings || []).filter((f: any) => {
+      const titleLower = f.title?.toLowerCase() || ''
+      const detailLower = f.detail?.toLowerCase() || ''
+      const recLower = f.recommendation?.toLowerCase() || ''
+      return !titleLower.includes('llms') && !detailLower.includes('llms') && !recLower.includes('llms')
+    })
     {
       crawlResult.findings.push({
         id: 'crawl_llms',
