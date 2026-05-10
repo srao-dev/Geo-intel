@@ -277,7 +277,7 @@ function synthesise(url: string, results: Record<string, any>, hasLlmsTxt: boole
     composite += (r.score || 0) * weight
     dimensionScores[agent] = { score: r.score || 0, grade: r.grade || 'F', summary: r.summary || '' }
     for (const f of r.findings || []) {
-      if (!seen.has(f.title)) { seen.add(f.title); allFindings.push({ ...f, dimension: agent }) }
+      if (!seen.has(f.title) && !f.title?.toLowerCase().includes('llms')) { seen.add(f.title); allFindings.push({ ...f, dimension: agent }) }
     }
   }
 
