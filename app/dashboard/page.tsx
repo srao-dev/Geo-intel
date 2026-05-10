@@ -500,7 +500,6 @@ export default function DashboardV2() {
             {[
               { label: "Visibility", icon: <Eye className="h-3.5 w-3.5" /> },
               { label: "Prompts", icon: <MessageSquare className="h-3.5 w-3.5" /> },
-              { label: "Citations", icon: <ClipboardList className="h-3.5 w-3.5" /> },
               { label: "Recommendations", icon: <Lightbulb className="h-3.5 w-3.5" /> },
             ].map(({ label, icon }) => (
               <button key={label} onClick={() => setActiveTab(label)} className="flex items-center gap-1.5 px-1 text-sm py-2 transition-colors"
