@@ -454,7 +454,7 @@ export default function DashboardV2() {
     <div className="flex h-screen overflow-hidden antialiased text-slate-900" style={{ background: "#f8fafc" }}>
       {showSetup && (
         <SetupWizard
-          onComplete={() => { setShowSetup(false); setEditingData(null); if (user) getCompanies(user.id).then(data => { setCompanies(data); if (data.length > 0) setSelectedCompanyId(data[0].id) }) }}
+          onComplete={() => { setShowSetup(false); setEditingData(null); if (user) getCompanies(user.id).then(data => { setCompanies(data); if (data.length > 0) { setSelectedCompanyId(data[0].id); localStorage.setItem('selectedCompanyId', data[0].id) } }) }}
           onSaveExit={() => { setShowSetup(false); setEditingData(null) }}
           initialData={editingData}
         />

@@ -163,6 +163,8 @@ export function SetupWizard({ onComplete, onSaveExit, initialData }: SetupWizard
 
   async function handleSubmit() {
     if (!user) return
+    if (prompts.length === 0) { setError("Add at least one prompt before starting tracking."); return }
+    if (selectedModels.length === 0) { setError("Select at least one model before starting tracking."); return }
     setLoading(true)
     setError("")
     try {
@@ -180,11 +182,15 @@ export function SetupWizard({ onComplete, onSaveExit, initialData }: SetupWizard
       })
 
       // Fire tracking job immediately
-      await fetch('/api/track', {
+      const trackRes = await fetch('/api/track', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ companyId }),
       })
+      if (!trackRes.ok) {
+        const trackErr = await trackRes.json().catch(() => ({}))
+        throw new Error(trackErr.error || 'Tracking failed to start')
+      }
 
       onComplete()
     } catch (err: any) {
