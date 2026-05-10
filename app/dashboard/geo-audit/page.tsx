@@ -94,12 +94,12 @@ function FindingRow({ finding, domain, vertical }: { finding: any; domain: strin
     }}>
       <button onClick={() => setOpen(o => !o)} className="w-full flex items-center justify-between p-3 text-left hover:bg-white/20 transition-colors">
         <div className="flex items-center gap-3">
-          <span className="px-1.5 py-0.5 rounded text-xs font-bold uppercase tracking-tight" style={{ backgroundColor: cfg.badgeBg, color: cfg.badgeColor }}>
+          <span className="py-0.5 rounded text-xs font-bold uppercase tracking-tight text-center flex-shrink-0" style={{ backgroundColor: cfg.badgeBg, color: cfg.badgeColor, width: "64px" }}>
             {finding.severity}
           </span>
           <div>
             <h3 className="text-sm font-bold text-slate-900 leading-snug">{finding.title}</h3>
-            <p className="text-sm text-slate-500 font-medium uppercase tracking-wider mt-0.5">{DIMENSION_LABELS[finding.dimension]}</p>
+
           </div>
         </div>
         {open ? <ChevronUp className="h-4 w-4 text-slate-400 flex-shrink-0" /> : <ChevronDown className="h-4 w-4 text-slate-400 flex-shrink-0" />}
@@ -249,6 +249,7 @@ export default function GeoAuditV2() {
   const [caAnalysis, setCaAnalysis] = useState<any>(null)
   const [caError, setCaError] = useState("")
   const [caBlocked, setCaBlocked] = useState(false)
+  const [caShowPaste, setCaShowPaste] = useState(false)
   const [caPasted, setCaPasted] = useState("")
 
   const runContentAnalysis = async (usePasted = false) => {
@@ -332,7 +333,21 @@ export default function GeoAuditV2() {
   if (authLoading || !user) return null
 
   const domain = report?.url?.replace("https://", "").replace("http://", "").replace("www.", "").split("/")[0] || ""
-  const allFindings = report ? [...(report.critical_findings || []), ...(report.high_findings || []), ...(report.all_findings || []).filter((f: any) => f.severity === "Medium")] : []
+  const allFindings = (() => {
+    if (!report) return []
+    const critical = report.critical_findings || []
+    const high = report.high_findings || []
+    const medium = (report.all_findings || []).filter((f: any) => f.severity === "Medium")
+    // If a Critical schema finding exists, hide Medium findings that mention schema
+    const hasSchemaIssue = critical.some((f: any) =>
+      f.title?.toLowerCase().includes('schema')
+    )
+    const filteredMedium = medium.filter((f: any) => {
+      if (hasSchemaIssue && f.title?.toLowerCase().includes('schema')) return false
+      return true
+    })
+    return [...critical, ...high, ...filteredMedium]
+  })()
   const ss = report ? getScoreStatus(report.composite_score) : null
 
   return (
@@ -349,7 +364,7 @@ export default function GeoAuditV2() {
         <div className="p-5 border-b border-[#c4c5d7]/30">
           <div className="flex items-center gap-2.5 mb-5">
             <div className="w-7 h-7 rounded-md flex items-center justify-center font-bold text-white text-sm" style={{ backgroundColor: BRAND }}>G</div>
-            <span className="text-lg font-bold tracking-tight">Geo Intel</span>
+            <span className="text-lg font-bold tracking-tight">CiteIQ</span>
           </div>
           <div className="pt-4 border-t border-[#c4c5d7]/40 flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
@@ -402,7 +417,7 @@ export default function GeoAuditV2() {
               </li>
               <li>
                 <a href="/dashboard/geo-audit" className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-sm font-bold transition-colors" style={{ backgroundColor: "rgba(0,43,146,0.1)", color: BRAND }}>
-                  <ClipboardList className="w-4 h-4" /> Geo Audit
+                  <ClipboardList className="w-4 h-4" /> GEO Audit
                 </a>
               </li>
             </ul>
@@ -590,6 +605,20 @@ export default function GeoAuditV2() {
           {/* ── Real results ── */}
           {report && !loading && (
             <div className="flex flex-col gap-4">
+              {/* Cached badge */}
+              {fromCache && (
+                <div className="flex items-center justify-between px-1 mb-1">
+                  <p className="text-xs text-slate-400">Showing cached result — may not reflect latest changes</p>
+                  <button
+                    onClick={() => runAudit(true)}
+                    className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-1.5"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                    Re-run fresh audit
+                  </button>
+                </div>
+              )}
+
               {/* 3 KPI cards */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-xl bg-white border border-slate-200 p-4" style={{ borderTop: `3px solid ${BRAND}` }}>
@@ -699,6 +728,42 @@ export default function GeoAuditV2() {
                   </button>
                 </div>
                 <p className="mt-2 text-xs text-slate-400 px-1">Works best on specific content pages — blog posts, case studies, whitepapers, FAQs</p>
+
+                {/* Optional paste for better results */}
+                <div className="mt-3">
+                  <button
+                    onClick={() => setCaShowPaste(!caShowPaste)}
+                    className="flex items-center gap-2 text-sm font-medium px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition-colors"
+                    style={{ color: BRAND }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+                    {caShowPaste ? "Hide paste option" : "Paste content for deeper analysis"}
+                    <span className="text-xs px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600 font-semibold">Optional</span>
+                  </button>
+                  {caShowPaste && (
+                    <div className="mt-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
+                      <p className="text-sm font-semibold text-blue-800 mb-1">Paste article text for better results</p>
+                      <p className="text-xs text-blue-600 mb-3">Open the page in your browser → Select all text (Cmd+A) → Copy → Paste below. This gives accurate results for JS-rendered pages and reveals statistics, author info, and content quality gaps.</p>
+                      <textarea
+                        value={caPasted}
+                        onChange={e => setCaPasted(e.target.value)}
+                        placeholder="Paste the full article text here..."
+                        rows={5}
+                        className="w-full rounded-lg border border-blue-200 bg-white px-3 py-2 text-sm text-slate-700 placeholder:text-slate-400 outline-none focus:border-blue-400 resize-none"
+                      />
+                      {caPasted.trim().length > 100 && (
+                        <button
+                          onClick={() => runContentAnalysis(true)}
+                          disabled={caLoading}
+                          className="mt-2 flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-white disabled:opacity-50 transition-all"
+                          style={{ background: BRAND }}
+                        >
+                          {caLoading ? "Analysing..." : <>Analyse with pasted content <ArrowRight className="h-4 w-4" /></>}
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
               </section>
 
               {/* Error */}
@@ -745,7 +810,7 @@ export default function GeoAuditV2() {
                   {/* Hero text */}
                   <div className="text-center py-4">
                     <h2 className="text-xl font-bold text-slate-900 mb-2">Why isn't this page being cited by AI?</h2>
-                    <p className="text-sm text-slate-500 max-w-lg mx-auto leading-relaxed">Paste any blog post, case study, whitepaper or FAQ page URL. Get a citation score, exact gaps, and copy-paste fixes in under 30 seconds.</p>
+                    <p className="text-sm text-slate-500 max-w-lg mx-auto leading-relaxed">Enter any blog post, case study, whitepaper or FAQ page URL. Get a citation score, exact gaps, and fixes in under 30 seconds.</p>
                   </div>
 
                   {/* What you get cards */}
@@ -831,24 +896,24 @@ export default function GeoAuditV2() {
                     {caAnalysis.critical_gaps?.length > 0 && (
                       <div className="space-y-2">
                         <div className="flex items-center justify-between px-1">
-                          <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Critical Gaps & Fixes</h2>
-                          <span className="text-xs font-bold text-slate-400">{caAnalysis.critical_gaps.length} gaps found</span>
+                          <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider">Critical Gaps & Fixes</h2>
+                          <span className="text-sm font-bold text-slate-400">{caAnalysis.critical_gaps.length} gaps found</span>
                         </div>
                         {caAnalysis.critical_gaps.map((gap: any, i: number) => (
                           <div key={i} className="rounded-xl overflow-hidden border-l-4" style={{ background: "rgba(229,238,255,0.4)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.3)", borderLeftColor: "#ef4444", borderLeftWidth: "4px" }}>
                             <div className="px-4 py-2.5 border-b border-slate-200/30 flex items-center gap-2" style={{ background: "rgba(255,255,255,0.5)" }}>
-                              <span className="px-1.5 py-0.5 rounded text-xs font-bold bg-red-100 text-red-700">Gap</span>
+                              <span className="px-2 py-0.5 rounded text-sm font-bold bg-red-100 text-red-700">Gap</span>
                               <p className="text-sm font-bold text-slate-900">{gap.gap}</p>
                             </div>
                             <div className="px-4 py-3 space-y-2">
                               <div>
-                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Fix</p>
+                                <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-1">Fix</p>
                                 <p className="text-sm text-slate-700">{gap.fix}</p>
                               </div>
                               {gap.example && (
-                                <p className="text-xs text-slate-500 italic bg-white/70 rounded-lg px-3 py-2">"{gap.example}"</p>
+                                <p className="text-sm text-slate-500 italic bg-white/70 rounded-lg px-3 py-2">"{gap.example}"</p>
                               )}
-                              {gap.impact && <p className="text-xs text-slate-400">Impact: {gap.impact}</p>}
+                              {gap.impact && <p className="text-sm text-slate-400">Impact: {gap.impact}</p>}
                             </div>
                           </div>
                         ))}
@@ -858,16 +923,16 @@ export default function GeoAuditV2() {
                     {/* Rewrite Suggestions */}
                     {caAnalysis.rewrite_suggestions?.length > 0 && (
                       <div className="space-y-2">
-                        <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider px-1">Rewrite Suggestions</h2>
+                        <h2 className="text-sm font-bold text-slate-700 uppercase tracking-wider px-1">Rewrite Suggestions</h2>
                         {caAnalysis.rewrite_suggestions.map((r: any, i: number) => (
                           <div key={i} className="rounded-xl overflow-hidden border-l-4" style={{ background: "rgba(229,238,255,0.4)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.3)", borderLeftColor: "#f59e0b", borderLeftWidth: "4px" }}>
                             <div className="px-4 py-2.5 border-b border-slate-200/30" style={{ background: "rgba(255,255,255,0.5)" }}>
                               <p className="text-sm font-bold text-slate-900">{r.element}</p>
                             </div>
                             <div className="px-4 py-3 space-y-2">
-                              {r.current && <p className="text-xs text-slate-500 italic bg-white/60 rounded-lg px-3 py-2 border border-slate-200/50">Before: "{r.current}"</p>}
-                              <p className="text-xs text-slate-800 font-semibold bg-amber-50/60 rounded-lg px-3 py-2 border border-amber-200/50">After: "{r.suggested}"</p>
-                              {r.why && <p className="text-xs text-slate-400">Why: {r.why}</p>}
+                              {r.current && <p className="text-sm text-slate-500 italic bg-white/60 rounded-lg px-3 py-2 border border-slate-200/50">Before: "{r.current}"</p>}
+                              <p className="text-sm text-slate-800 font-semibold bg-amber-50/60 rounded-lg px-3 py-2 border border-amber-200/50">After: "{r.suggested}"</p>
+                              {r.why && <p className="text-sm text-slate-400">Why: {r.why}</p>}
                             </div>
                           </div>
                         ))}
@@ -878,7 +943,7 @@ export default function GeoAuditV2() {
                     {caAnalysis.quick_wins?.length > 0 && (
                       <div className="rounded-xl overflow-hidden" style={{ background: "rgba(229,238,255,0.4)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.3)", borderLeftColor: "#0891b2", borderLeftWidth: "4px" }}>
                         <div className="px-4 py-2.5 border-b border-slate-200/30" style={{ background: "rgba(255,255,255,0.5)" }}>
-                          <h3 className="text-xs font-bold text-cyan-700 uppercase tracking-widest">Quick Wins</h3>
+                          <h3 className="text-sm font-bold text-cyan-700 uppercase tracking-widest">Quick Wins</h3>
                         </div>
                         <div className="p-4 space-y-3">
                           {caAnalysis.quick_wins.map((w: any, i: number) => (
@@ -886,7 +951,7 @@ export default function GeoAuditV2() {
                               <span className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: BRAND }}>{i + 1}</span>
                               <div>
                                 <p className="text-sm font-semibold text-slate-800">{w.action}</p>
-                                <p className="text-xs text-slate-400 mt-0.5">{w.impact} · {w.effort}</p>
+                                <p className="text-sm text-slate-400 mt-0.5">{w.impact} · {w.effort}</p>
                               </div>
                             </div>
                           ))}

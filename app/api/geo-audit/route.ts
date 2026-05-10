@@ -115,7 +115,7 @@ HTML size: ${data.html_size_kb}KB | JS SPA: ${data.has_js_spa}
 robots.txt: ${data.robots_txt.slice(0, 400)}
 AI bot access: ${JSON.stringify(data.ai_bot_status)}
 llms.txt: ${data.has_llms_txt} | Sitemap: ${data.has_sitemap}
-LLMS.TXT RULE: If has_llms_txt is false, always include a Medium finding titled "llms.txt file not found" with recommendation to create one at the root domain. llms.txt is a new standard that tells AI engines what content they can use — missing it is a missed GEO opportunity. This should always be flagged regardless of other findings.
+LLMS.TXT RULE: If has_llms_txt is false, you MUST always include a Medium finding titled "llms.txt file not found" — this is MANDATORY and counts OUTSIDE the 2 finding limit. Do not skip this finding even if you already have 2 findings. llms.txt is a new standard that tells AI engines what content they can use — missing it is a missed GEO opportunity.
 SCORING: 85-100 AI bots explicitly allowed + sitemap + llms.txt | 65-84 AI bots implicitly allowed via wildcard (not explicitly listed) | 45-64 some AI bots blocked | 25-44 multiple AI bots blocked | 0-24 all AI bots blocked
 IMPORTANT DISTINCTION:
 - "explicitly allowed" = User-agent: GPTBot with Allow: / present in robots.txt → score 85-100
@@ -125,7 +125,7 @@ IMPORTANT DISTINCTION:
 - CRITICAL: Blocking CCBot, PetalBot, Scrapy, img2dataset is CORRECT and should NOT be flagged as a problem — these are scrapers not LLM crawlers
 - Only flag as blocked if GPTBot, PerplexityBot, ClaudeBot or Google-Extended are explicitly blocked with Disallow: /
 - If those 4 bots are NOT mentioned in robots.txt but User-agent: * has empty Disallow, score must be 65-84 NOT below 50
-Only report ACTUAL problems. Max 2 findings. Each finding must be specific to THIS site — not generic advice. If no real issues found, return empty findings array.
+Max 2 findings PLUS the mandatory llms.txt finding if missing. Each finding must be specific to THIS site — not generic advice. If no real issues found, return empty findings array.
 - NEVER make observations about content frequency (e.g. "appears twice") — you may miscount
 - Finding titles must use sentence case — only capitalise the first word and proper nouns (e.g. "No schema markup detected" not "No Schema Markup Detected")
 - NEVER conclude that visual elements are absent just because they are not in the crawled HTML — customer logos, testimonials, carousels, ratings, and trust badges are frequently loaded via JavaScript and will not appear in raw HTML
@@ -229,15 +229,45 @@ async function runAgent(name: string, pageData: any) {
   try { return JSON.parse(raw) } catch { return { dimension: name, score: 0, grade: 'F', findings: [], summary: 'Parse error' } }
 }
 
-function synthesise(url: string, results: Record<string, any>) {
+function synthesise(url: string, results: Record<string, any>, hasLlmsTxt: boolean = true) {
   const weights: Record<string, number> = {
     'geo-competitive': 0.25, 'geo-content': 0.25,
     'geo-authority': 0.20, 'geo-schema': 0.20, 'geo-crawl': 0.10,
   }
   let composite = 0
   const dimensionScores: Record<string, any> = {}
-  const allFindings: any[] = []
+  // Inject llms.txt finding directly into allFindings before loop
+  const llmsFinding = (!hasLlmsTxt) ? [{
+    id: 'crawl_llms',
+    title: 'llms.txt file not found',
+    severity: 'Medium',
+    detail: `${url} does not have an llms.txt file at the domain root. This new standard tells AI engines what content they can use and which pages are most important.`,
+    recommendation: `Create an llms.txt file at the domain root describing your company, key pages, and content AI engines can use. Use the Get Fix button to generate the file content.`,
+    dimension: 'geo-crawl'
+  }] : []
+  const allFindings: any[] = [...llmsFinding]
   const seen = new Set()
+
+  // Hardcode llms.txt finding if missing — AI agents keep dropping it
+  const crawlResult = results['geo-crawl']
+  if (crawlResult && hasLlmsTxt === false) {
+    if (!crawlResult.findings) crawlResult.findings = []
+    // Remove any AI-generated llms findings (they're often wrong) and replace with ours
+    crawlResult.findings = crawlResult.findings.filter((f: any) =>
+      !f.title?.toLowerCase().includes('llms')
+    )
+    {
+      crawlResult.findings.push({
+        id: 'crawl_llms',
+        title: 'llms.txt file not found',
+        severity: 'Medium',
+        detail: `${url} does not have an llms.txt file at the domain root. This new standard tells AI engines what content they can use and which pages are most important.`,
+        recommendation: `Create an llms.txt file at ${new URL(url).origin}/llms.txt describing your company, key pages, and content AI engines are permitted to use. Use the Get Fix button to generate the file content.`,
+        effort: 'Hours',
+        estimated_impact: 'Direct communication channel with AI crawlers'
+      })
+    }
+  }
 
   for (const [agent, weight] of Object.entries(weights)) {
     const r = results[agent] || {}
@@ -289,7 +319,7 @@ export async function POST(req: NextRequest) {
       runAgent('geo-competitive', pageData),
     ])
 
-    const report = synthesise(cleanUrl, { 'geo-crawl': crawl, 'geo-content': content, 'geo-schema': schema, 'geo-authority': authority, 'geo-competitive': competitive })
+    const report = synthesise(cleanUrl, { 'geo-crawl': crawl, 'geo-content': content, 'geo-schema': schema, 'geo-authority': authority, 'geo-competitive': competitive }, pageData.has_llms_txt)
     return NextResponse.json({ success: true, report })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })

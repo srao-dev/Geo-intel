@@ -58,10 +58,13 @@ export async function POST(req: NextRequest) {
     // Detect JS-rendered pages — content looks like nav menus not article body
     const looksLikeNav = (text: string) => {
       const navKeywords = ["skip to main", "cookie policy", "privacy policy", "terms of service", "all rights reserved", "© 20"]
+      const articleKeywords = ["introduction", "in this article", "in summary", "conclusion", "however", "therefore", "for example", "according to", "research shows", "in conclusion", "as a result", "furthermore"]
       const lowerText = text.toLowerCase()
       const navCount = navKeywords.filter(k => lowerText.includes(k)).length
+      const articleCount = articleKeywords.filter(k => lowerText.includes(k)).length
       const wordCount = text.split(/\s+/).length
-      return wordCount < 300 || navCount >= 2
+      // Flag as nav if: short content, OR has nav keywords but no article structure
+      return wordCount < 300 || navCount >= 2 || (wordCount < 800 && articleCount === 0)
     }
 
     if (looksLikeNav(pageContent)) {
@@ -87,12 +90,26 @@ VERTICAL: ${vertical}
 PAGE CONTENT:
 ${sanitized}
 
+IMPORTANT CONTENT QUALITY CHECK:
+First, assess whether the page content looks like actual article body (paragraphs, arguments, data points) or mostly navigation menus, product listings, and promotional text.
+
+IF IT LOOKS LIKE NAVIGATION/PROMOTIONAL CONTENT (JS-rendered page):
+- Only report findings that can be verified from raw HTML regardless of JS: schema markup presence, meta description, page title quality
+- STRICTLY DO NOT report any of these — they require rendered content to verify: author byline, publication date, article body, statistics, data points, value propositions, core arguments. Reporting these from nav-only HTML is ALWAYS inaccurate and misleading.
+- Set summary to: "Analysis based on crawled HTML only — main article content appears to be JavaScript-rendered. Schema and meta findings below are accurate. For full content analysis including citations, rewrites and statistics gaps, paste the article text below."
+- Set geo_score based only on technical signals (schema, meta, title)
+- Leave rewrite_suggestions empty
+- Leave quick_wins focused only on schema and meta fixes
+
+IF IT LOOKS LIKE REAL ARTICLE CONTENT:
+- Analyse all dimensions normally
+
 CRITICAL: Return ONLY a raw JSON object. No markdown. No backticks. No explanation before or after. Start your response with { and end with }.
 {
   "page_title": "<detected page title>",
   "content_type": "<Blog Post|Comparison Page|Case Study|Solution Page|FAQ|Whitepaper|Homepage|Other>",
   "geo_score": <0-100>,
-  "summary": "<2-3 sentence honest assessment>",
+  "summary": "<2-3 sentence constructive assessment — focus on what can be improved, not what is wrong. Use neutral professional language. Never say the page 'fails' or 'lacks' — say 'would benefit from' or 'opportunity to improve'>", 
   "what_works": ["<thing that works for AI citation>"],
   "critical_gaps": [
     {

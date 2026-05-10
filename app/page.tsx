@@ -20,26 +20,41 @@ const FEATURES = [
   { icon: TrendingUp, title: "Competitor comparison", body: "See exactly what competitors are doing that you're not — and close the gap." },
 ]
 
-function RadarMascot() {
+function RadarMascot({ size = 72 }: { size?: number }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-      <svg width="72" height="72" viewBox="0 0 56 56" style={{ animation: "float 3s ease-in-out infinite" }}>
+      <svg width={size} height={size} viewBox="0 0 56 56" style={{ animation: "float 3s ease-in-out infinite", overflow: "visible" }}>
+        {/* Hair back */}
+        <ellipse cx="24" cy="18" rx="10" ry="7" fill="#1a1a2e"/>
+        <ellipse cx="32" cy="18" rx="10" ry="7" fill="#1a1a2e"/>
+        {/* Hair side curls */}
+        <path d="M14 22 Q10 17 14 13 Q18 9 16 17" fill="#1a1a2e"/>
+        <path d="M42 22 Q46 17 42 13 Q38 9 40 17" fill="#1a1a2e"/>
+        {/* Pigtails */}
+        <path d="M14 20 Q6 24 9 31 Q12 37 15 31" fill="#1a1a2e"/>
+        <path d="M42 20 Q50 24 47 31 Q44 37 41 31" fill="#1a1a2e"/>
+        {/* Robot body */}
         <rect x="12" y="22" width="32" height="28" rx="8" fill="#f0f4ff" stroke="#3B5BDB" strokeWidth="1.5"/>
-        <circle cx="21" cy="33" r="4" fill="white"/>
-        <circle cx="35" cy="33" r="4" fill="white"/>
-        <circle cx="21" cy="33" r="2" fill="#3B5BDB"/>
-        <circle cx="35" cy="33" r="2" fill="#3B5BDB"/>
-        <path d="M22 41 Q28 46 34 41" fill="none" stroke="#3B5BDB" strokeWidth="1.5" strokeLinecap="round"/>
-        <line x1="28" y1="22" x2="28" y2="12" stroke="#3B5BDB" strokeWidth="1.5" strokeLinecap="round"/>
-        <ellipse cx="28" cy="10" rx="7" ry="4" fill="none" stroke="#3B5BDB" strokeWidth="1.5" style={{ transformOrigin: "28px 10px", animation: "spin 3s linear infinite" }}/>
+        {/* Cheek blush */}
+        <ellipse cx="18" cy="35" rx="3.5" ry="2" fill="#FFB3C6" opacity="0.6"/>
+        <ellipse cx="38" cy="35" rx="3.5" ry="2" fill="#FFB3C6" opacity="0.6"/>
+        {/* Eyes */}
+        <circle cx="22" cy="31" r="4" fill="white"/>
+        <circle cx="34" cy="31" r="4" fill="white"/>
+        <circle cx="22" cy="31" r="2.2" fill="#3B5BDB"/>
+        <circle cx="34" cy="31" r="2.2" fill="#3B5BDB"/>
+        {/* Eye shine */}
+        <circle cx="23" cy="30" r="0.9" fill="white"/>
+        <circle cx="35" cy="30" r="0.9" fill="white"/>
+        {/* Smile */}
+        <path d="M21 39 Q28 44 35 39" fill="none" stroke="#3B5BDB" strokeWidth="1.5" strokeLinecap="round"/>
+        {/* Antenna */}
+        <line x1="28" y1="22" x2="28" y2="14" stroke="#3B5BDB" strokeWidth="1.5" strokeLinecap="round"/>
+        <circle cx="28" cy="12" r="2.5" fill="#3B5BDB"/>
+        {/* Arms */}
         <rect x="4" y="28" width="8" height="4" rx="2" fill="#f0f4ff" stroke="#3B5BDB" strokeWidth="1"/>
         <rect x="44" y="28" width="8" height="4" rx="2" fill="#f0f4ff" stroke="#3B5BDB" strokeWidth="1"/>
-        <rect x="18" y="37" width="20" height="8" rx="3" fill="rgba(59,91,219,0.1)" stroke="#3B5BDB" strokeWidth="0.5"/>
-        <text x="28" y="43.5" textAnchor="middle" fontSize="5" fontWeight="700" fill="#3B5BDB" fontFamily="monospace">GEO</text>
       </svg>
-      <div style={{ background: "#f0f4ff", border: "1px solid #c5d0f5", borderRadius: "12px 12px 12px 0", padding: "8px 14px", fontSize: 12, color: "#3B5BDB", fontWeight: 500, whiteSpace: "nowrap" }}>
-        Hi! I'll scan your AI visibility 📡
-      </div>
       <style>{`
         @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
         @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
@@ -137,7 +152,7 @@ export default function LandingPage() {
               <ellipse cx="28" cy="12" rx="5" ry="3" fill="none" stroke="#3B5BDB" strokeWidth="1.5"/>
             </svg>
           </div>
-          <span style={{ fontWeight: 800, fontSize: 17, letterSpacing: "-0.03em", color: "#111827" }}>GeoIntel</span>
+          <span style={{ fontWeight: 800, fontSize: 17, letterSpacing: "-0.03em", color: "#111827" }}>CiteIQ</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
           <a href="#how-it-works" style={{ fontSize: 13, color: "#374151", textDecoration: "none", fontWeight: 500 }}>How it works</a>
@@ -152,52 +167,43 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Hero centered layout */}
-      <section style={{ padding: "80px 5% 72px", maxWidth: 860, margin: "0 auto", textAlign: "center" }}>
-        {/* Feature pills */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 20, marginBottom: 32 }}>
-          {["Prompt Research", "AI Search Analytics", "AI Search Optimization"].map(f => (
-            <div key={f} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#6b7280" }}>
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#9ca3af", display: "inline-block" }} />
-              {f}
-            </div>
-          ))}
+      {/* Hero split layout */}
+      <section style={{ padding: "72px 5% 64px", maxWidth: 1280, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 64, alignItems: "center" }}>
+        <div>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 20, background: "#eef1fd", border: "1px solid #c5d0f5", marginBottom: 28 }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#3B5BDB", display: "inline-block" }} />
+            <span style={{ fontSize: 11, fontWeight: 600, color: "#3B5BDB", letterSpacing: "0.06em", textTransform: "uppercase" }}>AI search visibility platform</span>
+          </div>
+          <h1 style={{ fontSize: "clamp(40px,4vw,62px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: 20, color: "#111827" }}>
+            See where you stand.<br />
+            Understand why.<br />
+            <span style={{ color: "#3B5BDB" }}>Fix it today.</span>
+          </h1>
+          <p style={{ fontSize: 18, color: "#6b7280", marginBottom: 36, lineHeight: 1.7, maxWidth: 480 }}>
+            Your buyers are asking ChatGPT, Perplexity and Gemini which tool to use. Are you showing up? CiteIQ tells you exactly where you stand, why competitors rank above you, and gives you copy-paste fixes to change that.
+          </p>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 32 }}>
+            <button onClick={() => setModal("signup")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "14px 32px", borderRadius: 10, background: "#3B5BDB", color: "white", fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer" }}>
+              Start free audit <ArrowRight size={16} />
+            </button>
+            <button onClick={() => setModal("login")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "14px 24px", borderRadius: 10, background: "white", color: "#374151", fontWeight: 500, fontSize: 16, border: "1px solid #e5e7eb", cursor: "pointer" }}>
+              Sign in
+            </button>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 12, color: "#9ca3af" }}>Tracking across</span>
+            {["ChatGPT", "Perplexity", "Gemini", "Claude"].map(l => (
+              <span key={l} style={{ padding: "3px 10px", borderRadius: 20, fontSize: 12, fontWeight: 500, background: "white", border: "1px solid #e5e7eb", color: "#374151" }}>{l}</span>
+            ))}
+          </div>
         </div>
-        <h1 style={{ fontSize: "clamp(44px,5vw,72px)", fontWeight: 900, letterSpacing: "-0.04em", lineHeight: 1.05, marginBottom: 24, color: "#111827" }}>
-          See where <span style={{ color: "#3B5BDB" }}>your brand</span> shows up<br />on AI Search
-        </h1>
-        <p style={{ fontSize: 18, color: "#6b7280", marginBottom: 40, lineHeight: 1.7, maxWidth: 560, margin: "0 auto 40px" }}>
-          Your buyers are asking ChatGPT, Perplexity and Gemini which tool to use. GeoIntel tells you exactly where you stand, why competitors rank above you, and gives you copy-paste fixes to change that.
-        </p>
-        <div style={{ display: "flex", gap: 12, justifyContent: "center", marginBottom: 24 }}>
-          <button onClick={() => setModal("signup")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "14px 32px", borderRadius: 10, background: "#3B5BDB", color: "white", fontWeight: 700, fontSize: 16, border: "none", cursor: "pointer" }}>
-            Start free audit <ArrowRight size={16} />
-          </button>
-          <button onClick={() => setModal("login")} style={{ display: "flex", alignItems: "center", gap: 6, padding: "14px 24px", borderRadius: 10, background: "white", color: "#374151", fontWeight: 500, fontSize: 16, border: "1px solid #e5e7eb", cursor: "pointer" }}>
-            Sign in
-          </button>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 56 }}>
-          <span style={{ fontSize: 12, color: "#9ca3af" }}>Tracking across</span>
-          {["ChatGPT", "Perplexity", "Gemini", "Claude"].map(l => (
-            <span key={l} style={{ padding: "3px 10px", borderRadius: 20, fontSize: 12, fontWeight: 500, background: "white", border: "1px solid #e5e7eb", color: "#374151" }}>{l}</span>
-          ))}
-        </div>
-        {/* Dashboard mockup below headline */}
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 28, maxWidth: 780, margin: "0 auto" }}>
-          <svg width="180" height="180" viewBox="0 0 56 56" style={{ animation: "float 3s ease-in-out infinite" }}>
-            <rect x="12" y="22" width="32" height="28" rx="8" fill="#eef1fd" stroke="#3B5BDB" strokeWidth="1.5"/>
-            <circle cx="21" cy="33" r="4" fill="white"/><circle cx="35" cy="33" r="4" fill="white"/>
-            <circle cx="21" cy="33" r="2" fill="#3B5BDB"/><circle cx="35" cy="33" r="2" fill="#3B5BDB"/>
-            <path d="M22 41 Q28 46 34 41" fill="none" stroke="#3B5BDB" strokeWidth="1.5" strokeLinecap="round"/>
-            <line x1="28" y1="22" x2="28" y2="12" stroke="#3B5BDB" strokeWidth="1.5" strokeLinecap="round"/>
-            <ellipse cx="28" cy="10" rx="7" ry="4" fill="none" stroke="#3B5BDB" strokeWidth="1.5" style={{ transformOrigin: "28px 10px", animation: "spin 3s linear infinite" }}/>
-            <rect x="4" y="28" width="8" height="4" rx="2" fill="#eef1fd" stroke="#3B5BDB" strokeWidth="1"/>
-            <rect x="44" y="28" width="8" height="4" rx="2" fill="#eef1fd" stroke="#3B5BDB" strokeWidth="1"/>
-          </svg>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, position: "relative" }}>
           <style>{"@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}} @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}"}</style>
+          {/* Mascot peeking from bottom-right of dashboard */}
+          {/* Dashboard with mascot overlapping bottom-right corner */}
+          <div style={{ position: "relative", width: "100%" }}>
           {/* Dark dashboard mockup */}
-          <div style={{ background: "#0f1117", borderRadius: 16, padding: 20, border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 24px 64px rgba(0,0,0,0.15)", width: "100%" }}>
+          <div style={{ background: "#0f1117", borderRadius: 20, padding: 28, border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 24px 64px rgba(0,0,0,0.15)", width: "100%" }}>
             {/* Header */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, paddingBottom: 12, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
               <div>
@@ -243,6 +249,11 @@ export default function LandingPage() {
               <p style={{ fontSize: 10, color: "#5e5c78", margin: 0 }}>Copy-paste fix ready to implement</p>
             </div>
           </div>
+            {/* Mascot peeking at bottom-right corner */}
+            <div style={{ position: "absolute", bottom: -20, right: -20, zIndex: 10 }}>
+              <RadarMascot size={88} />
+            </div>
+          </div>
         </div>
       </section>
 
@@ -252,7 +263,7 @@ export default function LandingPage() {
         <div style={{ maxWidth: 860, margin: "0 auto", textAlign: "center" }}>
           <div style={{ fontSize: 11, fontWeight: 600, color: "#2dd4bf", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 16 }}>Where your buyers are searching</div>
           <h2 style={{ fontSize: "clamp(28px,4vw,44px)", fontWeight: 800, color: "white", letterSpacing: "-0.03em", marginBottom: 12, lineHeight: 1.15 }}>Your buyers search AI before<br />they ever visit your website</h2>
-          <p style={{ fontSize: 16, color: "#9896b0", marginBottom: 56, maxWidth: 500, margin: "0 auto 56px" }}>AI search has become the new first touch in B2B. GeoIntel tracks all 4 engines and tells you exactly what to fix to show up.</p>
+          <p style={{ fontSize: 16, color: "#9896b0", marginBottom: 56, maxWidth: 500, margin: "0 auto 56px" }}>AI search has become the new first touch in B2B. CiteIQ tracks all 4 engines and tells you exactly what to fix to show up.</p>
 
           <div style={{ position: "relative", height: 340 }}>
             <svg width="100%" height="340" viewBox="0 0 800 340" style={{ overflow: "visible" }}>
@@ -360,10 +371,10 @@ export default function LandingPage() {
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           <div style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: 14, padding: 24 }}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 8 }}>Free</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "#374151", marginBottom: 8 }}>Starter</div>
             <div style={{ fontSize: 36, fontWeight: 800, letterSpacing: "-0.04em", color: "#111827", marginBottom: 4 }}>$0</div>
             <div style={{ fontSize: 12, color: "#9ca3af", marginBottom: 18 }}>forever</div>
-            {["3 audits per month", "Basic visibility report", "Fix generator (3 uses)", "1 competitor tracked"].map(f => (
+            {["1 audit per month", "Basic visibility report", "View findings only", "1 competitor tracked"].map(f => (
               <div key={f} style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 7 }}>
                 <Check size={12} color="#10b981" />
                 <span style={{ fontSize: 13, color: "#6b7280" }}>{f}</span>
@@ -374,15 +385,15 @@ export default function LandingPage() {
           <div style={{ background: "#eef1fd", border: "1px solid #c5d0f5", borderRadius: 14, padding: 24, position: "relative" }}>
             <div style={{ position: "absolute", top: -10, right: 14, padding: "2px 10px", borderRadius: 20, background: "#3B5BDB", color: "white", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>Beta pricing</div>
             <div style={{ fontSize: 13, fontWeight: 600, color: "#3B5BDB", marginBottom: 8 }}>Pro</div>
-            <div style={{ fontSize: 36, fontWeight: 800, letterSpacing: "-0.04em", color: "#111827", marginBottom: 4 }}>$15</div>
-            <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 18 }}>per month · price goes up at launch</div>
+            <div style={{ fontSize: 36, fontWeight: 800, letterSpacing: "-0.04em", color: "#111827", marginBottom: 4 }}>$20</div>
+            <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 18 }}>per month · beta price, goes up at launch</div>
             {["Unlimited audits", "All 4 AI engines", "Full fix generator", "5 competitors tracked", "AI prompt research", "Daily re-scans"].map(f => (
               <div key={f} style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 7 }}>
                 <Check size={12} color="#3B5BDB" />
                 <span style={{ fontSize: 13, color: "#374151" }}>{f}</span>
               </div>
             ))}
-            <button onClick={() => setModal("signup")} style={{ display: "block", width: "100%", textAlign: "center", marginTop: 18, padding: "9px", borderRadius: 8, background: "#3B5BDB", color: "white", fontWeight: 700, fontSize: 13, border: "none", cursor: "pointer" }}>Lock in $15 →</button>
+            <button onClick={() => setModal("signup")} style={{ display: "block", width: "100%", textAlign: "center", marginTop: 18, padding: "9px", borderRadius: 8, background: "#3B5BDB", color: "white", fontWeight: 700, fontSize: 13, border: "none", cursor: "pointer" }}>Lock in $20/mo →</button>
           </div>
         </div>
         <p style={{ textAlign: "center", marginTop: 12, fontSize: 12, color: "#9ca3af" }}>No credit card required to start</p>
@@ -399,7 +410,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer style={{ borderTop: "1px solid #e5e7eb", padding: "16px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", background: "#fafafa" }}>
-        <span style={{ fontSize: 12, color: "#9ca3af" }}>GeoIntel</span>
+        <span style={{ fontSize: 12, color: "#9ca3af" }}>CiteIQ</span>
         <div style={{ display: "flex", gap: 20 }}>
           {[["Terms", "/terms"], ["Privacy", "/privacy"]].map(([l, h]) => (
             <Link key={l} href={h} style={{ fontSize: 12, color: "#9ca3af" }}>{l}</Link>
