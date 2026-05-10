@@ -9,9 +9,8 @@ function getServiceClient() {
 }
 
 export async function POST(req: NextRequest) {
-  const db = getServiceClient()
-
   try {
+    const db = getServiceClient()
     const { userId, name, url, description, industry, icpDescription, competitors, prompts, selectedModels } = await req.json()
 
     if (!userId || !name || !url) {
