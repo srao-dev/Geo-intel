@@ -13,16 +13,16 @@ const MODEL_GROUPS = [
     provider: "ChatGPT",
     color: "bg-emerald-100 text-emerald-700",
     models: [
-      { label: "GPT 5.3", slug: "GPT-5.3", provider: "openai" },
-      { label: "GPT 5.5", slug: "GPT-5.5", provider: "openai" },
+      { label: "GPT 5.3", slug: "GPT-5.3", provider: "openai", comingSoon: true },
+      { label: "GPT 5.5", slug: "GPT-5.5", provider: "openai", comingSoon: true },
     ],
   },
   {
     provider: "Claude",
     color: "bg-orange-100 text-orange-700",
     models: [
-      { label: "Sonnet 4.6", slug: "Claude Sonnet 4.6", provider: "anthropic" },
-      { label: "Opus 4.6", slug: "Claude Opus 4.6", provider: "anthropic" },
+      { label: "Sonnet 4.6", slug: "Claude Sonnet 4.6", provider: "anthropic", comingSoon: true },
+      { label: "Opus 4.6", slug: "Claude Opus 4.6", provider: "anthropic", comingSoon: true },
       { label: "Haiku 4.5", slug: "Claude Haiku 4.5", provider: "anthropic" },
     ],
   },
@@ -213,7 +213,7 @@ export function SetupWizard({ onComplete, onSaveExit, initialData }: SetupWizard
   const steps = ["Company", "Competitors", "Prompts", "Models"]
   const canNext = step === 0 ? !!companyName.trim() && !!websiteUrl.trim()
     : step === 1 ? true
-    : step === 2 ? prompts.length > 0
+    : step === 2 ? prompts.length > 0 || !!customPrompt.trim()
     : selectedModels.length > 0
 
   return (
@@ -401,6 +401,15 @@ export function SetupWizard({ onComplete, onSaveExit, initialData }: SetupWizard
                   <div className="flex flex-col gap-1.5">
                     {group.models.map(model => {
                       const selected = selectedModels.includes(model.slug)
+                      if (model.comingSoon) {
+                        return (
+                          <div key={model.slug} className="flex items-center gap-3 rounded-lg border border-gray-100 bg-gray-50 px-3 py-2.5 opacity-50 cursor-not-allowed">
+                            <div className="flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border border-gray-200 bg-white" />
+                            <span className="text-xs text-gray-400 font-medium">{model.label}</span>
+                            <span className="ml-auto text-[10px] font-semibold text-gray-400 bg-gray-200 px-1.5 py-0.5 rounded-full">Coming soon</span>
+                          </div>
+                        )
+                      }
                       return (
                         <button
                           key={model.slug}
@@ -434,7 +443,7 @@ export function SetupWizard({ onComplete, onSaveExit, initialData }: SetupWizard
             : <button onClick={onSaveExit} className="text-sm text-gray-400 hover:text-gray-700 transition-colors">Cancel</button>
           }
           {step < steps.length - 1
-            ? <button onClick={() => setStep(s => s + 1)} disabled={!canNext} className="flex items-center gap-2 rounded-lg bg-[#3B5BDB] px-5 py-2 text-sm font-semibold text-white hover:bg-[#3451c4] disabled:opacity-50 transition-colors">
+            ? <button onClick={() => { if (step === 2 && customPrompt.trim()) { setPrompts(prev => prev.includes(customPrompt.trim()) ? prev : [...prev, customPrompt.trim()]); setCustomPrompt("") } setStep(s => s + 1) }} disabled={!canNext} className="flex items-center gap-2 rounded-lg bg-[#3B5BDB] px-5 py-2 text-sm font-semibold text-white hover:bg-[#3451c4] disabled:opacity-50 transition-colors">
                 Continue <ChevronRight className="h-4 w-4" />
               </button>
             : <button onClick={handleSubmit} disabled={loading || !canNext} className="flex items-center gap-2 rounded-lg bg-[#3B5BDB] px-5 py-2 text-sm font-semibold text-white hover:bg-[#3451c4] disabled:opacity-60 transition-colors">
