@@ -98,65 +98,102 @@ export async function POST(req: NextRequest) {
     }
     const topDomains = Object.entries(domainCounts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([d, c]) => `${d} (${c})`).join(', ')
 
-    // Weak prompts
+    // Calculate prompt stats with mention rates
     const promptStats = (promptsRes.data || []).map(p => {
       const pr = responses.filter(r => r.prompt_id === p.id)
       const mentions = pr.filter(r => r.response_text?.toLowerCase().includes(companyName.toLowerCase())).length
       const mentionRate = pr.length > 0 ? Math.round((mentions / pr.length) * 100) : 0
-      return { text: p.text, mentionRate, mentions, total: pr.length }
+
+      // Calculate top competitor for this prompt
+      const brandVis = allBrands.map(b => ({
+        name: b.name,
+        isOurBrand: b.isOurBrand,
+        visibility: Math.round((pr.filter(r => r.response_text?.toLowerCase().includes(b.name.toLowerCase())).length / pr.length) * 100) || 0
+      }))
+      const topComp = brandVis.filter(b => !b.isOurBrand).sort((a, b) => b.visibility - a.visibility)[0]
+
+      return { id: p.id, text: p.text, mentionRate, mentions, total: pr.length, topCompetitor: topComp?.name, topCompetitorRate: topComp?.visibility || 0 }
     })
-    const weakPrompts = promptStats.filter(p => p.mentionRate < 30 && p.total > 0)
-      .map(p => `"${p.text}" — ${p.mentions}/${p.total} mentions (${p.mentionRate}%)`)
-      .join('\n')
-    const strongPrompts = promptStats.filter(p => p.mentionRate >= 60)
-      .sort((a, b) => b.mentionRate - a.mentionRate)
-      .map(p => `"${p.text}" — ${p.mentions}/${p.total} mentions (${p.mentionRate}%)`)
-      .join('\n')
+
+    // Categorize prompts
+    const strongPrompts = promptStats.filter(p => p.mentionRate >= 60).sort((a, b) => b.mentionRate - a.mentionRate)
+    const criticalPrompts = promptStats.filter(p => p.mentionRate < 20 && p.total > 0).sort((a, b) => a.mentionRate - b.mentionRate)
+    const importantPrompts = promptStats.filter(p => p.mentionRate >= 20 && p.mentionRate < 50 && p.total > 0).sort((a, b) => a.mentionRate - b.mentionRate)
+    const allWeakPrompts = [...criticalPrompts, ...importantPrompts]
 
     const competitorDomains = competitorNames.map((n: string) => n.toLowerCase().replace(/\s+/g, '') + '.com').join(', ')
 
-    // Build Haiku prompt
-    const prompt = `You are an AI visibility strategist analyzing data for ${companyName}.
+    // Format prompts for Haiku context
+    const formatPromptList = (prompts: any[]) => prompts
+      .map(p => `"${p.text}" — you: ${p.mentionRate}%, ${p.topCompetitor}: ${p.topCompetitorRate}%`)
+      .join('\n')
 
-COMPETITOR VISIBILITY BY MODEL:
-${modelInsights.join('\n') || 'No data'}
+    // Build Haiku prompt for content plan
+    const prompt = `You are a content strategist for ${companyName}. Generate a content plan based on AI visibility gaps.
 
-TOP CITED DOMAINS (AI sources for this category):
-${topDomains || 'No citation data'}
+CONTEXT:
+- Company: ${companyName}
+- Top cited sources: ${topDomains || 'General web'}
+- Total tracked prompts: ${promptStats.length}
 
-STRONG PROMPTS (what is already working for ${companyName}):
-${strongPrompts || 'None yet'}
+STRONG PROMPTS TO DEFEND & EXPAND (60%+ mention rate):
+${formatPromptList(strongPrompts) || 'None yet'}
 
-WEAK PROMPTS (low mention rate for ${companyName}):
-${weakPrompts || 'None'}
+CRITICAL GAPS TO FILL (under 20% mention rate):
+${formatPromptList(criticalPrompts) || 'None'}
 
-Based on this data, generate 4-5 specific, actionable recommendations:
-1. What content to create based on competitor citation types (blogs, reviews, listicles etc.)
-2. Which NEUTRAL THIRD-PARTY platforms to get listed/cited on. NEVER suggest competitor domains.
-3. How to build on strong prompts — replicate what is already working.
-4. Which weak prompt topics to create content for to improve visibility.
+IMPORTANT GAPS (20-50% mention rate):
+${formatPromptList(importantPrompts) || 'None'}
 
-IMPORTANT RULES:
-- Never suggest publishing on or targeting competitor domains (${competitorDomains} or any competitor website)
-- Only suggest neutral platforms: G2, Capterra, TechCrunch, Forbes, Reddit, Gartner, analyst publications, etc.
-- Reference specific prompt text and mention numbers from the data above.
-- Be concrete and actionable.
+Generate content recommendations in JSON format. For each gap, suggest a specific piece of content.
+For strong prompts, suggest how to expand/defend the position.
 
-Return ONLY a JSON array with no markdown, no explanation:
-[{"title":"...","detail":"...","action":"...","priority":"Critical|High|Win"}]`
+RULES:
+- Never suggest ${competitorDomains} or any competitor domains
+- Output only valid JSON, no markdown
+
+Return ONLY this JSON structure with no other text:
+{
+  "summary": {
+    "headline": "brief summary of the content strategy",
+    "total_gaps": number,
+    "critical_gaps": number,
+    "top_competitor": "name",
+    "estimated_improvement": "e.g. +15-20 visibility points"
+  },
+  "sections": {
+    "defend": [
+      {
+        "prompt": "the original prompt",
+        "title": "exact content title",
+        "format": "long-form|comparison|faq|guide|case-study",
+        "channels": ["blog", "G2", "Reddit"],
+        "why": "one sentence evidence",
+        "effort": "low|medium|high",
+        "impact": "low|medium|high"
+      }
+    ],
+    "critical": [
+      { "prompt": "", "title": "", "format": "", "channels": [], "why": "", "effort": "", "impact": "" }
+    ],
+    "important": [
+      { "prompt": "", "title": "", "format": "", "channels": [], "why": "", "effort": "", "impact": "" }
+    ]
+  }
+}`
 
     const message = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1024,
+      max_tokens: 2000,
       messages: [{ role: 'user', content: prompt }],
     })
 
     const text = message.content[0].type === 'text' ? message.content[0].text : ''
-    const jsonMatch = text.match(/\[[\s\S]*\]/)
-    if (!jsonMatch) return NextResponse.json({ error: 'Failed to parse recommendations' }, { status: 500 })
+    const jsonMatch = text.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) return NextResponse.json({ error: 'Failed to parse content plan' }, { status: 500 })
 
-    const recommendations = JSON.parse(jsonMatch[0])
-    return NextResponse.json({ recommendations })
+    const contentPlan = JSON.parse(jsonMatch[0])
+    return NextResponse.json({ recommendations: contentPlan.sections, summary: contentPlan.summary })
 
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })

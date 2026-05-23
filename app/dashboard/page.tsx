@@ -126,9 +126,29 @@ const CONTENT_TYPE_COLORS: Record<string, string> = {
   'Web Article': '#94a3b8',
 }
 
-function RecommendationsTab({ companyId, insights, loading, aiRecs, aiLoading, aiError, onLoad, onGenerateAi }: {
+function ContentPlanCard({ item, color, textColor }: { item: any; color: string; textColor: string }) {
+  return (
+    <div className="p-3 rounded-lg" style={{ background: color, border: `1px solid ${textColor}20` }}>
+      <p className="text-xs font-bold" style={{ color: textColor }}>{item.format?.toUpperCase()}</p>
+      <p className="text-sm font-bold text-slate-900 mt-1">{item.title}</p>
+      <p className="text-xs text-slate-600 mt-1">"{item.prompt}"</p>
+      <p className="text-xs text-slate-600 mt-1">{item.why}</p>
+      <div className="flex flex-wrap gap-2 mt-2">
+        {item.channels?.map((ch: string) => (
+          <span key={ch} className="px-2 py-1 rounded text-xs font-semibold bg-white" style={{ color: textColor }}>{ch}</span>
+        ))}
+      </div>
+      <div className="flex gap-3 mt-2 text-xs">
+        <span className="text-slate-500">Effort: <span className="font-semibold text-slate-700">{item.effort}</span></span>
+        <span className="text-slate-500">Impact: <span className="font-semibold text-slate-700">{item.impact}</span></span>
+      </div>
+    </div>
+  )
+}
+
+function RecommendationsTab({ companyId, insights, loading, aiRecs, aiSummary, aiLoading, aiError, onLoad, onGenerateAi }: {
   companyId: string; insights: any[]; loading: boolean
-  aiRecs: any[]; aiLoading: boolean; aiError: string
+  aiRecs: any; aiSummary: any; aiLoading: boolean; aiError: string
   onLoad: () => void; onGenerateAi: () => void
 }) {
   useEffect(() => { onLoad() }, [companyId])
@@ -159,35 +179,65 @@ function RecommendationsTab({ companyId, insights, loading, aiRecs, aiLoading, a
           </button>
         </div>
         {aiError && <p className="text-xs text-red-500 px-4 py-3">{aiError}</p>}
-        {!aiRecs.length && !aiLoading && !aiError && (
-          <p className="text-xs text-slate-400 px-4 py-6 text-center">Click "Generate with AI" to get Haiku-powered content and citation recommendations based on your tracking data.</p>
+        {!aiRecs && !aiLoading && !aiError && (
+          <p className="text-xs text-slate-400 px-4 py-6 text-center">Click "Generate with AI" to get Haiku-powered content recommendations based on your tracking data.</p>
         )}
-        {aiRecs.length > 0 && (
-          <div className="p-4 space-y-2">
-            {aiRecs.map((rec: any, i: number) => {
-              const cardBg: Record<string, React.CSSProperties> = {
-                Critical: { background: "rgba(254,242,242,0.5)", border: "1px solid rgba(254,202,202,0.5)" },
-                High: { background: "rgba(255,247,237,0.5)", border: "1px solid rgba(254,215,170,0.5)" },
-                Win: { background: "rgba(239,246,255,0.5)", border: "1px solid rgba(191,219,254,0.5)" },
-              }
-              const badgeStyle: Record<string, React.CSSProperties> = {
-                Critical: { background: "#fee2e2", color: "#b91c1c" },
-                High: { background: "#ffedd5", color: "#c2410c" },
-                Win: { background: BRAND_LIGHT, color: BRAND },
-              }
-              const bg = cardBg[rec.priority] || cardBg.Win
-              const badge = badgeStyle[rec.priority] || badgeStyle.Win
-              return (
-                <div key={i} className="flex items-start gap-3 p-4 rounded-xl" style={bg}>
-                  <span className="px-1.5 py-0.5 rounded text-xs font-bold uppercase whitespace-nowrap h-fit" style={badge}>{rec.priority}</span>
-                  <div>
-                    <p className="text-sm font-bold text-slate-900">{rec.title}</p>
-                    <p className="text-sm text-slate-500 mt-0.5">{rec.detail}</p>
-                    {rec.action && <p className="text-xs font-semibold mt-1" style={{ color: BRAND }}>→ {rec.action}</p>}
-                  </div>
+        {aiRecs && (
+          <div className="p-4 space-y-4">
+            {/* Summary Card */}
+            {aiSummary && (
+              <div className="rounded-xl p-4" style={{ background: "rgba(59,91,219,0.08)", border: "1px solid rgba(59,91,219,0.2)" }}>
+                <p className="text-sm font-bold text-slate-900">{aiSummary.headline}</p>
+                <div className="flex flex-wrap gap-4 mt-3 text-xs">
+                  <div><span className="font-semibold text-slate-700">{aiSummary.total_gaps}</span> <span className="text-slate-500">visibility gaps</span></div>
+                  <div><span className="font-semibold text-red-600">{aiSummary.critical_gaps}</span> <span className="text-slate-500">critical</span></div>
+                  <div><span className="font-semibold text-slate-700">{aiSummary.top_competitor}</span> <span className="text-slate-500">leads by visibility</span></div>
+                  <div><span className="font-semibold text-green-600">{aiSummary.estimated_improvement}</span> <span className="text-slate-500">potential</span></div>
                 </div>
-              )
-            })}
+              </div>
+            )}
+
+            {/* Defend & Replicate Section */}
+            {aiRecs.defend?.length > 0 && (
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full" style={{ background: "#10b981" }}></span>Defend & Replicate
+                </h4>
+                <div className="space-y-2">
+                  {aiRecs.defend.map((item: any, i: number) => (
+                    <ContentPlanCard key={i} item={item} color="#ecfdf5" textColor="#047857" />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Critical Gaps Section */}
+            {aiRecs.critical?.length > 0 && (
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full" style={{ background: "#dc2626" }}></span>Critical Gaps
+                </h4>
+                <div className="space-y-2">
+                  {aiRecs.critical.map((item: any, i: number) => (
+                    <ContentPlanCard key={i} item={item} color="#fee2e2" textColor="#b91c1c" />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Important Gaps Section */}
+            {aiRecs.important?.length > 0 && (
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full" style={{ background: "#ea580c" }}></span>Important Gaps
+                </h4>
+                <div className="space-y-2">
+                  {aiRecs.important.map((item: any, i: number) => (
+                    <ContentPlanCard key={i} item={item} color="#ffedd5" textColor="#c2410c" />
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -375,7 +425,8 @@ export default function DashboardV2() {
   const [citationsLoading, setCitationsLoading] = useState(false)
   const [competitorInsights, setCompetitorInsights] = useState<any[]>([])
   const [insightsLoading, setInsightsLoading] = useState(false)
-  const [aiRecs, setAiRecs] = useState<any[]>([])
+  const [aiRecs, setAiRecs] = useState<any>(null)
+  const [aiSummary, setAiSummary] = useState<any>(null)
   const [aiRecsLoading, setAiRecsLoading] = useState(false)
   const [aiRecsError, setAiRecsError] = useState('')
 
@@ -412,7 +463,14 @@ export default function DashboardV2() {
       setCompetitorInsights([])
       setAiRecsError('')
       const cached = localStorage.getItem(`aiRecs_${selectedCompanyId}`)
-      setAiRecs(cached ? JSON.parse(cached) : [])
+      const cachedSummary = localStorage.getItem(`aiSummary_${selectedCompanyId}`)
+      if (cached) {
+        setAiRecs(JSON.parse(cached))
+        setAiSummary(cachedSummary ? JSON.parse(cachedSummary) : null)
+      } else {
+        setAiRecs(null)
+        setAiSummary(null)
+      }
       setTimeout(() => setBarsVisible(true), 100)
     } catch {}
     setLoading(false)
@@ -895,6 +953,7 @@ export default function DashboardV2() {
                   insights={competitorInsights}
                   loading={insightsLoading}
                   aiRecs={aiRecs}
+                  aiSummary={aiSummary}
                   aiLoading={aiRecsLoading}
                   aiError={aiRecsError}
                   onLoad={async () => {
@@ -915,8 +974,10 @@ export default function DashboardV2() {
                       })
                       const data = await res.json()
                       if (!res.ok) throw new Error(data.error || 'Failed to generate')
-                      setAiRecs(data.recommendations || [])
-                      localStorage.setItem(`aiRecs_${selectedCompanyId}`, JSON.stringify(data.recommendations || []))
+                      setAiRecs(data.recommendations || null)
+                      setAiSummary(data.summary || null)
+                      localStorage.setItem(`aiRecs_${selectedCompanyId}`, JSON.stringify(data.recommendations || null))
+                      localStorage.setItem(`aiSummary_${selectedCompanyId}`, JSON.stringify(data.summary || null))
                     } catch (err: any) {
                       setAiRecsError(err.message)
                     }
