@@ -762,6 +762,7 @@ export default function DashboardV2() {
               { label: "Visibility", icon: <Eye className="h-3.5 w-3.5" /> },
               { label: "Prompts", icon: <MessageSquare className="h-3.5 w-3.5" /> },
               { label: "Recommendations", icon: <Lightbulb className="h-3.5 w-3.5" /> },
+              { label: "Content Blueprint", icon: <ClipboardList className="h-3.5 w-3.5" /> },
             ].map(({ label, icon }) => (
               <button key={label} onClick={() => setActiveTab(label)} className="flex items-center gap-1.5 px-1 text-sm py-2 transition-colors"
                 style={activeTab === label ? { fontWeight: 700, color: BRAND, borderBottom: `2px solid ${BRAND}` } : { fontWeight: 500, color: "#64748b" }}>
@@ -1036,6 +1037,21 @@ export default function DashboardV2() {
                     setAiRecsLoading(false)
                   }}
                 />
+              )}
+
+              {/* Content Blueprint tab */}
+              {activeTab === "Content Blueprint" && (
+                <div className="rounded-xl overflow-hidden" style={glassCard}>
+                  <div className="px-4 py-2.5 border-b border-slate-200/60 flex items-center gap-1.5" style={{ background: "rgba(255,255,255,0.5)" }}>
+                    <ClipboardList className="h-3.5 w-3.5 text-slate-400" />
+                    <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider">Content Blueprint</h3>
+                  </div>
+                  <div className="flex flex-col items-center justify-center h-64 gap-3 text-center p-4">
+                    <ClipboardList className="h-8 w-8 text-slate-300" />
+                    <p className="text-sm font-semibold text-slate-600">Coming soon</p>
+                    <p className="text-xs text-slate-400">Content blueprint functionality is under development.</p>
+                  </div>
+                </div>
               )}
 
               {/* Visibility tab */}
