@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Play, RefreshCw, ExternalLink, ChevronDown, ArrowUp, ArrowDown, Eye, ClipboardList, Clock, Zap, LogOut, Radio, Trophy, Hash, Target, LayoutList, Lightbulb, MessageSquare, Pencil, Trash2 } from "lucide-react"
+import { Plus, Play, RefreshCw, ExternalLink, ChevronDown, ArrowUp, ArrowDown, Eye, ClipboardList, Clock, Zap, LogOut, Radio, Trophy, Hash, Target, LayoutList, Lightbulb, MessageSquare, Pencil, Trash2, LayoutGrid, Table2 } from "lucide-react"
 import { useAuth } from "@/lib/auth-context"
 import { getCompanies, getDashboardStats, getRankings, getResponses, getVisibilityPerRun, getPromptStats, getPromptResponses, getPromptModelBreakdown, getCitationStats, getModelCompetitorInsights } from "@/lib/queries"
 import { VisibilityWidget } from "@/components/visibility-chart"
@@ -151,6 +151,7 @@ function RecommendationsTab({ companyId, insights, loading, aiRecs, aiSummary, a
   aiRecs: any; aiSummary: any; aiLoading: boolean; aiError: string
   onLoad: () => void; onGenerateAi: () => void
 }) {
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
   useEffect(() => { onLoad() }, [companyId])
 
   if (loading) return <div className="rounded-xl overflow-hidden" style={glassCard}><CardSkeleton rows={4} /></div>
@@ -172,21 +173,33 @@ function RecommendationsTab({ companyId, insights, loading, aiRecs, aiSummary, a
           <h3 className="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
             <Lightbulb className="h-3.5 w-3.5 text-slate-400" />AI Content Recommendations
           </h3>
-          <button onClick={onGenerateAi} disabled={aiLoading}
-            className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg text-white disabled:opacity-60 transition-all"
-            style={{ backgroundColor: BRAND }}>
-            {aiLoading ? <><RefreshCw className="h-3 w-3 animate-spin" />Generating...</> : <><Zap className="h-3 w-3" />Generate with AI</>}
-          </button>
+          <div className="flex items-center gap-2">
+            {aiRecs && (
+              <div className="flex items-center gap-0.5 border border-slate-200 rounded-lg p-1">
+                <button onClick={() => setViewMode('cards')} className={`p-1.5 rounded transition-colors ${viewMode === 'cards' ? 'bg-slate-100 text-slate-700' : 'text-slate-400 hover:text-slate-600'}`} title="Cards view">
+                  <LayoutGrid className="h-4 w-4" />
+                </button>
+                <button onClick={() => setViewMode('table')} className={`p-1.5 rounded transition-colors ${viewMode === 'table' ? 'bg-slate-100 text-slate-700' : 'text-slate-400 hover:text-slate-600'}`} title="Table view">
+                  <Table2 className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+            <button onClick={onGenerateAi} disabled={aiLoading}
+              className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg text-white disabled:opacity-60 transition-all"
+              style={{ backgroundColor: BRAND }}>
+              {aiLoading ? <><RefreshCw className="h-3 w-3 animate-spin" />Generating...</> : <><Zap className="h-3 w-3" />Generate with AI</>}
+            </button>
+          </div>
         </div>
         {aiError && <p className="text-xs text-red-500 px-4 py-3">{aiError}</p>}
         {!aiRecs && !aiLoading && !aiError && (
           <p className="text-xs text-slate-400 px-4 py-6 text-center">Click "Generate with AI" to get Haiku-powered content recommendations based on your tracking data.</p>
         )}
         {aiRecs && (
-          <div className="p-4 space-y-4">
+          <div className="p-4">
             {/* Summary Card */}
             {aiSummary && (
-              <div className="rounded-xl p-4" style={{ background: "rgba(59,91,219,0.08)", border: "1px solid rgba(59,91,219,0.2)" }}>
+              <div className="rounded-xl p-4 mb-4" style={{ background: "rgba(59,91,219,0.08)", border: "1px solid rgba(59,91,219,0.2)" }}>
                 <p className="text-sm font-bold text-slate-900">{aiSummary.headline}</p>
                 <div className="flex flex-wrap gap-4 mt-3 text-xs">
                   <div><span className="font-semibold text-slate-700">{aiSummary.total_gaps}</span> <span className="text-slate-500">visibility gaps</span></div>
@@ -197,45 +210,84 @@ function RecommendationsTab({ companyId, insights, loading, aiRecs, aiSummary, a
               </div>
             )}
 
-            {/* Defend & Replicate Section */}
-            {aiRecs.defend?.length > 0 && (
-              <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full" style={{ background: "#10b981" }}></span>Defend & Replicate
-                </h4>
-                <div className="space-y-2">
-                  {aiRecs.defend.map((item: any, i: number) => (
-                    <ContentPlanCard key={i} item={item} color="#ecfdf5" textColor="#047857" />
-                  ))}
-                </div>
+            {/* Cards View */}
+            {viewMode === 'cards' && (
+              <div className="space-y-4">
+                {/* Defend & Replicate Section */}
+                {aiRecs.defend?.length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full" style={{ background: "#10b981" }}></span>Defend & Replicate
+                    </h4>
+                    <div className="space-y-2">
+                      {aiRecs.defend.map((item: any, i: number) => (
+                        <ContentPlanCard key={i} item={item} color="#ecfdf5" textColor="#047857" />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Critical Gaps Section */}
+                {aiRecs.critical?.length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full" style={{ background: "#dc2626" }}></span>Critical Gaps
+                    </h4>
+                    <div className="space-y-2">
+                      {aiRecs.critical.map((item: any, i: number) => (
+                        <ContentPlanCard key={i} item={item} color="#fee2e2" textColor="#b91c1c" />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Important Gaps Section */}
+                {aiRecs.important?.length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full" style={{ background: "#ea580c" }}></span>Important Gaps
+                    </h4>
+                    <div className="space-y-2">
+                      {aiRecs.important.map((item: any, i: number) => (
+                        <ContentPlanCard key={i} item={item} color="#ffedd5" textColor="#c2410c" />
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
-            {/* Critical Gaps Section */}
-            {aiRecs.critical?.length > 0 && (
-              <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full" style={{ background: "#dc2626" }}></span>Critical Gaps
-                </h4>
-                <div className="space-y-2">
-                  {aiRecs.critical.map((item: any, i: number) => (
-                    <ContentPlanCard key={i} item={item} color="#fee2e2" textColor="#b91c1c" />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Important Gaps Section */}
-            {aiRecs.important?.length > 0 && (
-              <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full" style={{ background: "#ea580c" }}></span>Important Gaps
-                </h4>
-                <div className="space-y-2">
-                  {aiRecs.important.map((item: any, i: number) => (
-                    <ContentPlanCard key={i} item={item} color="#ffedd5" textColor="#c2410c" />
-                  ))}
-                </div>
+            {/* Table View */}
+            {viewMode === 'table' && (
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="border-b border-slate-200 bg-slate-50">
+                      <th className="text-left px-2 py-2 font-semibold text-slate-700 whitespace-nowrap">Priority</th>
+                      <th className="text-left px-2 py-2 font-semibold text-slate-700">Title</th>
+                      <th className="text-left px-2 py-2 font-semibold text-slate-700 whitespace-nowrap">Format</th>
+                      <th className="text-left px-2 py-2 font-semibold text-slate-700">Channels</th>
+                      <th className="text-left px-2 py-2 font-semibold text-slate-700 whitespace-nowrap">Effort</th>
+                      <th className="text-left px-2 py-2 font-semibold text-slate-700 whitespace-nowrap">Impact</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      ...((aiRecs.defend || []).map((item: any) => ({ ...item, priority: 'Defend', color: '#047857', bg: '#ecfdf5' }))),
+                      ...((aiRecs.critical || []).map((item: any) => ({ ...item, priority: 'Critical', color: '#b91c1c', bg: '#fee2e2' }))),
+                      ...((aiRecs.important || []).map((item: any) => ({ ...item, priority: 'Important', color: '#c2410c', bg: '#ffedd5' })))
+                    ].map((item: any, i: number) => (
+                      <tr key={i} className="border-b border-slate-100 hover:bg-slate-50/50">
+                        <td className="px-2 py-2"><span className="px-1.5 py-0.5 rounded text-xs font-bold whitespace-nowrap" style={{ color: item.color, background: item.bg }}>{item.priority}</span></td>
+                        <td className="px-2 py-2"><span className="text-slate-900 line-clamp-2" title={item.title}>{item.title}</span></td>
+                        <td className="px-2 py-2 whitespace-nowrap"><span className="text-xs font-semibold" style={{ color: item.color }}>{item.format}</span></td>
+                        <td className="px-2 py-2"><span className="text-xs text-slate-600">{item.channels?.slice(0, 2).join(', ')}{item.channels?.length > 2 ? '+' : ''}</span></td>
+                        <td className="px-2 py-2 whitespace-nowrap"><span className="text-xs font-semibold text-slate-700">{item.effort}</span></td>
+                        <td className="px-2 py-2 whitespace-nowrap"><span className="text-xs font-semibold text-slate-700">{item.impact}</span></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
