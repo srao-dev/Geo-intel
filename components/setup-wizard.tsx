@@ -88,6 +88,9 @@ export function SetupWizard({ onComplete, onSaveExit, initialData }: SetupWizard
   const [customPrompt, setCustomPrompt] = useState("")
   const [promptCount, setPromptCount] = useState(5)
 
+  // Step 3 — Monitoring Interval
+  const [monitoringInterval, setMonitoringInterval] = useState<'daily' | 'weekly' | 'monthly' | 'manual'>('manual')
+
   // Step 4 — Models
   const [selectedModels, setSelectedModels] = useState<string[]>(initialData?.selectedModels || [])
 
@@ -180,6 +183,7 @@ export function SetupWizard({ onComplete, onSaveExit, initialData }: SetupWizard
           icpDescription: geography,
           competitors: competitors.filter(c => c.name.trim()).map(c => c.name),
           prompts,
+          monitoringInterval,
           selectedModels: MODEL_GROUPS.flatMap(g => g.models)
             .filter(m => selectedModels.includes(m.slug))
             .map(m => ({ provider: m.provider, model: m.slug })),
@@ -210,15 +214,16 @@ export function SetupWizard({ onComplete, onSaveExit, initialData }: SetupWizard
     }
   }
 
-  const steps = ["Company", "Competitors", "Prompts", "Models"]
+  const steps = ["Company", "Competitors", "Prompts", "Monitoring", "Models"]
   const canNext = step === 0 ? !!companyName.trim() && !!websiteUrl.trim()
     : step === 1 ? true
     : step === 2 ? prompts.length > 0 || !!customPrompt.trim()
+    : step === 3 ? true
     : selectedModels.length > 0
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-      <div className="relative w-full max-w-lg rounded-2xl bg-white border border-gray-200 shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-2xl rounded-2xl bg-white border border-gray-200 shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <div>
@@ -389,8 +394,44 @@ export function SetupWizard({ onComplete, onSaveExit, initialData }: SetupWizard
             </div>
           )}
 
-          {/* Step 3 — Models */}
+          {/* Step 3 — Monitoring Interval */}
           {step === 3 && (
+            <div className="flex flex-col gap-4">
+              <p className="text-xs text-gray-500">How often should we automatically track your competitors?</p>
+              <div className="flex flex-col gap-2">
+                {(['daily', 'weekly', 'monthly', 'manual'] as const).map(interval => (
+                  <button
+                    key={interval}
+                    onClick={() => setMonitoringInterval(interval)}
+                    className={`flex items-center gap-3 rounded-lg border px-4 py-3 text-left transition-colors ${
+                      monitoringInterval === interval
+                        ? 'border-[#3B5BDB] bg-blue-50'
+                        : 'border-gray-200 hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className={`flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border ${
+                      monitoringInterval === interval
+                        ? 'bg-[#3B5BDB] border-[#3B5BDB]'
+                        : 'border-gray-300'
+                    }`}>
+                      {monitoringInterval === interval && <Check className="h-2.5 w-2.5 text-white" />}
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-xs font-semibold text-gray-900 capitalize">
+                        {interval === 'daily' ? 'Daily' : interval === 'weekly' ? 'Weekly' : interval === 'monthly' ? 'Monthly' : 'Manual (never auto-refresh)'}
+                      </span>
+                      <span className="text-[10px] text-gray-500">
+                        {interval === 'daily' ? 'Every 24 hours' : interval === 'weekly' ? 'Every 7 days' : interval === 'monthly' ? 'Every 30 days' : 'Only when you run manually'}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Step 4 — Models */}
+          {step === 4 && (
             <div className="flex flex-col gap-4">
               <p className="text-xs text-gray-500">Select the AI models you want to track your brand across.</p>
               {MODEL_GROUPS.map(group => (

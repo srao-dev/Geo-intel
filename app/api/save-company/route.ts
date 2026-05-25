@@ -15,7 +15,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const db = getServiceClient()
-    const { userId, name, url, description, industry, icpDescription, competitors, prompts, selectedModels } = await req.json()
+    const { userId, name, url, description, industry, icpDescription, competitors, prompts, monitoringInterval, selectedModels } = await req.json()
 
     if (!userId || !name || !url) {
       return NextResponse.json({ error: 'userId, name and url are required' }, { status: 400 })
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     if (existing) {
       const { data, error } = await db
         .from('companies')
-        .update({ name, description, industry, icp_description: icpDescription, updated_at: new Date().toISOString() })
+        .update({ name, description, industry, icp_description: icpDescription, monitoring_interval: monitoringInterval || 'manual', updated_at: new Date().toISOString() })
         .eq('id', existing.id)
         .select('id')
         .single()
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     } else {
       const { data, error } = await db
         .from('companies')
-        .insert({ user_id: userId, name, url, description, industry, icp_description: icpDescription, status: 'active' })
+        .insert({ user_id: userId, name, url, description, industry, icp_description: icpDescription, monitoring_interval: monitoringInterval || 'manual', status: 'active' })
         .select('id')
         .single()
       if (error) throw new Error(`Company insert failed: ${error.message}`)

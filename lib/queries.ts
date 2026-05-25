@@ -5,7 +5,7 @@ import { supabase } from './supabase'
 export async function getCompanies(userId: string) {
   const { data, error } = await supabase
     .from('companies')
-    .select('id, name, url, status, created_at')
+    .select('id, name, url, status, created_at, monitoring_interval, last_tracked_at')
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
   if (error) throw error

@@ -481,6 +481,9 @@ export default function DashboardV2() {
   const [aiSummary, setAiSummary] = useState<any>(null)
   const [aiRecsLoading, setAiRecsLoading] = useState(false)
   const [aiRecsError, setAiRecsError] = useState('')
+  const [monitoringInterval, setMonitoringInterval] = useState<'daily' | 'weekly' | 'monthly' | 'manual'>('manual')
+  const [showMonitoringModal, setShowMonitoringModal] = useState(false)
+  const [updatingInterval, setUpdatingInterval] = useState(false)
 
   useEffect(() => { if (!authLoading && !user) router.push("/auth") }, [authLoading, user, router])
 
@@ -530,6 +533,15 @@ export default function DashboardV2() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
+  // Update monitoring interval when company changes
+  useEffect(() => {
+    if (!selectedCompanyId) return
+    const company = companies.find(c => c.id === selectedCompanyId) as any
+    if (company?.monitoring_interval) {
+      setMonitoringInterval(company.monitoring_interval)
+    }
+  }, [selectedCompanyId, companies])
+
   // Keyboard shortcut R â†' Run now
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -549,6 +561,25 @@ export default function DashboardV2() {
       await fetchData()
     } finally {
       setRunLoading(false)
+    }
+  }
+
+  const handleUpdateMonitoringInterval = async (newInterval: 'daily' | 'weekly' | 'monthly' | 'manual') => {
+    if (!selectedCompanyId || updatingInterval) return
+    setUpdatingInterval(true)
+    try {
+      const res = await fetch('/api/update-monitoring-interval', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ companyId: selectedCompanyId, monitoringInterval: newInterval }),
+      })
+      if (!res.ok) throw new Error('Failed to update interval')
+      setMonitoringInterval(newInterval)
+      setShowMonitoringModal(false)
+    } catch (err) {
+      console.error('Error updating monitoring interval:', err)
+    } finally {
+      setUpdatingInterval(false)
     }
   }
 
@@ -629,6 +660,53 @@ export default function DashboardV2() {
           onSaveExit={() => { setShowSetup(false); setEditingData(null) }}
           initialData={editingData}
         />
+      )}
+
+      {/* Monitoring Interval Modal */}
+      {showMonitoringModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="relative w-full max-w-md rounded-2xl bg-white border border-gray-200 shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+              <h2 className="text-base font-semibold text-gray-900">Monitoring Settings</h2>
+              <button onClick={() => setShowMonitoringModal(false)} className="rounded-lg p-1.5 hover:bg-gray-100 transition-colors">
+                <X className="h-4 w-4 text-gray-400" />
+              </button>
+            </div>
+            <div className="px-6 py-5 flex flex-col gap-4">
+              <p className="text-sm text-gray-600">How often should we automatically track {selectedCompanyName}?</p>
+              <div className="flex flex-col gap-2">
+                {(['daily', 'weekly', 'monthly', 'manual'] as const).map(interval => (
+                  <button
+                    key={interval}
+                    onClick={() => handleUpdateMonitoringInterval(interval)}
+                    disabled={updatingInterval}
+                    className={`flex items-center gap-3 rounded-lg border px-4 py-3 text-left transition-colors disabled:opacity-60 ${
+                      monitoringInterval === interval
+                        ? 'border-blue-600 bg-blue-50'
+                        : 'border-gray-200 hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className={`flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full border ${
+                      monitoringInterval === interval
+                        ? 'bg-blue-600 border-blue-600'
+                        : 'border-gray-300'
+                    }`}>
+                      {monitoringInterval === interval && <Check className="h-2.5 w-2.5 text-white" />}
+                    </div>
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-sm font-semibold text-gray-900 capitalize">
+                        {interval === 'daily' ? 'Daily' : interval === 'weekly' ? 'Weekly' : interval === 'monthly' ? 'Monthly' : 'Manual'}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {interval === 'daily' ? 'Every 24 hours' : interval === 'weekly' ? 'Every 7 days' : interval === 'monthly' ? 'Every 30 days' : 'Only when you run manually'}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Sidebar */}
@@ -748,6 +826,9 @@ export default function DashboardV2() {
               </select>
               <button onClick={handleReprocessPositions} disabled={reprocessLoading} className="p-1.5 text-slate-400 border border-slate-200 rounded-md hover:bg-slate-50 transition-colors disabled:opacity-50" title="Refresh and reprocess positions">
                 <RefreshCw className={`h-3.5 w-3.5 ${reprocessLoading ? "animate-spin" : ""}`} />
+              </button>
+              <button onClick={() => setShowMonitoringModal(true)} className="p-1.5 text-slate-400 border border-slate-200 rounded-md hover:bg-slate-50 transition-colors" title="Monitoring interval settings">
+                <Clock className="h-3.5 w-3.5" />
               </button>
               <button onClick={handleRunNow} disabled={runLoading} className="flex items-center gap-1.5 text-white px-3 py-1.5 rounded-md text-sm font-semibold transition-all shadow-sm disabled:opacity-70" style={{ backgroundColor: BRAND }}
                 title="Press R to run">
