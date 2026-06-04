@@ -596,6 +596,7 @@ export default function DashboardV2() {
       competitors: (data.competitors || []).map((c: any) => ({ name: c.name || c, url: c.url || "" })),
       prompts: (data.prompts || []).map((p: any) => p.text),
       selectedModels: (data.trackedModels || []).map((m: any) => m.model_slug),
+      monitoringInterval: data.monitoring_interval || "manual",
     })
     setShowSetup(true)
   }

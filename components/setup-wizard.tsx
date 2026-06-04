@@ -89,7 +89,7 @@ export function SetupWizard({ onComplete, onSaveExit, initialData }: SetupWizard
   const [promptCount, setPromptCount] = useState(5)
 
   // Step 3 — Monitoring Interval
-  const [monitoringInterval, setMonitoringInterval] = useState<'daily' | 'weekly' | 'monthly' | 'manual'>('manual')
+  const [monitoringInterval, setMonitoringInterval] = useState<'daily' | 'weekly' | 'monthly' | 'manual'>(initialData?.monitoringInterval || 'manual')
 
   // Step 4 — Models
   const [selectedModels, setSelectedModels] = useState<string[]>(initialData?.selectedModels || [])
@@ -514,11 +514,13 @@ export function SetupWizard({ onComplete, onSaveExit, initialData }: SetupWizard
         {error && <p className="px-6 pb-2 text-xs text-red-500">{error}</p>}
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50">
+        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50 gap-4">
           {step > 0
             ? <button onClick={() => setStep(s => s - 1)} className="text-sm text-gray-400 hover:text-gray-700 transition-colors">← Back</button>
             : <button onClick={onSaveExit} className="text-sm text-gray-400 hover:text-gray-700 transition-colors">Cancel</button>
           }
+
+          <div className="flex-1" />
 
           <div className="flex items-center gap-3">
             {initialData?.companyId && (
