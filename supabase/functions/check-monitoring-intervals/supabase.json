@@ -1,0 +1,8 @@
+{
+  "functions": [
+    {
+      "name": "check-monitoring-intervals",
+      "verify_jwt": false
+    }
+  ]
+}

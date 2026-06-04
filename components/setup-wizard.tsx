@@ -164,6 +164,42 @@ export function SetupWizard({ onComplete, onSaveExit, initialData }: SetupWizard
     }
   }
 
+  async function handleQuickSave() {
+    if (!user || !initialData?.companyId) return
+    setLoading(true)
+    setError("")
+    try {
+      const saveRes = await fetch('/api/save-company', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          companyId: initialData.companyId,
+          userId: user.id,
+          name: companyName,
+          url: websiteUrl,
+          description,
+          industry: vertical,
+          icpDescription: geography,
+          competitors: competitors.filter(c => c.name.trim()).map(c => c.name),
+          prompts,
+          monitoringInterval,
+          selectedModels: MODEL_GROUPS.flatMap(g => g.models)
+            .filter(m => selectedModels.includes(m.slug))
+            .map(m => ({ provider: m.provider, model: m.slug })),
+        }),
+      })
+      const saveText = await saveRes.text()
+      let saveData: any
+      try { saveData = JSON.parse(saveText) } catch { throw new Error(`Save failed (HTTP ${saveRes.status}): ${saveText.slice(0, 200)}`) }
+      if (!saveRes.ok) throw new Error(saveData.error || 'Failed to save company')
+      onSaveExit()
+    } catch (err: any) {
+      setError(err.message || "Something went wrong")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   async function handleSubmit() {
     if (!user) return
     if (prompts.length === 0) { setError("Add at least one prompt before starting tracking."); return }
@@ -483,14 +519,23 @@ export function SetupWizard({ onComplete, onSaveExit, initialData }: SetupWizard
             ? <button onClick={() => setStep(s => s - 1)} className="text-sm text-gray-400 hover:text-gray-700 transition-colors">← Back</button>
             : <button onClick={onSaveExit} className="text-sm text-gray-400 hover:text-gray-700 transition-colors">Cancel</button>
           }
-          {step < steps.length - 1
-            ? <button onClick={() => { if (step === 2 && customPrompt.trim()) { setPrompts(prev => prev.includes(customPrompt.trim()) ? prev : [...prev, customPrompt.trim()]); setCustomPrompt("") } setStep(s => s + 1) }} disabled={!canNext} className="flex items-center gap-2 rounded-lg bg-[#3B5BDB] px-5 py-2 text-sm font-semibold text-white hover:bg-[#3451c4] disabled:opacity-50 transition-colors">
-                Continue <ChevronRight className="h-4 w-4" />
+
+          <div className="flex items-center gap-3">
+            {initialData?.companyId && (
+              <button onClick={handleQuickSave} disabled={loading} className="rounded-lg border border-gray-300 bg-white px-5 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 disabled:opacity-50 transition-colors">
+                {loading ? "Saving…" : "Save"}
               </button>
-            : <button onClick={handleSubmit} disabled={loading || !canNext} className="flex items-center gap-2 rounded-lg bg-[#3B5BDB] px-5 py-2 text-sm font-semibold text-white hover:bg-[#3451c4] disabled:opacity-60 transition-colors">
-                {loading ? "Running first scan…" : "🚀 Start tracking"}
-              </button>
-          }
+            )}
+
+            {step < steps.length - 1
+              ? <button onClick={() => { if (step === 2 && customPrompt.trim()) { setPrompts(prev => prev.includes(customPrompt.trim()) ? prev : [...prev, customPrompt.trim()]); setCustomPrompt("") } setStep(s => s + 1) }} disabled={!canNext} className="flex items-center gap-2 rounded-lg bg-[#3B5BDB] px-5 py-2 text-sm font-semibold text-white hover:bg-[#3451c4] disabled:opacity-50 transition-colors">
+                  Continue <ChevronRight className="h-4 w-4" />
+                </button>
+              : <button onClick={handleSubmit} disabled={loading || !canNext} className="flex items-center gap-2 rounded-lg bg-[#3B5BDB] px-5 py-2 text-sm font-semibold text-white hover:bg-[#3451c4] disabled:opacity-60 transition-colors">
+                  {loading ? "Running first scan…" : "🚀 Start tracking"}
+                </button>
+            }
+          </div>
         </div>
       </div>
     </div>
