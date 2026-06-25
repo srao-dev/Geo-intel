@@ -1,3 +1,5 @@
+> Product name: **CiteIQ**. Internally built and tracked under the repo name "Geo-intel".
+
 # GEO Intel
 
 **The only GEO intelligence tool built specifically for enterprise automation and AI platform companies.**
